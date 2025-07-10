@@ -3,8 +3,10 @@ import {
   waitlistEntries, 
   roadmapTemplates, 
   customRoadmaps,
+  sessions,
   type User, 
   type InsertUser,
+  type UpsertUser,
   type WaitlistEntry,
   type InsertWaitlistEntry,
   type RoadmapTemplate,
@@ -12,11 +14,14 @@ import {
   type CustomRoadmap,
   type InsertCustomRoadmap
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  upsertUser(user: UpsertUser): Promise<User>;
   
   createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry>;
   getWaitlistEntries(): Promise<WaitlistEntry[]>;
@@ -27,14 +32,14 @@ export interface IStorage {
   
   createCustomRoadmap(roadmap: InsertCustomRoadmap): Promise<CustomRoadmap>;
   getCustomRoadmap(id: number): Promise<CustomRoadmap | undefined>;
+  getCustomRoadmapsByUser(userId: string): Promise<CustomRoadmap[]>;
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<number, User>;
+  private users: Map<string, User>;
   private waitlistEntries: Map<number, WaitlistEntry>;
   private roadmapTemplates: Map<string, RoadmapTemplate>;
   private customRoadmaps: Map<number, CustomRoadmap>;
-  private currentUserId: number;
   private currentWaitlistId: number;
   private currentTemplateId: number;
   private currentCustomRoadmapId: number;
@@ -44,7 +49,6 @@ export class MemStorage implements IStorage {
     this.waitlistEntries = new Map();
     this.roadmapTemplates = new Map();
     this.customRoadmaps = new Map();
-    this.currentUserId = 1;
     this.currentWaitlistId = 1;
     this.currentTemplateId = 1;
     this.currentCustomRoadmapId = 1;
@@ -178,20 +182,43 @@ export class MemStorage implements IStorage {
     });
   }
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
-      (user) => user.username === username,
+      (user) => user.email === email,
     );
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const user: User = { 
+      ...insertUser, 
+      email: insertUser.email || null,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      profileImageUrl: insertUser.profileImageUrl || null,
+      createdAt: new Date(), 
+      updatedAt: new Date() 
+    };
+    this.users.set(insertUser.id, user);
+    return user;
+  }
+
+  async upsertUser(insertUser: UpsertUser): Promise<User> {
+    const existingUser = this.users.get(insertUser.id);
+    const user: User = { 
+      ...existingUser,
+      ...insertUser,
+      email: insertUser.email || null,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      profileImageUrl: insertUser.profileImageUrl || null,
+      createdAt: existingUser?.createdAt || new Date(),
+      updatedAt: new Date() 
+    };
+    this.users.set(insertUser.id, user);
     return user;
   }
 
@@ -225,8 +252,10 @@ export class MemStorage implements IStorage {
     const id = this.currentCustomRoadmapId++;
     const customRoadmap: CustomRoadmap = { 
       ...roadmap, 
-      id, 
-      originalTemplateId: roadmap.originalTemplateId || null 
+      id,
+      originalTemplateId: roadmap.originalTemplateId || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.customRoadmaps.set(id, customRoadmap);
     return customRoadmap;
@@ -235,6 +264,103 @@ export class MemStorage implements IStorage {
   async getCustomRoadmap(id: number): Promise<CustomRoadmap | undefined> {
     return this.customRoadmaps.get(id);
   }
+
+  async getCustomRoadmapsByUser(userId: string): Promise<CustomRoadmap[]> {
+    return Array.from(this.customRoadmaps.values()).filter(
+      roadmap => roadmap.userId === userId
+    );
+  }
 }
 
-export const storage = new MemStorage();
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .returning();
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry> {
+    const [waitlistEntry] = await db
+      .insert(waitlistEntries)
+      .values(entry)
+      .returning();
+    return waitlistEntry;
+  }
+
+  async getWaitlistEntries(): Promise<WaitlistEntry[]> {
+    return await db.select().from(waitlistEntries);
+  }
+
+  async getRoadmapTemplate(key: string): Promise<RoadmapTemplate | undefined> {
+    const [template] = await db
+      .select()
+      .from(roadmapTemplates)
+      .where(eq(roadmapTemplates.key, key));
+    return template;
+  }
+
+  async getAllRoadmapTemplates(): Promise<RoadmapTemplate[]> {
+    return await db.select().from(roadmapTemplates);
+  }
+
+  async createRoadmapTemplate(template: InsertRoadmapTemplate): Promise<RoadmapTemplate> {
+    const [roadmapTemplate] = await db
+      .insert(roadmapTemplates)
+      .values(template)
+      .returning();
+    return roadmapTemplate;
+  }
+
+  async createCustomRoadmap(roadmap: InsertCustomRoadmap): Promise<CustomRoadmap> {
+    const [customRoadmap] = await db
+      .insert(customRoadmaps)
+      .values(roadmap)
+      .returning();
+    return customRoadmap;
+  }
+
+  async getCustomRoadmap(id: number): Promise<CustomRoadmap | undefined> {
+    const [roadmap] = await db
+      .select()
+      .from(customRoadmaps)
+      .where(eq(customRoadmaps.id, id));
+    return roadmap;
+  }
+
+  async getCustomRoadmapsByUser(userId: string): Promise<CustomRoadmap[]> {
+    return await db
+      .select()
+      .from(customRoadmaps)
+      .where(eq(customRoadmaps.userId, userId));
+  }
+}
+
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
