@@ -16,6 +16,11 @@ Preferred communication style: Simple, everyday language.
 ✓ Added dynamic roadmap generation API endpoint
 ✓ Updated color scheme to use gray tones instead of bright colors
 ✓ Streamlined hero section and removed complex features section
+✓ Fixed button text visibility issue in roadmap display section
+✓ Added comprehensive email collection functionality with modal
+✓ Expanded dropdown options for courses and roles (40+ options total)
+✓ Added manual entry option for custom courses and roles
+✓ Enhanced user flexibility in career path selection
 
 ## System Architecture
 

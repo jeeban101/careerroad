@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { List, Clock, Wrench, CheckCircle } from "lucide-react";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
@@ -18,13 +19,20 @@ interface RoadmapBuilderProps {
 interface FormData {
   currentCourse: string;
   targetRole: string;
+  customCourse?: string;
+  customRole?: string;
 }
 
 export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderProps) {
+  const [showCustomCourse, setShowCustomCourse] = useState(false);
+  const [showCustomRole, setShowCustomRole] = useState(false);
+  
   const form = useForm<FormData>({
     defaultValues: {
       currentCourse: "",
-      targetRole: ""
+      targetRole: "",
+      customCourse: "",
+      customRole: ""
     }
   });
 
@@ -47,10 +55,17 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
   });
 
   const onSubmit = async (data: FormData) => {
-    if (!data.currentCourse || !data.targetRole) {
+    const currentCourse = data.currentCourse === 'custom' ? data.customCourse : data.currentCourse;
+    const targetRole = data.targetRole === 'custom' ? data.customRole : data.targetRole;
+    
+    if (!currentCourse || !targetRole) {
       return;
     }
-    generateMutation.mutate(data);
+    
+    generateMutation.mutate({
+      currentCourse: currentCourse || '',
+      targetRole: targetRole || ''
+    });
   };
 
   return (
@@ -69,7 +84,10 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                   name="currentCourse"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        setShowCustomCourse(value === 'custom');
+                      }} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="h-14 text-lg bg-white border-2 border-gray-200 rounded-lg">
                             <SelectValue placeholder="Current course" />
@@ -83,6 +101,23 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                           ))}
                         </SelectContent>
                       </Select>
+                      {showCustomCourse && (
+                        <FormField
+                          control={form.control}
+                          name="customCourse"
+                          render={({ field }) => (
+                            <FormItem className="mt-2">
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter your course name"
+                                  {...field}
+                                  className="h-12 text-lg bg-white border-2 border-gray-200 rounded-lg"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </FormItem>
                   )}
                 />
@@ -91,7 +126,10 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                   name="targetRole"
                   render={({ field }) => (
                     <FormItem>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={(value) => {
+                        field.onChange(value);
+                        setShowCustomRole(value === 'custom');
+                      }} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="h-14 text-lg bg-white border-2 border-gray-200 rounded-lg">
                             <SelectValue placeholder="Desired role" />
@@ -105,6 +143,23 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                           ))}
                         </SelectContent>
                       </Select>
+                      {showCustomRole && (
+                        <FormField
+                          control={form.control}
+                          name="customRole"
+                          render={({ field }) => (
+                            <FormItem className="mt-2">
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter your desired role"
+                                  {...field}
+                                  className="h-12 text-lg bg-white border-2 border-gray-200 rounded-lg"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </FormItem>
                   )}
                 />
