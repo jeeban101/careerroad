@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Header from "@/components/header";
 import HeroSection from "@/components/hero-section";
-import FeaturesSection from "@/components/features-section";
 import RoadmapBuilder from "@/components/roadmap-builder";
 import RoadmapDisplay from "@/components/roadmap-display";
 import WaitlistSection from "@/components/waitlist-section";
@@ -36,24 +35,27 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      <HeroSection />
-      <FeaturesSection />
-      <RoadmapBuilder onRoadmapGenerated={handleRoadmapGenerated} />
-      {selectedRoadmap && (
-        <RoadmapDisplay 
-          roadmap={selectedRoadmap} 
-          onFork={handleForkRoadmap}
-          onShare={handleShareRoadmap}
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col">
+        <Header />
+        <main className="flex-1 flex flex-col justify-center items-center px-4 py-8">
+          <HeroSection />
+          <RoadmapBuilder onRoadmapGenerated={handleRoadmapGenerated} />
+          {selectedRoadmap && (
+            <RoadmapDisplay 
+              roadmap={selectedRoadmap} 
+              onFork={handleForkRoadmap}
+              onShare={handleShareRoadmap}
+            />
+          )}
+          <WaitlistSection />
+        </main>
+        <Footer />
+        <CustomizationModal 
+          isOpen={showCustomization} 
+          onClose={() => setShowCustomization(false)}
+          roadmap={selectedRoadmap}
         />
-      )}
-      <WaitlistSection />
-      <Footer />
-      <CustomizationModal 
-        isOpen={showCustomization} 
-        onClose={() => setShowCustomization(false)}
-        roadmap={selectedRoadmap}
-      />
+      </div>
     </div>
   );
 }

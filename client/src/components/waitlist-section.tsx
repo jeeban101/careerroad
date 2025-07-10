@@ -58,65 +58,26 @@ export default function WaitlistSection() {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Get Early Access</h2>
-          <p className="text-xl text-gray-300">
-            Join 1000+ students who are already planning their career journey
-          </p>
-        </div>
-        
-        <Card className="shadow-2xl">
-          <CardContent className="p-8 text-gray-900">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="Enter your full name"
-                            className="border-gray-300 focus:ring-2 focus:ring-[hsl(var(--brand-indigo))] focus:border-transparent"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            type="email"
-                            placeholder="Enter your email"
-                            className="border-gray-300 focus:ring-2 focus:ring-[hsl(var(--brand-indigo))] focus:border-transparent"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
+    <section className="w-full max-w-4xl mx-auto mb-12">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Get Early Access</h2>
+      </div>
+      
+      <Card className="shadow-lg">
+        <CardContent className="p-8">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
-                  name="college"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>College/University</FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Enter your college name"
-                          className="border-gray-300 focus:ring-2 focus:ring-[hsl(var(--brand-indigo))] focus:border-transparent"
+                          placeholder="Name"
+                          className="h-14 text-lg bg-white border-2 border-gray-200 rounded-lg"
                         />
                       </FormControl>
                     </FormItem>
@@ -124,64 +85,53 @@ export default function WaitlistSection() {
                 />
                 <FormField
                   control={form.control}
-                  name="confusion"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>What career are you most confused about?</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Input 
                           {...field} 
-                          rows={3}
-                          placeholder="Tell us what you're struggling with..."
-                          className="border-gray-300 focus:ring-2 focus:ring-[hsl(var(--brand-indigo))] focus:border-transparent"
+                          type="email"
+                          placeholder="Email"
+                          className="h-14 text-lg bg-white border-2 border-gray-200 rounded-lg"
                         />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <div className="pt-4">
-                  <Button 
-                    type="submit" 
-                    className={`w-full py-4 px-6 text-lg font-semibold ${
-                      isSubmitted 
-                        ? 'bg-[hsl(var(--brand-emerald))] hover:bg-[hsl(var(--brand-emerald))]' 
-                        : 'bg-[hsl(var(--brand-indigo))] hover:bg-[hsl(var(--brand-indigo))]/90'
-                    }`}
-                    disabled={mutation.isPending || isSubmitted}
-                  >
-                    {mutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        Joining...
-                      </>
-                    ) : isSubmitted ? (
-                      <>
-                        <Check className="mr-2 h-5 w-5" />
-                        Welcome to CareerRoad!
-                      </>
-                    ) : (
-                      <>
-                        <Rocket className="mr-2 h-5 w-5" />
-                        Join Waitlist
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-        
-        {/* Social Proof */}
-        <div className="mt-12 text-center">
-          <p className="text-gray-400 mb-6">Trusted by students from</p>
-          <div className="flex justify-center space-x-8 opacity-60">
-            {colleges.map(college => (
-              <span key={college} className="text-lg font-medium">{college}</span>
-            ))}
-          </div>
-        </div>
-      </div>
+              </div>
+              <div className="pt-4">
+                <Button 
+                  type="submit" 
+                  className={`w-full py-4 px-6 text-lg font-semibold h-14 rounded-lg ${
+                    isSubmitted 
+                      ? 'bg-green-600 hover:bg-green-600' 
+                      : 'bg-gray-800 hover:bg-gray-700'
+                  }`}
+                  disabled={mutation.isPending || isSubmitted}
+                >
+                  {mutation.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Joining...
+                    </>
+                  ) : isSubmitted ? (
+                    <>
+                      <Check className="mr-2 h-5 w-5" />
+                      Welcome to CareerRoad!
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="mr-2 h-5 w-5" />
+                      Join Waitlist
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </section>
   );
 }

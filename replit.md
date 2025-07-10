@@ -2,11 +2,20 @@
 
 ## Overview
 
-CareerRoad is a full-stack web application that helps students and early graduates navigate their career paths by providing personalized, step-by-step roadmaps from their current education to their dream roles. The application generates structured career guidance based on the user's current course (e.g., B.Com, B.Tech) and target career role (e.g., Product Manager, Data Analyst).
+CareerRoad is a full-stack web application that helps students and early graduates navigate their career paths by providing personalized, step-by-step roadmaps from their current education to their dream roles. The application now uses AI-powered roadmap generation with Google's Gemini 2.5 Flash model, providing more dynamic and personalized career guidance.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Recent Changes (July 10, 2025)
+
+✓ Redesigned landing page to match minimalist design requirements
+✓ Implemented AI-powered roadmap generation using Gemini 2.5 Flash
+✓ Simplified UI layout with clean, centered design
+✓ Added dynamic roadmap generation API endpoint
+✓ Updated color scheme to use gray tones instead of bright colors
+✓ Streamlined hero section and removed complex features section
 
 ## System Architecture
 
@@ -43,22 +52,24 @@ Preferred communication style: Simple, everyday language.
 ### API Endpoints
 - `GET /api/roadmap-templates` - Retrieve all available roadmap templates
 - `GET /api/roadmap-templates/:key` - Get specific roadmap template
+- `POST /api/generate-roadmap` - Generate AI-powered roadmap using Gemini
 - `POST /api/waitlist` - Create waitlist entry
 - `GET /api/waitlist` - Retrieve waitlist entries
 - `POST /api/custom-roadmaps` - Create customized roadmap
 
 ### Core Features
 1. **Goal Selector Form**: Users select current course and target role
-2. **Static Roadmap Templates**: Pre-written roadmaps stored in database
-3. **Roadmap Display**: Timeline view with phases, skills, tools, and tasks
-4. **Customization Modal**: Users can fork and modify roadmap templates
-5. **Waitlist System**: Early user registration and feedback collection
+2. **AI-Powered Roadmap Generation**: Dynamic roadmaps created using Gemini 2.5 Flash
+3. **Static Roadmap Templates**: Pre-written roadmaps stored in database as fallback
+4. **Roadmap Display**: Timeline view with phases, skills, tools, and tasks
+5. **Customization Modal**: Users can fork and modify roadmap templates
+6. **Waitlist System**: Simplified user registration system
 
 ## Data Flow
 
 1. **User Input**: User selects current course and target career role
-2. **Template Matching**: System generates roadmap key from user selections
-3. **Database Query**: Fetch corresponding roadmap template from database
+2. **AI Generation**: System uses Gemini 2.5 Flash to generate personalized roadmap
+3. **Template Fallback**: Falls back to static templates if AI generation fails
 4. **Roadmap Rendering**: Display structured roadmap with phases and items
 5. **Customization**: Users can fork roadmaps and create custom versions
 6. **Persistence**: Custom roadmaps saved to database with user modifications
@@ -75,6 +86,7 @@ Preferred communication style: Simple, everyday language.
 - Express.js for server framework
 - Drizzle ORM for database operations
 - Neon Database for PostgreSQL hosting
+- Google Gemini AI (@google/genai) for roadmap generation
 - Development tools (tsx, esbuild, Vite)
 
 ### Development Tools

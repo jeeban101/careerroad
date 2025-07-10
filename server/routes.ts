@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertWaitlistEntrySchema, insertCustomRoadmapSchema } from "@shared/schema";
+import { generateRoadmap } from "./gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -79,6 +80,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(roadmap);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch custom roadmap" });
+    }
+  });
+
+  // Generate AI-powered roadmap
+  app.post("/api/generate-roadmap", async (req, res) => {
+    try {
+      const { currentCourse, targetRole } = req.body;
+      
+      if (!currentCourse || !targetRole) {
+        return res.status(400).json({ message: "Current course and target role are required" });
+      }
+
+      const phases = await generateRoadmap(currentCourse, targetRole);
+      
+      // Create a temporary roadmap template
+      const roadmapTemplate = {
+        id: Date.now(), // Temporary ID
+        key: `ai_${currentCourse}_${targetRole}_${Date.now()}`,
+        title: `${currentCourse} → ${targetRole} (AI Generated)`,
+        currentCourse,
+        targetRole,
+        phases
+      };
+
+      res.json(roadmapTemplate);
+    } catch (error) {
+      console.error("Failed to generate roadmap:", error);
+      res.status(500).json({ message: "Failed to generate roadmap" });
     }
   });
 

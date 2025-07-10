@@ -197,7 +197,7 @@ export class MemStorage implements IStorage {
 
   async createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry> {
     const id = this.currentWaitlistId++;
-    const waitlistEntry: WaitlistEntry = { ...entry, id };
+    const waitlistEntry: WaitlistEntry = { ...entry, id, confusion: entry.confusion || null };
     this.waitlistEntries.set(id, waitlistEntry);
     return waitlistEntry;
   }
@@ -223,7 +223,11 @@ export class MemStorage implements IStorage {
 
   async createCustomRoadmap(roadmap: InsertCustomRoadmap): Promise<CustomRoadmap> {
     const id = this.currentCustomRoadmapId++;
-    const customRoadmap: CustomRoadmap = { ...roadmap, id };
+    const customRoadmap: CustomRoadmap = { 
+      ...roadmap, 
+      id, 
+      originalTemplateId: roadmap.originalTemplateId || null 
+    };
     this.customRoadmaps.set(id, customRoadmap);
     return customRoadmap;
   }
