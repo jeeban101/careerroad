@@ -25,8 +25,10 @@ export default function Home() {
     setShowEmailModal(true);
   };
 
+  const { logoutMutation } = useAuth();
+  
   const handleLogout = () => {
-    window.location.href = '/api/logout';
+    logoutMutation.mutate();
   };
 
   return (

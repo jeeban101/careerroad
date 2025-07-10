@@ -13,13 +13,26 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// Users table for Replit Auth
+// Users table for simple email/password auth
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 255 }).unique().notNull(),
+  email: varchar("email", { length: 255 }).unique().notNull(),
+  password: varchar("password", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 255 }),
+  lastName: varchar("last_name", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Saved roadmaps for users
+export const savedRoadmaps = pgTable("saved_roadmaps", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  currentCourse: varchar("current_course", { length: 255 }).notNull(),
+  targetRole: varchar("target_role", { length: 255 }).notNull(),
+  phases: jsonb("phases").notNull().$type<RoadmapPhase[]>(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -43,7 +56,7 @@ export const roadmapTemplates = pgTable("roadmap_templates", {
 
 export const customRoadmaps = pgTable("custom_roadmaps", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
   originalTemplateId: integer("original_template_id").references(() => roadmapTemplates.id),
   title: text("title").notNull(),
   phases: jsonb("phases").notNull(),
@@ -52,22 +65,20 @@ export const customRoadmaps = pgTable("custom_roadmaps", {
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
-  id: true,
+  username: true,
   email: true,
+  password: true,
   firstName: true,
   lastName: true,
-  profileImageUrl: true,
 });
 
-export const upsertUserSchema = createInsertSchema(users).pick({
-  id: true,
-  email: true,
-  firstName: true,
-  lastName: true,
-  profileImageUrl: true,
+export const insertSavedRoadmapSchema = createInsertSchema(savedRoadmaps).pick({
+  userId: true,
+  title: true,
+  currentCourse: true,
+  targetRole: true,
+  phases: true,
 });
-
-export type UpsertUser = z.infer<typeof upsertUserSchema>;
 
 export const insertWaitlistEntrySchema = createInsertSchema(waitlistEntries).pick({
   name: true,
@@ -93,6 +104,8 @@ export const insertCustomRoadmapSchema = createInsertSchema(customRoadmaps).pick
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type InsertSavedRoadmap = z.infer<typeof insertSavedRoadmapSchema>;
+export type SavedRoadmap = typeof savedRoadmaps.$inferSelect;
 export type InsertWaitlistEntry = z.infer<typeof insertWaitlistEntrySchema>;
 export type WaitlistEntry = typeof waitlistEntries.$inferSelect;
 export type InsertRoadmapTemplate = z.infer<typeof insertRoadmapTemplateSchema>;

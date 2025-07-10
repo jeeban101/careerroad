@@ -1,8 +1,15 @@
 import { Route } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function Header() {
+  const [, setLocation] = useLocation();
+
+  const handleSignIn = () => {
+    setLocation('/auth');
+  };
+
   return (
     <header className="w-full bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,7 +24,10 @@ export default function Header() {
             <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800">
               <HelpCircle className="h-4 w-4" />
             </Button>
-            <Button className="bg-gray-800 hover:bg-gray-700 text-white">
+            <Button 
+              onClick={handleSignIn}
+              className="bg-gray-800 hover:bg-gray-700 text-white"
+            >
               Sign In
             </Button>
           </div>

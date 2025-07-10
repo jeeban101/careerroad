@@ -1,20 +1,26 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, emailRequestSchema } from "@shared/schema";
+import { setupAuth } from "./auth";
+import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema } from "@shared/schema";
 import { generateRoadmap } from "./gemini";
+
+function isAuthenticated(req: any, res: any, next: any) {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  next();
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
-  await setupAuth(app);
+  setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // User info route
+  app.get('/api/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const user = req.user;
+      res.json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -123,6 +129,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to generate roadmap:", error);
       res.status(500).json({ message: "Failed to generate roadmap" });
+    }
+  });
+
+  // Save roadmap for authenticated user
+  app.post("/api/saved-roadmaps", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const validation = insertSavedRoadmapSchema.safeParse({
+        ...req.body,
+        userId: user.id
+      });
+      
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid saved roadmap data" });
+      }
+      
+      const savedRoadmap = await storage.createSavedRoadmap(validation.data);
+      res.json(savedRoadmap);
+    } catch (error) {
+      console.error("Failed to save roadmap:", error);
+      res.status(500).json({ message: "Failed to save roadmap" });
+    }
+  });
+
+  // Get user's saved roadmaps
+  app.get("/api/saved-roadmaps", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const savedRoadmaps = await storage.getSavedRoadmapsByUser(user.id);
+      res.json(savedRoadmaps);
+    } catch (error) {
+      console.error("Failed to fetch saved roadmaps:", error);
+      res.status(500).json({ message: "Failed to fetch saved roadmaps" });
+    }
+  });
+
+  // Delete saved roadmap
+  app.delete("/api/saved-roadmaps/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const roadmapId = parseInt(req.params.id);
+      
+      await storage.deleteSavedRoadmap(roadmapId, user.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Failed to delete saved roadmap:", error);
+      res.status(500).json({ message: "Failed to delete saved roadmap" });
     }
   });
 

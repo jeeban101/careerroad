@@ -3,25 +3,26 @@ import {
   waitlistEntries, 
   roadmapTemplates, 
   customRoadmaps,
+  savedRoadmaps,
   sessions,
   type User, 
   type InsertUser,
-  type UpsertUser,
   type WaitlistEntry,
   type InsertWaitlistEntry,
   type RoadmapTemplate,
   type InsertRoadmapTemplate,
   type CustomRoadmap,
-  type InsertCustomRoadmap
+  type InsertCustomRoadmap,
+  type SavedRoadmap,
+  type InsertSavedRoadmap
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
+  getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  upsertUser(user: UpsertUser): Promise<User>;
   
   createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry>;
   getWaitlistEntries(): Promise<WaitlistEntry[]>;
@@ -32,26 +33,36 @@ export interface IStorage {
   
   createCustomRoadmap(roadmap: InsertCustomRoadmap): Promise<CustomRoadmap>;
   getCustomRoadmap(id: number): Promise<CustomRoadmap | undefined>;
-  getCustomRoadmapsByUser(userId: string): Promise<CustomRoadmap[]>;
+  getCustomRoadmapsByUser(userId: number): Promise<CustomRoadmap[]>;
+  
+  createSavedRoadmap(roadmap: InsertSavedRoadmap): Promise<SavedRoadmap>;
+  getSavedRoadmapsByUser(userId: number): Promise<SavedRoadmap[]>;
+  deleteSavedRoadmap(id: number, userId: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
+  private users: Map<number, User>;
   private waitlistEntries: Map<number, WaitlistEntry>;
   private roadmapTemplates: Map<string, RoadmapTemplate>;
   private customRoadmaps: Map<number, CustomRoadmap>;
+  private savedRoadmaps: Map<number, SavedRoadmap>;
+  private currentUserId: number;
   private currentWaitlistId: number;
   private currentTemplateId: number;
   private currentCustomRoadmapId: number;
+  private currentSavedRoadmapId: number;
 
   constructor() {
     this.users = new Map();
     this.waitlistEntries = new Map();
     this.roadmapTemplates = new Map();
     this.customRoadmaps = new Map();
+    this.savedRoadmaps = new Map();
+    this.currentUserId = 1;
     this.currentWaitlistId = 1;
     this.currentTemplateId = 1;
     this.currentCustomRoadmapId = 1;
+    this.currentSavedRoadmapId = 1;
     
     // Initialize with sample roadmap templates
     this.initializeRoadmapTemplates();
@@ -182,7 +193,7 @@ export class MemStorage implements IStorage {
     });
   }
 
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }
 
@@ -193,32 +204,16 @@ export class MemStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    const id = this.currentUserId++;
     const user: User = { 
       ...insertUser, 
-      email: insertUser.email || null,
+      id,
       firstName: insertUser.firstName || null,
       lastName: insertUser.lastName || null,
-      profileImageUrl: insertUser.profileImageUrl || null,
       createdAt: new Date(), 
       updatedAt: new Date() 
     };
-    this.users.set(insertUser.id, user);
-    return user;
-  }
-
-  async upsertUser(insertUser: UpsertUser): Promise<User> {
-    const existingUser = this.users.get(insertUser.id);
-    const user: User = { 
-      ...existingUser,
-      ...insertUser,
-      email: insertUser.email || null,
-      firstName: insertUser.firstName || null,
-      lastName: insertUser.lastName || null,
-      profileImageUrl: insertUser.profileImageUrl || null,
-      createdAt: existingUser?.createdAt || new Date(),
-      updatedAt: new Date() 
-    };
-    this.users.set(insertUser.id, user);
+    this.users.set(id, user);
     return user;
   }
 
@@ -265,16 +260,41 @@ export class MemStorage implements IStorage {
     return this.customRoadmaps.get(id);
   }
 
-  async getCustomRoadmapsByUser(userId: string): Promise<CustomRoadmap[]> {
+  async getCustomRoadmapsByUser(userId: number): Promise<CustomRoadmap[]> {
     return Array.from(this.customRoadmaps.values()).filter(
       roadmap => roadmap.userId === userId
     );
+  }
+
+  async createSavedRoadmap(roadmap: InsertSavedRoadmap): Promise<SavedRoadmap> {
+    const id = this.currentSavedRoadmapId++;
+    const savedRoadmap: SavedRoadmap = { 
+      ...roadmap, 
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.savedRoadmaps.set(id, savedRoadmap);
+    return savedRoadmap;
+  }
+
+  async getSavedRoadmapsByUser(userId: number): Promise<SavedRoadmap[]> {
+    return Array.from(this.savedRoadmaps.values()).filter(
+      roadmap => roadmap.userId === userId
+    );
+  }
+
+  async deleteSavedRoadmap(id: number, userId: number): Promise<void> {
+    const roadmap = this.savedRoadmaps.get(id);
+    if (roadmap && roadmap.userId === userId) {
+      this.savedRoadmaps.delete(id);
+    }
   }
 }
 
 // Database storage implementation
 export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
@@ -288,21 +308,6 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .insert(users)
       .values(userData)
-      .returning();
-    return user;
-  }
-
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
       .returning();
     return user;
   }
@@ -355,12 +360,33 @@ export class DatabaseStorage implements IStorage {
     return roadmap;
   }
 
-  async getCustomRoadmapsByUser(userId: string): Promise<CustomRoadmap[]> {
+  async getCustomRoadmapsByUser(userId: number): Promise<CustomRoadmap[]> {
     return await db
       .select()
       .from(customRoadmaps)
       .where(eq(customRoadmaps.userId, userId));
   }
+
+  async createSavedRoadmap(roadmap: InsertSavedRoadmap): Promise<SavedRoadmap> {
+    const [savedRoadmap] = await db
+      .insert(savedRoadmaps)
+      .values(roadmap)
+      .returning();
+    return savedRoadmap;
+  }
+
+  async getSavedRoadmapsByUser(userId: number): Promise<SavedRoadmap[]> {
+    return await db
+      .select()
+      .from(savedRoadmaps)
+      .where(eq(savedRoadmaps.userId, userId));
+  }
+
+  async deleteSavedRoadmap(id: number, userId: number): Promise<void> {
+    await db
+      .delete(savedRoadmaps)
+      .where(and(eq(savedRoadmaps.id, id), eq(savedRoadmaps.userId, userId)));
+  }
 }
 
-export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+export const storage = new MemStorage();

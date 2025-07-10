@@ -4,9 +4,13 @@ import FeaturesSection from '@/components/features-section';
 import WaitlistSection from '@/components/waitlist-section';
 import Footer from '@/components/footer';
 
+import { useLocation } from "wouter";
+
 export default function Landing() {
+  const [, setLocation] = useLocation();
+  
   const handleGetStarted = () => {
-    window.location.href = '/api/login';
+    setLocation('/auth');
   };
 
   return (
