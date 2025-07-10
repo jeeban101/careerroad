@@ -59,6 +59,10 @@ const getPhaseColor = (index: number) => {
 export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisplayProps) {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
 
+  // Debug log to see what we're getting
+  console.log('Roadmap data:', roadmap);
+  console.log('Roadmap phases:', roadmap.phases);
+
   const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
   const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
 

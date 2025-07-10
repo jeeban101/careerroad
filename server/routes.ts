@@ -94,6 +94,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const phases = await generateRoadmap(currentCourse, targetRole);
       
+      console.log('Generated phases from Gemini:', JSON.stringify(phases, null, 2));
+      
       // Create a temporary roadmap template
       const roadmapTemplate = {
         id: Date.now(), // Temporary ID
@@ -104,6 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         phases
       };
 
+      console.log('Roadmap template being sent:', JSON.stringify(roadmapTemplate, null, 2));
       res.json(roadmapTemplate);
     } catch (error) {
       console.error("Failed to generate roadmap:", error);
