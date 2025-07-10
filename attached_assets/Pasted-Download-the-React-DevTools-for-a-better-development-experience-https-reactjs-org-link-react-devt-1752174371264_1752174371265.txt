@@ -1,0 +1,44 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+content-script.js:22 Document already loaded, running initialization immediately
+content-script.js:4 Attempting to initialize AdUnit
+content-script.js:6 AdUnit initialized successfully
+2roadmap-display.tsx:76 Uncaught TypeError: Cannot read properties of undefined (reading 'reduce')
+    at RoadmapDisplay (roadmap-display.tsx:76:37)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=ea405915:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=ea405915:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=ea405915:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=ea405915:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=ea405915:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=ea405915:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=ea405915:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=ea405915:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=ea405915:19137:13)Understand this error
+chunk-RPCDYKBN.js?v=ea405915:14032 The above error occurred in the <RoadmapDisplay> component:
+
+    at RoadmapDisplay (https://a824794a-781d-41a7-a4e2-f83fae7fc0c4-00-22p70ka9mz8yw.picard.replit.dev/src/components/roadmap-display.tsx:64:42)
+    at main
+    at div
+    at div
+    at Home (https://a824794a-781d-41a7-a4e2-f83fae7fc0c4-00-22p70ka9mz8yw.picard.replit.dev/src/pages/home.tsx:28:49)
+    at Route (https://a824794a-781d-41a7-a4e2-f83fae7fc0c4-00-22p70ka9mz8yw.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ea405915:323:16)
+    at Switch (https://a824794a-781d-41a7-a4e2-f83fae7fc0c4-00-22p70ka9mz8yw.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ea405915:379:17)
+    at Router
+    at Provider (https://a824794a-781d-41a7-a4e2-f83fae7fc0c4-00-22p70ka9mz8yw.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=ea405915:38:15)
+    at TooltipProvider (https://a824794a-781d-41a7-a4e2-f83fae7fc0c4-00-22p70ka9mz8yw.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=ea405915:61:5)
+    at QueryClientProvider (https://a824794a-781d-41a7-a4e2-f83fae7fc0c4-00-22p70ka9mz8yw.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=ea405915:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-RPCDYKBN.js?v=ea405915:14032Understand this error
+chunk-RPCDYKBN.js?v=ea405915:19413 Uncaught TypeError: Cannot read properties of undefined (reading 'reduce')
+    at RoadmapDisplay (roadmap-display.tsx:76:37)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=ea405915:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=ea405915:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=ea405915:15914:22)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=ea405915:19753:22)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=ea405915:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=ea405915:19137:13)
+    at renderRootSync (chunk-RPCDYKBN.js?v=ea405915:19116:15)
+    at recoverFromConcurrentError (chunk-RPCDYKBN.js?v=ea405915:18736:28)
+    at performConcurrentWorkOnRoot (chunk-RPCDYKBN.js?v=ea405915:18684:30)Understand this error

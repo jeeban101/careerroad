@@ -73,7 +73,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
     setCheckedItems(newCheckedItems);
   };
 
-  const totalWeeks = roadmap.phases.reduce((sum, phase) => sum + phase.duration_weeks, 0);
+  const totalWeeks = roadmap.phases?.reduce((sum, phase) => sum + phase.duration_weeks, 0) || 0;
 
   return (
     <section id="roadmap-display" className="py-20 bg-white">
@@ -106,70 +106,78 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
           {/* Timeline Line */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300"></div>
           
-          {roadmap.phases.map((phase, phaseIndex) => {
-            const PhaseIcon = getPhaseIcon(phaseIndex);
-            const phaseColor = getPhaseColor(phaseIndex);
-            
-            return (
-              <div key={phaseIndex} className="mb-12 relative">
-                <div className="flex items-start">
-                  <div className={`flex-shrink-0 w-16 h-16 ${phaseColor} rounded-full flex items-center justify-center relative z-10`}>
-                    <PhaseIcon className="text-white text-xl" size={24} />
-                  </div>
-                  <Card className="ml-8 flex-1 border border-gray-200">
-                    <CardContent className="p-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-gray-900">
-                          Phase {phaseIndex + 1}: {phase.title}
-                        </h3>
-                        <span className={`${phaseColor} text-white px-3 py-1 rounded-full text-sm font-medium`}>
-                          {phase.duration_weeks} weeks
-                        </span>
-                      </div>
-                      <div className="space-y-4">
-                        {phase.items.map((item, itemIndex) => {
-                          const ItemIcon = getItemIcon(item.type);
-                          const itemColor = getItemColor(item.type);
-                          const itemKey = `${phaseIndex}-${itemIndex}`;
-                          const isChecked = checkedItems.has(itemKey);
-                          
-                          return (
-                            <div key={itemIndex} className={`flex items-start p-4 ${itemColor} rounded-lg border ${isChecked ? 'opacity-75' : ''}`}>
-                              <Checkbox
-                                checked={isChecked}
-                                onCheckedChange={(checked) => handleItemCheck(phaseIndex, itemIndex, checked as boolean)}
-                                className="mt-1 mr-4"
-                              />
-                              <div className="flex-1">
-                                <div className="flex items-center mb-2">
-                                  <ItemIcon className={`mr-2 ${getItemColor(item.type).split(' ')[2]}`} size={16} />
-                                  <span className="font-medium capitalize">{item.type}</span>
+          {!roadmap.phases || roadmap.phases.length === 0 ? (
+            <Card className="border border-gray-200">
+              <CardContent className="p-8 text-center">
+                <p className="text-gray-500">No roadmap phases available. Please try generating a new roadmap.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            roadmap.phases.map((phase, phaseIndex) => {
+              const PhaseIcon = getPhaseIcon(phaseIndex);
+              const phaseColor = getPhaseColor(phaseIndex);
+              
+              return (
+                <div key={phaseIndex} className="mb-12 relative">
+                  <div className="flex items-start">
+                    <div className={`flex-shrink-0 w-16 h-16 ${phaseColor} rounded-full flex items-center justify-center relative z-10`}>
+                      <PhaseIcon className="text-white text-xl" size={24} />
+                    </div>
+                    <Card className="ml-8 flex-1 border border-gray-200">
+                      <CardContent className="p-8">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-2xl font-bold text-gray-900">
+                            Phase {phaseIndex + 1}: {phase.title}
+                          </h3>
+                          <span className={`${phaseColor} text-white px-3 py-1 rounded-full text-sm font-medium`}>
+                            {phase.duration_weeks} weeks
+                          </span>
+                        </div>
+                        <div className="space-y-4">
+                          {phase.items.map((item, itemIndex) => {
+                            const ItemIcon = getItemIcon(item.type);
+                            const itemColor = getItemColor(item.type);
+                            const itemKey = `${phaseIndex}-${itemIndex}`;
+                            const isChecked = checkedItems.has(itemKey);
+                            
+                            return (
+                              <div key={itemIndex} className={`flex items-start p-4 ${itemColor} rounded-lg border ${isChecked ? 'opacity-75' : ''}`}>
+                                <Checkbox
+                                  checked={isChecked}
+                                  onCheckedChange={(checked) => handleItemCheck(phaseIndex, itemIndex, checked as boolean)}
+                                  className="mt-1 mr-4"
+                                />
+                                <div className="flex-1">
+                                  <div className="flex items-center mb-2">
+                                    <ItemIcon className={`mr-2 ${getItemColor(item.type).split(' ')[2]}`} size={16} />
+                                    <span className="font-medium capitalize">{item.type}</span>
+                                  </div>
+                                  <p className="text-gray-700">{item.label}</p>
+                                  {item.description && (
+                                    <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+                                  )}
+                                  {item.link && (
+                                    <a 
+                                      href={item.link} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className={`${getItemColor(item.type).split(' ')[2]} hover:underline text-sm`}
+                                    >
+                                      View Resource →
+                                    </a>
+                                  )}
                                 </div>
-                                <p className="text-gray-700">{item.label}</p>
-                                {item.description && (
-                                  <p className="text-sm text-gray-500 mt-1">{item.description}</p>
-                                )}
-                                {item.link && (
-                                  <a 
-                                    href={item.link} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className={`${getItemColor(item.type).split(' ')[2]} hover:underline text-sm`}
-                                  >
-                                    View Resource →
-                                  </a>
-                                )}
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
         {/* Progress Summary */}
