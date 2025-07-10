@@ -81,3 +81,13 @@ export interface RoadmapItem {
   link?: string;
   description?: string;
 }
+
+// Email schemas
+export const emailRequestSchema = z.object({
+  email: z.string().email(),
+  name: z.string().optional(),
+  roadmapId: z.number(),
+  roadmapTitle: z.string(),
+});
+
+export type EmailRequest = z.infer<typeof emailRequestSchema>;

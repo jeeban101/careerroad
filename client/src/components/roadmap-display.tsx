@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users } from "lucide-react";
 import { RoadmapTemplate, RoadmapItem } from "@shared/schema";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
+import EmailModal from "@/components/email-modal";
 
 interface RoadmapDisplayProps {
   roadmap: RoadmapTemplate;
@@ -58,6 +59,7 @@ const getPhaseColor = (index: number) => {
 
 export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisplayProps) {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
   const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
@@ -259,21 +261,24 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
               </div>
               
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button className="bg-white text-indigo-600 px-8 py-4 font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 rounded-xl shadow-lg">
+                <Button 
+                  onClick={() => window.open('mailto:', '_blank')}
+                  className="bg-white text-indigo-600 px-8 py-4 font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 rounded-xl shadow-lg"
+                >
                   <div className="flex items-center space-x-2">
                     <div className="w-5 h-5 bg-indigo-600 rounded-full animate-pulse"></div>
                     <span>Start Your Journey</span>
                   </div>
                 </Button>
                 <Button 
-                  variant="outline" 
-                  className="border-2 border-white text-white px-8 py-4 font-bold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-300 transform hover:scale-105 rounded-xl"
+                  onClick={() => setShowEmailModal(true)}
+                  className="bg-white/20 backdrop-blur-sm border-2 border-white/50 text-white px-8 py-4 font-bold text-lg hover:bg-white/30 hover:border-white transition-all duration-300 transform hover:scale-105 rounded-xl shadow-lg"
                 >
                   <div className="flex items-center space-x-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                     </svg>
-                    <span>Save for Later</span>
+                    <span className="text-white">Send to Email</span>
                   </div>
                 </Button>
               </div>
@@ -281,6 +286,12 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
           </Card>
         </div>
       </div>
+      
+      <EmailModal 
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        roadmap={roadmap}
+      />
     </section>
   );
 }

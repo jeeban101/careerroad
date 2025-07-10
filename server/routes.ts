@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWaitlistEntrySchema, insertCustomRoadmapSchema } from "@shared/schema";
+import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, emailRequestSchema } from "@shared/schema";
 import { generateRoadmap } from "./gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -108,6 +108,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to generate roadmap:", error);
       res.status(500).json({ message: "Failed to generate roadmap" });
+    }
+  });
+
+  // Send roadmap to email
+  app.post("/api/send-roadmap-email", async (req, res) => {
+    try {
+      const validation = emailRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid email request data" });
+      }
+      
+      const { email, name, roadmapId, roadmapTitle } = validation.data;
+      
+      // For now, just store the email in waitlist (you can enhance this later with actual email sending)
+      await storage.createWaitlistEntry({
+        name: name || "Anonymous",
+        email,
+        college: "Email subscriber",
+        confusion: `Requested roadmap: ${roadmapTitle}`
+      });
+      
+      // In production, you would send the actual email here using SendGrid
+      console.log(`Email request: ${email} wants roadmap: ${roadmapTitle}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Email request received! We'll send your roadmap shortly." 
+      });
+    } catch (error) {
+      console.error("Failed to process email request:", error);
+      res.status(500).json({ message: "Failed to process email request" });
     }
   });
 
