@@ -31,17 +31,14 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
   const generateMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const response = await apiRequest("POST", "/api/generate-roadmap", data);
-      console.log('Raw API response:', response);
       // If response is a Response object, parse it as JSON
       if (response instanceof Response) {
         const jsonData = await response.json();
-        console.log('Parsed JSON data:', jsonData);
         return jsonData as RoadmapTemplate;
       }
       return response as RoadmapTemplate;
     },
     onSuccess: (roadmap) => {
-      console.log('Mutation success with roadmap:', roadmap);
       onRoadmapGenerated(roadmap);
       setTimeout(() => {
         document.getElementById('roadmap-display')?.scrollIntoView({ behavior: 'smooth' });

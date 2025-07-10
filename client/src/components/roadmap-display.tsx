@@ -76,24 +76,43 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
   const totalWeeks = roadmap.phases?.reduce((sum, phase) => sum + phase.duration_weeks, 0) || 0;
 
   return (
-    <section id="roadmap-display" className="py-20 bg-white">
+    <section id="roadmap-display" className="py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Your Career Roadmap</h2>
-          <p className="text-xl text-gray-600">
-            {courseLabel} → {roleLabel}
-          </p>
-          <div className="flex justify-center mt-6 space-x-4">
+        <div className="text-center mb-16 animate-in fade-in duration-700">
+          <div className="relative inline-block">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-800 bg-clip-text text-transparent">
+              Your Career Roadmap
+            </h2>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+          </div>
+          
+          <div className="mt-8 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 inline-block animate-in slide-in-from-bottom duration-1000 delay-300">
+            <div className="flex items-center justify-center space-x-4 text-lg md:text-xl">
+              <span className="font-semibold text-gray-800 px-4 py-2 bg-blue-50 rounded-xl border border-blue-200">
+                {courseLabel}
+              </span>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                <div className="w-8 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+              </div>
+              <span className="font-semibold text-gray-800 px-4 py-2 bg-purple-50 rounded-xl border border-purple-200">
+                {roleLabel}
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex justify-center mt-8 space-x-4 animate-in slide-in-from-bottom duration-1000 delay-500">
             <Button 
               onClick={onFork}
-              className="bg-[hsl(var(--brand-purple))] hover:bg-[hsl(var(--brand-purple))]/90 text-white px-6 py-3 font-semibold"
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               <GitBranch className="mr-2 h-4 w-4" />
               Fork & Customize
             </Button>
             <Button 
               onClick={onShare}
-              className="bg-[hsl(var(--brand-emerald))] hover:bg-[hsl(var(--brand-emerald))]/90 text-white px-6 py-3 font-semibold"
+              className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               <Share2 className="mr-2 h-4 w-4" />
               Share Roadmap
@@ -101,13 +120,14 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
           </div>
         </div>
 
-        {/* Roadmap Timeline */}
+        {/* Enhanced Roadmap Timeline */}
         <div className="relative">
-          {/* Timeline Line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+          {/* Enhanced Timeline Line */}
+          <div className="absolute left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 rounded-full opacity-70"></div>
+          <div className="absolute left-10 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full animate-pulse"></div>
           
           {!roadmap.phases || roadmap.phases.length === 0 ? (
-            <Card className="border border-gray-200">
+            <Card className="border border-gray-200 animate-in fade-in duration-500">
               <CardContent className="p-8 text-center">
                 <p className="text-gray-500">No roadmap phases available. Please try generating a new roadmap.</p>
               </CardContent>
@@ -118,22 +138,40 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
               const phaseColor = getPhaseColor(phaseIndex);
               
               return (
-                <div key={phaseIndex} className="mb-12 relative">
+                <div 
+                  key={phaseIndex} 
+                  className="mb-16 relative animate-in slide-in-from-left duration-700"
+                  style={{ animationDelay: `${phaseIndex * 200}ms` }}
+                >
                   <div className="flex items-start">
-                    <div className={`flex-shrink-0 w-16 h-16 ${phaseColor} rounded-full flex items-center justify-center relative z-10`}>
-                      <PhaseIcon className="text-white text-xl" size={24} />
+                    <div className={`flex-shrink-0 w-20 h-20 ${phaseColor} rounded-2xl flex items-center justify-center relative z-10 shadow-2xl border-4 border-white transform transition-all duration-300 hover:scale-110 hover:rotate-3`}>
+                      <PhaseIcon className="text-white text-2xl" size={28} />
+                      <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl opacity-30 animate-pulse"></div>
                     </div>
-                    <Card className="ml-8 flex-1 border border-gray-200">
+                    <Card className="ml-8 flex-1 border-0 shadow-xl bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 rounded-2xl overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"></div>
                       <CardContent className="p-8">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-2xl font-bold text-gray-900">
-                            Phase {phaseIndex + 1}: {phase.title}
-                          </h3>
-                          <span className={`${phaseColor} text-white px-3 py-1 rounded-full text-sm font-medium`}>
-                            {phase.duration_weeks} weeks
-                          </span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                          <div>
+                            <div className="flex items-center mb-2">
+                              <span className="text-sm font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+                                Phase {phaseIndex + 1}
+                              </span>
+                            </div>
+                            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                              {phase.title}
+                            </h3>
+                          </div>
+                          <div className={`${phaseColor} text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg w-fit`}>
+                            <div className="flex items-center space-x-1">
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
+                              </svg>
+                              <span>{phase.duration_weeks} weeks</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="space-y-4">
+                        <div className="grid gap-4">
                           {phase.items.map((item, itemIndex) => {
                             const ItemIcon = getItemIcon(item.type);
                             const itemColor = getItemColor(item.type);
@@ -141,29 +179,42 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                             const isChecked = checkedItems.has(itemKey);
                             
                             return (
-                              <div key={itemIndex} className={`flex items-start p-4 ${itemColor} rounded-lg border ${isChecked ? 'opacity-75' : ''}`}>
+                              <div 
+                                key={itemIndex} 
+                                className={`group flex items-start p-5 ${itemColor} rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${isChecked ? 'opacity-75 scale-95' : ''} cursor-pointer`}
+                                style={{ animationDelay: `${(phaseIndex * 200) + (itemIndex * 100)}ms` }}
+                              >
                                 <Checkbox
                                   checked={isChecked}
                                   onCheckedChange={(checked) => handleItemCheck(phaseIndex, itemIndex, checked as boolean)}
-                                  className="mt-1 mr-4"
+                                  className="mt-1 mr-4 transform transition-transform duration-200 hover:scale-110"
                                 />
                                 <div className="flex-1">
-                                  <div className="flex items-center mb-2">
-                                    <ItemIcon className={`mr-2 ${getItemColor(item.type).split(' ')[2]}`} size={16} />
-                                    <span className="font-medium capitalize">{item.type}</span>
+                                  <div className="flex items-center mb-3">
+                                    <div className={`p-2 rounded-lg mr-3 ${getItemColor(item.type).replace('bg-', 'bg-').replace('50', '100')} transition-colors duration-200 group-hover:scale-110`}>
+                                      <ItemIcon className={`${getItemColor(item.type).split(' ')[2]}`} size={18} />
+                                    </div>
+                                    <span className="font-semibold capitalize text-sm px-3 py-1 bg-white/80 rounded-full text-gray-700 border">
+                                      {item.type}
+                                    </span>
                                   </div>
-                                  <p className="text-gray-700">{item.label}</p>
+                                  <h4 className="font-bold text-gray-900 mb-2 text-lg group-hover:text-gray-700 transition-colors duration-200">
+                                    {item.label}
+                                  </h4>
                                   {item.description && (
-                                    <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+                                    <p className="text-gray-600 mb-3 leading-relaxed">{item.description}</p>
                                   )}
                                   {item.link && (
                                     <a 
                                       href={item.link} 
                                       target="_blank" 
                                       rel="noopener noreferrer"
-                                      className={`${getItemColor(item.type).split(' ')[2]} hover:underline text-sm`}
+                                      className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200 hover:underline"
                                     >
-                                      View Resource →
+                                      <span>View Resource</span>
+                                      <svg className="w-4 h-4 transform transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                      </svg>
                                     </a>
                                   )}
                                 </div>
@@ -180,28 +231,55 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
           )}
         </div>
 
-        {/* Progress Summary */}
-        <Card className="bg-gradient-to-r from-[hsl(var(--brand-indigo))] to-[hsl(var(--brand-purple))] text-white">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-2xl font-bold mb-4">Ready to Start Your Journey?</h3>
-            <p className="text-lg mb-6">
-              This roadmap will take approximately {Math.ceil(totalWeeks / 4)} months to complete
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Button className="bg-white text-[hsl(var(--brand-indigo))] px-6 py-3 font-semibold hover:bg-gray-100">
-                <div className="w-4 h-4 bg-[hsl(var(--brand-indigo))] rounded-full mr-2"></div>
-                Start Now
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-white text-white px-6 py-3 font-semibold hover:bg-white hover:text-[hsl(var(--brand-indigo))]"
-              >
-                <div className="w-4 h-4 border-2 border-white rounded mr-2"></div>
-                Save for Later
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Enhanced Progress Summary */}
+        <div className="mt-16 animate-in slide-in-from-bottom duration-1000 delay-700">
+          <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white border-0 shadow-2xl overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 animate-pulse"></div>
+            <CardContent className="p-12 text-center relative z-10">
+              <div className="mb-8">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full mb-6 backdrop-blur-sm">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Journey?</h3>
+                <div className="flex items-center justify-center space-x-4 mb-6">
+                  <div className="flex items-center space-x-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
+                    </svg>
+                    <span className="text-xl font-semibold">
+                      {Math.ceil(totalWeeks / 4)} months journey
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
+                  This comprehensive roadmap will guide you step-by-step towards your career goals with practical skills and real-world experience.
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button className="bg-white text-indigo-600 px-8 py-4 font-bold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 rounded-xl shadow-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-5 h-5 bg-indigo-600 rounded-full animate-pulse"></div>
+                    <span>Start Your Journey</span>
+                  </div>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-2 border-white text-white px-8 py-4 font-bold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-300 transform hover:scale-105 rounded-xl"
+                >
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>Save for Later</span>
+                  </div>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </section>
   );
