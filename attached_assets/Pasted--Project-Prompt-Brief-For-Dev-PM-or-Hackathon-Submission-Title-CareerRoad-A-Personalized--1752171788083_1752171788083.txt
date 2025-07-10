@@ -1,0 +1,149 @@
+📝 Project Prompt / Brief (For Dev, PM, or Hackathon Submission)
+Title: CareerRoad – A Personalized Roadmap Generator for Gen Z’s Career Confusion
+
+Problem:
+Students and early graduates often feel lost when navigating from college to their first career — they don't know what skills to build, what tools to learn, which internships matter, or what steps to follow. There's no clear, personalized path that says: "You're here — do this next."
+
+Solution:
+CareerRoad is a web app that helps students generate structured, step-by-step career roadmaps from their current course (e.g., B.Com) to their dream role (e.g., Product Manager at Zomato). These roadmaps include curated learning resources, skill checklists, milestone timelines, and peer-sharable plans that can be customized and remixed.
+
+Why Now:
+Gen Z in cities like Bangalore is highly online, ambitious, and confused. They don't want vague advice — they want clear, credible, personalized paths. CareerRoad fills that gap with structure, social remixability, and transparency.
+
+🔨 V1 — What We Are Building (Non-AI Version)
+✅ Key Features:
+Goal Selector Form
+
+User chooses:
+
+Current course/degree (e.g., B.Com, B.Tech, B.Sc)
+
+Target career role (e.g., Product Manager, UX Designer, Data Analyst)
+
+Static Roadmap Templates
+
+Based on the combo, we fetch a prewritten roadmap from local JSON (or Supabase DB)
+
+Each roadmap is structured by:
+
+🧠 Skills to build
+
+🧰 Tools to learn
+
+📚 Resources to use
+
+📆 Suggested timeline (semesters/weeks)
+
+✅ Mini checklists (e.g., "Create mock PRD")
+
+UI Output: Career Roadmap View
+
+Render in a timeline or column format
+
+Each "phase" has:
+
+Title
+
+Weeks covered
+
+Steps (skills, tools, tasks, resources)
+
+Fork + Customize
+
+Allow users to remix the roadmap:
+
+Add/remove steps
+
+Edit deadlines or tools
+
+Save their own custom version
+
+Waitlist Form
+
+Users can join the waitlist with name, email, college
+
+Store in Supabase (or Google Sheet for MVP)
+
+🧱 Tech Stack (for V1)
+Layer	Tool
+Frontend	React (or Next.js) + TailwindCSS
+Backend	Supabase (Postgres + Auth + Storage)
+State/Logic	Roadmap templates stored as JSON
+Hosting	Vercel (for free & fast deployment)
+Optional	Notion-style editor (later for remix UI)
+
+📁 Folder Structure (Basic Idea)
+pgsql
+Copy
+Edit
+careerroad/
+├── public/
+├── src/
+│   ├── components/
+│   │   └── RoadmapCard.jsx
+│   ├── data/
+│   │   └── templates/
+│   │       └── bcom_to_pm.json
+│   ├── pages/
+│   │   └── index.jsx
+│   └── lib/
+│       └── fetchRoadmap.js
+└── supabase/
+    └── schema.sql
+📦 Sample JSON Template (Static Data for Now)
+json
+Copy
+Edit
+{
+  "title": "B.Com → Product Manager @ Zomato",
+  "phases": [
+    {
+      "title": "Learn Product Thinking",
+      "duration_weeks": 3,
+      "items": [
+        {
+          "type": "resource",
+          "label": "Read 'Inspired' by Marty Cagan",
+          "link": "https://example.com/inspired"
+        },
+        {
+          "type": "tool",
+          "label": "Use Notion to write PRDs"
+        }
+      ]
+    },
+    {
+      "title": "Build Projects",
+      "duration_weeks": 4,
+      "items": [
+        {
+          "type": "task",
+          "label": "Write a mock PRD for Swiggy feature"
+        },
+        {
+          "type": "resource",
+          "label": "Join Product Case Study Telegram group"
+        }
+      ]
+    }
+  ]
+}
+📅 Timeline Plan
+Week	Task
+Week 1	Build landing page + roadmap viewer UI
+Week 2	Create 3–5 static roadmap templates
+Week 3	Add "Fork" UI + Waitlist form + Deploy
+Week 4	Polish UX and test with 5–10 students
+
+🔮 Later (AI-Powered V2 — with Gemini / GPT-4 API)
+Once the MVP is validated, we can:
+
+Auto-generate career roadmaps using Gemini or GPT-4
+
+Use prompts like:
+
+“Create a 3-month roadmap for a B.Com student to become a Product Manager at Zomato — include resources, tools, projects, and prep material.”
+
+Let users “ask” for any career goal, and dynamically generate the roadmap JSON
+
+Add feedback loops (thumbs up/down per roadmap phase)
