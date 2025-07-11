@@ -3,16 +3,38 @@ import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Header() {
   const [location, setLocation] = useLocation();
   const { user, logoutMutation, isLoading } = useAuth();
   
+  // Also query user data directly to be sure
+  const { data: directUser } = useQuery({
+    queryKey: ["/api/user"],
+    queryFn: async () => {
+      try {
+        const res = await fetch('/api/user', { credentials: 'include' });
+        if (res.status === 401) return null;
+        if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
+        return await res.json();
+      } catch (error) {
+        console.error('Direct user fetch error:', error);
+        return null;
+      }
+    },
+    refetchInterval: 5000,
+    staleTime: 1000,
+  });
+  
+  // Use direct user data or auth context user
+  const currentUser = directUser || user;
+  
   // Debug: Log user state
-  console.log('Header - user:', user, 'isLoading:', isLoading, 'isLoggedIn:', !!user);
+  console.log('Header - user:', user, 'directUser:', directUser, 'currentUser:', currentUser, 'isLoading:', isLoading, 'isLoggedIn:', !!currentUser);
   
   // Force show the button if user exists
-  const showMyRoadmapsButton = user && user.id;
+  const showMyRoadmapsButton = currentUser && currentUser.id;
 
   const handleSignIn = () => {
     setLocation('/auth');
@@ -60,7 +82,7 @@ export default function Header() {
               </nav>
               
               <span className="text-sm text-gray-700">
-                Welcome, {user.firstName || user.email}
+                Welcome, {currentUser.firstName || currentUser.email}
               </span>
               <Button
                 variant="outline"
