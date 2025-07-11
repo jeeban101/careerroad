@@ -184,14 +184,14 @@ export default function TaskCard({
             </div>
           </div>
           {item.description && (
-            <p className={`text-sm text-gray-300 leading-relaxed ${isChecked ? 'line-through text-gray-500' : ''}`}>
+            <p className={`text-sm text-gray-200 leading-relaxed ${isChecked ? 'line-through text-gray-500' : ''}`}>
               {item.description}
             </p>
           )}
           
           {/* Enhanced Notes Section */}
           {showNotes && (
-            <div className="mt-4 p-4 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 border-2 border-purple-400/30 rounded-xl shadow-lg backdrop-blur-glass">
+            <div className="mt-4 p-4 bg-gray-800/80 border-2 border-purple-400/30 rounded-xl shadow-lg backdrop-blur-glass">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -224,7 +224,7 @@ export default function TaskCard({
                     value={tempNotes}
                     onChange={(e) => setTempNotes(e.target.value)}
                     placeholder="✨ Share your thoughts, progress updates, challenges, or helpful tips here..."
-                    className="text-sm resize-none h-24 bg-white/10 border-2 border-purple-400/30 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 rounded-lg shadow-sm placeholder:text-gray-400 text-white"
+                    className="text-sm resize-none h-24 bg-gray-900/80 border-2 border-purple-400/30 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 rounded-lg shadow-sm placeholder:text-gray-400 text-white"
                   />
                   <div className="absolute bottom-2 right-2 text-xs text-gray-400">
                     {tempNotes.length} characters
@@ -236,7 +236,7 @@ export default function TaskCard({
           
           {/* Enhanced Notes Preview */}
           {!showNotes && (notes || taskProgress?.notes) && (
-            <div className="mt-3 p-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-lg border-2 border-emerald-400/30 shadow-sm backdrop-blur-glass">
+            <div className="mt-3 p-3 bg-gray-800/60 rounded-lg border-2 border-emerald-400/30 shadow-sm backdrop-blur-glass">
               <div className="flex items-start space-x-2">
                 <StickyNote className="text-emerald-300 flex-shrink-0 mt-0.5" size={14} />
                 <div className="flex-1 min-w-0">
