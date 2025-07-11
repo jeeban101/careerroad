@@ -109,69 +109,78 @@ export default function TaskCard({
   };
 
   return (
-    <div className="group p-4 rounded-xl bg-gradient-to-r from-white to-gray-50 border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5">
+    <div className="group p-5 rounded-2xl bg-gradient-to-br from-white via-gray-50 to-purple-50 border-2 border-gray-200 hover:border-purple-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01]">
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
           <Checkbox 
             checked={isChecked}
             onCheckedChange={handleTaskToggle}
-            className="mt-1"
+            className="mt-1 h-5 w-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 transition-all duration-200"
           />
         </div>
-        <div className={`flex-shrink-0 w-10 h-10 ${itemColor} rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110`}>
-          <ItemIcon className="text-sm" size={16} />
+        <div className={`flex-shrink-0 w-12 h-12 ${itemColor} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md`}>
+          <ItemIcon className="text-white" size={18} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
             <h4 className={`text-sm font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-200 ${isChecked ? 'line-through text-gray-500' : ''}`}>
               {item.label}
             </h4>
-            <div className="flex items-center space-x-2">
-              <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${itemColor}`}>
+            <div className="flex items-center space-x-3 flex-wrap">
+              <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm`}>
                 {item.type}
               </span>
-              {user && roadmapHistoryId && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleNotesToggle}
-                        className={`p-1 h-8 w-8 rounded-full transition-all duration-200 ${
-                          (notes || taskProgress?.notes) 
-                            ? 'text-purple-600 bg-purple-100 hover:bg-purple-200' 
-                            : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
-                        }`}
-                      >
-                        <StickyNote size={14} />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{(notes || taskProgress?.notes) ? 'Edit notes' : 'Add notes'}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-              {item.link && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <a 
-                        href={item.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="p-1 h-8 w-8 rounded-full flex items-center justify-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-all duration-200"
-                      >
-                        <ExternalLink size={14} />
-                      </a>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Open external resource</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+              
+              {/* Enhanced Action Buttons */}
+              <div className="flex items-center space-x-2">
+                {user && roadmapHistoryId && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleNotesToggle}
+                          className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 ${
+                            (notes || taskProgress?.notes) 
+                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg' 
+                              : 'bg-white text-gray-600 border-gray-300 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50'
+                          }`}
+                        >
+                          <StickyNote size={12} className="mr-1" />
+                          {(notes || taskProgress?.notes) ? 'Edit Notes' : 'Add Notes'}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">
+                          {(notes || taskProgress?.notes) ? 'Click to edit your personal notes' : 'Click to add personal notes and track your progress'}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                
+                {item.link && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <a 
+                          href={item.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="px-3 py-1 h-8 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-2 border-blue-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg flex items-center space-x-1"
+                        >
+                          <ExternalLink size={12} />
+                          <span>Open Resource</span>
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">Click to open external learning resource in a new tab</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
             </div>
           </div>
           {item.description && (
@@ -180,49 +189,63 @@ export default function TaskCard({
             </p>
           )}
           
-          {/* Notes Section */}
+          {/* Enhanced Notes Section */}
           {showNotes && (
-            <Card className="mt-3 p-3 bg-purple-50 border-purple-200">
-              <div className="space-y-3">
+            <div className="mt-4 p-4 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 border-2 border-purple-200 rounded-xl shadow-lg">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-purple-800">Task Notes</span>
-                  <div className="flex space-x-1">
+                  <div className="flex items-center space-x-2">
+                    <StickyNote className="text-purple-600" size={16} />
+                    <span className="text-sm font-semibold text-purple-800">Personal Notes & Progress</span>
+                  </div>
+                  <div className="flex space-x-2">
                     <Button
-                      variant="ghost"
+                      variant="default"
                       size="sm"
                       onClick={handleSaveNotes}
                       disabled={updateTaskMutation.isPending}
-                      className="h-6 px-2 text-xs bg-purple-600 text-white hover:bg-purple-700"
+                      className="h-8 px-3 text-xs bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 border-none shadow-md"
                     >
-                      <Save size={10} className="mr-1" />
-                      Save
+                      <Save size={12} className="mr-1" />
+                      Save Notes
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={() => setShowNotes(false)}
-                      className="h-6 px-2 text-xs text-gray-600 hover:text-gray-800"
+                      className="h-8 px-3 text-xs border-gray-300 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                     >
-                      <X size={10} />
+                      <X size={12} />
                     </Button>
                   </div>
                 </div>
-                <Textarea
-                  value={tempNotes}
-                  onChange={(e) => setTempNotes(e.target.value)}
-                  placeholder="Add your notes, thoughts, or progress details..."
-                  className="text-sm resize-none h-20 bg-white border-purple-200 focus:border-purple-400"
-                />
+                <div className="relative">
+                  <Textarea
+                    value={tempNotes}
+                    onChange={(e) => setTempNotes(e.target.value)}
+                    placeholder="✨ Share your thoughts, progress updates, challenges, or helpful tips here..."
+                    className="text-sm resize-none h-24 bg-white border-2 border-purple-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 rounded-lg shadow-sm placeholder:text-gray-400"
+                  />
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+                    {tempNotes.length} characters
+                  </div>
+                </div>
               </div>
-            </Card>
+            </div>
           )}
           
-          {/* Show existing notes preview */}
+          {/* Enhanced Notes Preview */}
           {!showNotes && (notes || taskProgress?.notes) && (
-            <div className="mt-2 p-2 bg-purple-50 rounded-lg border border-purple-200">
-              <p className="text-xs text-purple-700 line-clamp-2">
-                📝 {notes || taskProgress?.notes}
-              </p>
+            <div className="mt-3 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border-2 border-emerald-200 shadow-sm">
+              <div className="flex items-start space-x-2">
+                <StickyNote className="text-emerald-600 flex-shrink-0 mt-0.5" size={14} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-emerald-800 mb-1">Your Notes:</p>
+                  <p className="text-sm text-emerald-700 line-clamp-3 leading-relaxed">
+                    {notes || taskProgress?.notes}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
