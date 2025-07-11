@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users } from "lucide-react";
+import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users, Save, Heart, Bookmark, Star } from "lucide-react";
 import { RoadmapTemplate, RoadmapItem, UserRoadmapProgress } from "@shared/schema";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
 import { useAuth } from "@/hooks/useAuth";
@@ -169,6 +169,14 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
           </div>
           
           <div className="flex justify-center mt-8 space-x-4 animate-in slide-in-from-bottom duration-1000 delay-500">
+            {user && (
+              <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <Bookmark className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-700">
+                  {saveToHistoryMutation.isPending ? 'Saving...' : 'Saved to History'}
+                </span>
+              </div>
+            )}
             <Button 
               onClick={onFork}
               className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"

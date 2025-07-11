@@ -39,6 +39,11 @@ Preferred communication style: Simple, everyday language.
 ✓ COMPLETED: Frontend-backend integration for seamless user experience
 ✓ COMPLETED: History button properly visible in navigation when logged in
 ✓ COMPLETED: Database verified with 3 saved roadmaps for testing
+✓ COMPLETED: Enhanced UI with elegant save indicators and aesthetic design improvements
+✓ COMPLETED: Roadmap display now shows "Saved to History" indicator for logged-in users
+✓ COMPLETED: Removed all Neon database dependencies and packages
+✓ COMPLETED: Updated Drizzle configuration to use postgres-js instead of Neon
+✓ COMPLETED: Improved database configuration to use environment variables properly
 
 ## System Architecture
 
@@ -54,7 +59,7 @@ Preferred communication style: Simple, everyday language.
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript with ES modules
 - **Database**: PostgreSQL with direct SQL queries
-- **Database Provider**: Neon Database (native pg client)
+- **Database Provider**: Supabase PostgreSQL (postgres-js client)
 - **Session Management**: PostgreSQL-based session storage
 - **API Design**: RESTful API with JSON responses
 
@@ -108,7 +113,8 @@ Preferred communication style: Simple, everyday language.
 ### Backend Dependencies
 - Express.js for server framework
 - Drizzle ORM for database operations
-- Neon Database for PostgreSQL hosting
+- Supabase PostgreSQL for database hosting
+- postgres-js for database connectivity
 - Google Gemini AI (@google/genai) for roadmap generation
 - Development tools (tsx, esbuild, Vite)
 
