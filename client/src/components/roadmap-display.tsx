@@ -36,15 +36,15 @@ const getItemIcon = (type: string) => {
 const getItemColor = (type: string) => {
   switch (type) {
     case "resource":
-      return "bg-blue-50 border-blue-200 text-[hsl(var(--brand-indigo))]";
+      return "bg-blue-600/20 border-blue-500/30 text-blue-300";
     case "tool":
-      return "bg-purple-50 border-purple-200 text-[hsl(var(--brand-purple))]";
+      return "bg-purple-600/20 border-purple-500/30 text-purple-300";
     case "task":
-      return "bg-emerald-50 border-emerald-200 text-[hsl(var(--brand-emerald))]";
+      return "bg-emerald-600/20 border-emerald-500/30 text-emerald-300";
     case "community":
-      return "bg-amber-50 border-amber-200 text-[hsl(var(--brand-amber))]";
+      return "bg-amber-600/20 border-amber-500/30 text-amber-300";
     default:
-      return "bg-blue-50 border-blue-200 text-[hsl(var(--brand-indigo))]";
+      return "bg-blue-600/20 border-blue-500/30 text-blue-300";
   }
 };
 
@@ -143,19 +143,19 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
   const totalWeeks = roadmap.phases?.reduce((sum, phase) => sum + phase.duration_weeks, 0) || 0;
 
   return (
-    <section id="roadmap-display" className="py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center mb-16 animate-in fade-in duration-700">
           <div className="relative inline-block">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-800 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
               Your Career Roadmap
             </h2>
-            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse shimmer"></div>
           </div>
           
-          <div className="mt-8 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 inline-block animate-in slide-in-from-bottom duration-1000 delay-300">
+          <div className="mt-8 p-6 bg-white/5 backdrop-blur-glass rounded-2xl shadow-lg border border-purple-500/20 inline-block animate-in slide-in-from-bottom duration-1000 delay-300">
             <div className="flex items-center justify-center space-x-4 text-lg md:text-xl">
-              <span className="font-semibold text-gray-800 px-4 py-2 bg-blue-50 rounded-xl border border-blue-200">
+              <span className="font-semibold text-white px-4 py-2 bg-blue-600/20 rounded-xl border border-blue-500/30">
                 {courseLabel}
               </span>
               <div className="flex items-center space-x-2">
@@ -163,7 +163,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                 <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                 <div className="w-8 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
               </div>
-              <span className="font-semibold text-gray-800 px-4 py-2 bg-purple-50 rounded-xl border border-purple-200">
+              <span className="font-semibold text-white px-4 py-2 bg-purple-600/20 rounded-xl border border-purple-500/30">
                 {roleLabel}
               </span>
             </div>
@@ -171,23 +171,23 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
           
           <div className="flex justify-center mt-8 space-x-4 animate-in slide-in-from-bottom duration-1000 delay-500">
             {user && (
-              <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <Bookmark className="h-4 w-4 text-emerald-600" />
-                <span className="text-sm font-medium text-emerald-700">
+              <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
+                <Bookmark className="h-4 w-4 text-emerald-400" />
+                <span className="text-sm font-medium text-emerald-300">
                   {saveToHistoryMutation.isPending ? 'Saving...' : 'Saved to History'}
                 </span>
               </div>
             )}
             <Button 
               onClick={onFork}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer"
             >
               <GitBranch className="mr-2 h-4 w-4" />
               Fork & Customize
             </Button>
             <Button 
               onClick={onShare}
-              className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              className="bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer"
             >
               <Share2 className="mr-2 h-4 w-4" />
               Share Roadmap
@@ -198,13 +198,13 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
         {/* Enhanced Roadmap Timeline */}
         <div className="relative">
           {/* Enhanced Timeline Line */}
-          <div className="absolute left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 rounded-full opacity-70"></div>
-          <div className="absolute left-10 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full animate-pulse"></div>
+          <div className="absolute left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-400 via-pink-400 to-blue-400 rounded-full opacity-70"></div>
+          <div className="absolute left-10 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full animate-pulse"></div>
           
           {!roadmap.phases || roadmap.phases.length === 0 ? (
-            <Card className="border border-gray-200 animate-in fade-in duration-500">
+            <Card className="border border-purple-500/20 animate-in fade-in duration-500 bg-white/5 backdrop-blur-glass">
               <CardContent className="p-8 text-center">
-                <p className="text-gray-500">No roadmap phases available. Please try generating a new roadmap.</p>
+                <p className="text-gray-300">No roadmap phases available. Please try generating a new roadmap.</p>
               </CardContent>
             </Card>
           ) : (
@@ -219,21 +219,21 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                   style={{ animationDelay: `${phaseIndex * 200}ms` }}
                 >
                   <div className="flex items-start">
-                    <div className={`flex-shrink-0 w-20 h-20 ${phaseColor} rounded-2xl flex items-center justify-center relative z-10 shadow-2xl border-4 border-white transform transition-all duration-300 hover:scale-110 hover:rotate-3`}>
+                    <div className={`flex-shrink-0 w-20 h-20 ${phaseColor} rounded-2xl flex items-center justify-center relative z-10 shadow-2xl border-4 border-white/20 transform transition-all duration-300 hover:scale-110 hover:rotate-3`}>
                       <PhaseIcon className="text-white text-2xl" size={28} />
-                      <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl opacity-30 animate-pulse"></div>
+                      <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl opacity-30 animate-pulse"></div>
                     </div>
-                    <Card className="ml-8 flex-1 border-0 shadow-xl bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 rounded-2xl overflow-hidden">
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400"></div>
+                    <Card className="ml-8 flex-1 border-0 shadow-xl bg-white/5 backdrop-blur-glass hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 rounded-2xl overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400"></div>
                       <CardContent className="p-8">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                           <div>
                             <div className="flex items-center mb-2">
-                              <span className="text-sm font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+                              <span className="text-sm font-semibold text-purple-300 bg-purple-600/20 px-3 py-1 rounded-full">
                                 Phase {phaseIndex + 1}
                               </span>
                             </div>
-                            <h3 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                            <h3 className="text-2xl md:text-3xl font-bold text-white leading-tight">
                               {phase.title}
                             </h3>
                           </div>
@@ -337,6 +337,6 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
         onClose={() => setShowEmailModal(false)}
         roadmap={roadmap}
       />
-    </section>
+    </div>
   );
 }
