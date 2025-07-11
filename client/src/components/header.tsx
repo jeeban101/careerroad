@@ -6,7 +6,13 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const [location, setLocation] = useLocation();
-  const { user, logoutMutation } = useAuth();
+  const { user, logoutMutation, isLoading } = useAuth();
+  
+  // Debug: Log user state
+  console.log('Header - user:', user, 'isLoading:', isLoading, 'isLoggedIn:', !!user);
+  
+  // Force show the button if user exists
+  const showMyRoadmapsButton = user && user.id;
 
   const handleSignIn = () => {
     setLocation('/auth');
@@ -31,7 +37,7 @@ export default function Header() {
             </div>
           </div>
           
-          {user ? (
+          {showMyRoadmapsButton ? (
             <div className="flex items-center space-x-4">
               <nav className="flex items-center space-x-2">
                 <Link href="/">

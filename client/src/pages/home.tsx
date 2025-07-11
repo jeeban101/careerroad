@@ -9,6 +9,9 @@ import { RoadmapTemplate } from "@shared/schema";
 
 export default function Home() {
   const { user } = useAuth();
+  
+  // Debug: Log user state
+  console.log('Home - user:', user, 'isLoggedIn:', !!user);
   const [selectedRoadmap, setSelectedRoadmap] = useState<RoadmapTemplate | null>(null);
   const [showCustomization, setShowCustomization] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
