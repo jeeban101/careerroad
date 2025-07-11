@@ -5,8 +5,8 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  connectionString: "postgresql://postgres.nwjzidculhziaghdarwx:9qewE+e47@aws-0-ap-south-1.pooler.supabase.com:6543/postgres",
+  ssl: { rejectUnauthorized: false }
 });
 
 // Test connection
