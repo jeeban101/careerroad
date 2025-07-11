@@ -88,8 +88,11 @@ export function setupAuth(app: Express) {
       }
 
       const user = await storage.createUser({
-        ...req.body,
+        email: req.body.email,
+        username: req.body.email, // Use email as username for now
         password: await hashPassword(req.body.password),
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
       });
 
       req.login(user, (err) => {
@@ -97,7 +100,8 @@ export function setupAuth(app: Express) {
         res.status(201).json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
       });
     } catch (error) {
-      res.status(500).json({ message: "Registration failed" });
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed", error: error.message });
     }
   });
 
