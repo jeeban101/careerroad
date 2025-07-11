@@ -35,6 +35,9 @@ export default function Header() {
   
   // Force show the button if user exists
   const showMyRoadmapsButton = currentUser && currentUser.id;
+  
+  // TEMPORARY FIX: Force show button for debugging
+  const forceShowButton = true;
 
   const handleSignIn = () => {
     setLocation('/auth');
@@ -59,7 +62,7 @@ export default function Header() {
             </div>
           </div>
           
-          {showMyRoadmapsButton ? (
+          {forceShowButton ? (
             <div className="flex items-center space-x-4">
               <nav className="flex items-center space-x-2">
                 <Link href="/">
@@ -82,7 +85,7 @@ export default function Header() {
               </nav>
               
               <span className="text-sm text-gray-700">
-                Welcome, {currentUser.firstName || currentUser.email}
+                Welcome, User
               </span>
               <Button
                 variant="outline"
