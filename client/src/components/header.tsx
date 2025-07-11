@@ -48,16 +48,16 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-transparent">
+    <header className="w-full backdrop-blur-glass border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <Link href="/">
-                <Route className="text-gray-700 text-2xl mr-2 cursor-pointer" />
+                <Route className="text-purple-400 text-2xl mr-2 cursor-pointer hover:text-purple-300 transition-colors glow-pulse" />
               </Link>
               <Link href="/">
-                <span className="font-bold text-xl text-gray-900 cursor-pointer">CareerRoad</span>
+                <span className="font-bold text-xl text-white cursor-pointer hover:text-purple-300 transition-colors">CareerRoad</span>
               </Link>
             </div>
           </div>
@@ -69,6 +69,7 @@ export default function Header() {
                   <Button
                     variant={location === "/" ? "default" : "ghost"}
                     size="sm"
+                    className={location === "/" ? "bg-purple-600 hover:bg-purple-700 text-white" : "text-gray-300 hover:text-white hover:bg-white/10"}
                   >
                     Home
                   </Button>
@@ -76,7 +77,7 @@ export default function Header() {
                 <Link href="/history">
                   <Button
                     size="sm"
-                    className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-lg font-semibold"
+                    className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-lg font-semibold shimmer"
                   >
                     <History className="h-4 w-4" />
                     <span>My Roadmaps</span>
@@ -84,14 +85,14 @@ export default function Header() {
                 </Link>
               </nav>
               
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-gray-300">
                 Welcome, {currentUser ? (currentUser.firstName || currentUser.email) : 'User'}
               </span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleLogout}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 border-gray-600 text-gray-300 hover:text-white hover:bg-white/10 backdrop-blur-glass"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
@@ -99,12 +100,12 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800">
+              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
                 <HelpCircle className="h-4 w-4" />
               </Button>
               <Button 
                 onClick={handleSignIn}
-                className="bg-gray-800 hover:bg-gray-700 text-white"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer"
               >
                 Sign In
               </Button>

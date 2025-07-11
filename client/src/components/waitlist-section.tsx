@@ -58,12 +58,17 @@ export default function WaitlistSection() {
   ];
 
   return (
-    <section className="w-full max-w-4xl mx-auto mb-12">
+    <section className="w-full max-w-4xl mx-auto mb-12 relative">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Get Early Access</h2>
+        <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full mb-6 backdrop-blur-glass border border-purple-500/30">
+          <Rocket className="h-4 w-4 text-purple-300 mr-2" />
+          <span className="text-sm font-medium text-purple-200">Join the Future of Career Planning</span>
+        </div>
+        <h2 className="text-3xl font-bold text-white mb-2">Get Early Access</h2>
+        <p className="text-gray-300">Be among the first to experience AI-powered career guidance</p>
       </div>
       
-      <Card className="shadow-lg">
+      <Card className="shadow-lg backdrop-blur-glass border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
         <CardContent className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -76,8 +81,8 @@ export default function WaitlistSection() {
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Name"
-                          className="h-14 text-lg bg-white border-2 border-gray-200 rounded-lg"
+                          placeholder="Your Name"
+                          className="h-14 text-lg bg-white/10 border-2 border-purple-400/30 rounded-lg text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
                         />
                       </FormControl>
                     </FormItem>
@@ -92,8 +97,8 @@ export default function WaitlistSection() {
                         <Input 
                           {...field} 
                           type="email"
-                          placeholder="Email"
-                          className="h-14 text-lg bg-white border-2 border-gray-200 rounded-lg"
+                          placeholder="Your Email"
+                          className="h-14 text-lg bg-white/10 border-2 border-purple-400/30 rounded-lg text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
                         />
                       </FormControl>
                     </FormItem>
@@ -103,10 +108,10 @@ export default function WaitlistSection() {
               <div className="pt-4">
                 <Button 
                   type="submit" 
-                  className={`w-full py-4 px-6 text-lg font-semibold h-14 rounded-lg ${
+                  className={`w-full py-4 px-6 text-lg font-semibold h-14 rounded-lg shimmer transition-all duration-300 transform hover:scale-105 ${
                     isSubmitted 
                       ? 'bg-green-600 hover:bg-green-600' 
-                      : 'bg-gray-800 hover:bg-gray-700'
+                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
                   }`}
                   disabled={mutation.isPending || isSubmitted}
                 >

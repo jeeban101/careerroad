@@ -109,21 +109,21 @@ export default function TaskCard({
   };
 
   return (
-    <div className="group p-5 rounded-2xl bg-gradient-to-br from-white via-gray-50 to-purple-50 border-2 border-gray-200 hover:border-purple-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01]">
+    <div className="group p-5 rounded-2xl bg-gradient-to-br from-white/5 via-white/10 to-purple-500/10 border-2 border-white/20 hover:border-purple-400/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] backdrop-blur-glass shimmer">
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
           <Checkbox 
             checked={isChecked}
             onCheckedChange={handleTaskToggle}
-            className="mt-1 h-5 w-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 transition-all duration-200"
+            className="mt-1 h-5 w-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 transition-all duration-200 border-gray-400 data-[state=unchecked]:border-gray-400"
           />
         </div>
-        <div className={`flex-shrink-0 w-12 h-12 ${itemColor} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md`}>
+        <div className={`flex-shrink-0 w-12 h-12 ${itemColor} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md glow-pulse`}>
           <ItemIcon className="text-white" size={18} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
-            <h4 className={`text-sm font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-200 ${isChecked ? 'line-through text-gray-500' : ''}`}>
+            <h4 className={`text-sm font-semibold text-white group-hover:text-purple-300 transition-colors duration-200 ${isChecked ? 'line-through text-gray-400' : ''}`}>
               {item.label}
             </h4>
             <div className="flex items-center space-x-3 flex-wrap">
@@ -141,10 +141,10 @@ export default function TaskCard({
                           variant="outline"
                           size="sm"
                           onClick={handleNotesToggle}
-                          className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 ${
+                          className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer ${
                             (notes || taskProgress?.notes) 
                               ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg' 
-                              : 'bg-white text-gray-600 border-gray-300 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50'
+                              : 'bg-white/10 text-gray-300 border-gray-500 hover:border-purple-400 hover:text-purple-300 hover:bg-purple-500/20'
                           }`}
                         >
                           <StickyNote size={12} className="mr-1" />
@@ -168,7 +168,7 @@ export default function TaskCard({
                           href={item.link} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="px-3 py-1 h-8 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-2 border-blue-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg flex items-center space-x-1"
+                          className="px-3 py-1 h-8 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-2 border-blue-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg flex items-center space-x-1 shimmer"
                         >
                           <ExternalLink size={12} />
                           <span>Open Resource</span>
@@ -184,19 +184,19 @@ export default function TaskCard({
             </div>
           </div>
           {item.description && (
-            <p className={`text-sm text-gray-600 leading-relaxed ${isChecked ? 'line-through text-gray-400' : ''}`}>
+            <p className={`text-sm text-gray-300 leading-relaxed ${isChecked ? 'line-through text-gray-500' : ''}`}>
               {item.description}
             </p>
           )}
           
           {/* Enhanced Notes Section */}
           {showNotes && (
-            <div className="mt-4 p-4 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 border-2 border-purple-200 rounded-xl shadow-lg">
+            <div className="mt-4 p-4 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 border-2 border-purple-400/30 rounded-xl shadow-lg backdrop-blur-glass">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <StickyNote className="text-purple-600" size={16} />
-                    <span className="text-sm font-semibold text-purple-800">Personal Notes & Progress</span>
+                    <StickyNote className="text-purple-300" size={16} />
+                    <span className="text-sm font-semibold text-purple-200">Personal Notes & Progress</span>
                   </div>
                   <div className="flex space-x-2">
                     <Button
@@ -204,7 +204,7 @@ export default function TaskCard({
                       size="sm"
                       onClick={handleSaveNotes}
                       disabled={updateTaskMutation.isPending}
-                      className="h-8 px-3 text-xs bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 border-none shadow-md"
+                      className="h-8 px-3 text-xs bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 border-none shadow-md shimmer"
                     >
                       <Save size={12} className="mr-1" />
                       Save Notes
@@ -213,7 +213,7 @@ export default function TaskCard({
                       variant="outline"
                       size="sm"
                       onClick={() => setShowNotes(false)}
-                      className="h-8 px-3 text-xs border-gray-300 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                      className="h-8 px-3 text-xs border-gray-500 text-gray-300 hover:text-white hover:bg-white/10"
                     >
                       <X size={12} />
                     </Button>
@@ -224,7 +224,7 @@ export default function TaskCard({
                     value={tempNotes}
                     onChange={(e) => setTempNotes(e.target.value)}
                     placeholder="✨ Share your thoughts, progress updates, challenges, or helpful tips here..."
-                    className="text-sm resize-none h-24 bg-white border-2 border-purple-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 rounded-lg shadow-sm placeholder:text-gray-400"
+                    className="text-sm resize-none h-24 bg-white/10 border-2 border-purple-400/30 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 rounded-lg shadow-sm placeholder:text-gray-400 text-white"
                   />
                   <div className="absolute bottom-2 right-2 text-xs text-gray-400">
                     {tempNotes.length} characters
@@ -236,12 +236,12 @@ export default function TaskCard({
           
           {/* Enhanced Notes Preview */}
           {!showNotes && (notes || taskProgress?.notes) && (
-            <div className="mt-3 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border-2 border-emerald-200 shadow-sm">
+            <div className="mt-3 p-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-lg border-2 border-emerald-400/30 shadow-sm backdrop-blur-glass">
               <div className="flex items-start space-x-2">
-                <StickyNote className="text-emerald-600 flex-shrink-0 mt-0.5" size={14} />
+                <StickyNote className="text-emerald-300 flex-shrink-0 mt-0.5" size={14} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-emerald-800 mb-1">Your Notes:</p>
-                  <p className="text-sm text-emerald-700 line-clamp-3 leading-relaxed">
+                  <p className="text-xs font-medium text-emerald-200 mb-1">Your Notes:</p>
+                  <p className="text-sm text-emerald-100 line-clamp-3 leading-relaxed">
                     {notes || taskProgress?.notes}
                   </p>
                 </div>
