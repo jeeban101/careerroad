@@ -4,13 +4,21 @@ import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
+import { createUser, getUserByEmail, getUserById } from "./database";
 import connectPg from "connect-pg-simple";
 
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    interface User {
+      id: number;
+      email: string;
+      username?: string;
+      first_name?: string;
+      last_name?: string;
+      password: string;
+      created_at: Date;
+      updated_at: Date;
+    }
   }
 }
 
@@ -33,7 +41,7 @@ export function setupAuth(app: Express) {
   const PostgresSessionStore = connectPg(session);
   const sessionStore = new PostgresSessionStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: false, // We already created the table
+    createTableIfMissing: true, // Let it create the table if needed
     tableName: 'sessions',
   });
 
@@ -60,7 +68,7 @@ export function setupAuth(app: Express) {
       { usernameField: 'email' },
       async (email, password, done) => {
         try {
-          const user = await storage.getUserByEmail(email);
+          const user = await getUserByEmail(email);
           if (!user || !(await comparePasswords(password, user.password))) {
             return done(null, false);
           } else {
@@ -76,7 +84,7 @@ export function setupAuth(app: Express) {
   passport.serializeUser((user, done) => done(null, user.id));
   passport.deserializeUser(async (id: number, done) => {
     try {
-      const user = await storage.getUser(id);
+      const user = await getUserById(id);
       done(null, user);
     } catch (error) {
       done(error);
@@ -85,22 +93,21 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const existingUser = await storage.getUserByEmail(req.body.email);
+      const existingUser = await getUserByEmail(req.body.email);
       if (existingUser) {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      const user = await storage.createUser({
-        email: req.body.email,
-        username: req.body.email, // Use email as username for now
-        password: await hashPassword(req.body.password),
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-      });
+      const user = await createUser(
+        req.body.email,
+        await hashPassword(req.body.password),
+        req.body.firstName,
+        req.body.lastName
+      );
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
+        res.status(201).json({ id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name });
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -109,8 +116,8 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    const user = req.user as SelectUser;
-    res.status(200).json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
+    const user = req.user!;
+    res.status(200).json({ id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name });
   });
 
   app.post("/api/logout", (req, res, next) => {
@@ -122,7 +129,7 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const user = req.user as SelectUser;
-    res.json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
+    const user = req.user!;
+    res.json({ id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name });
   });
 }

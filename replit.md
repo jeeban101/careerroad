@@ -26,6 +26,9 @@ Preferred communication style: Simple, everyday language.
 ✓ FIXED: Authentication system fully functional with database storage
 ✓ FIXED: All database tables created and working (users, sessions, roadmaps, etc.)
 ✓ FIXED: API endpoints tested and working correctly for registration/login
+✓ FIXED: Replaced ORM with direct SQL queries for better performance and reliability
+✓ FIXED: Database connection using native PostgreSQL client (pg package)
+✓ FIXED: Session persistence tested and working correctly with cookies
 
 ## System Architecture
 
@@ -40,9 +43,9 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL with Drizzle ORM
-- **Database Provider**: Neon Database (@neondatabase/serverless)
-- **Session Management**: In-memory storage for development (MemStorage class)
+- **Database**: PostgreSQL with direct SQL queries
+- **Database Provider**: Neon Database (native pg client)
+- **Session Management**: PostgreSQL-based session storage
 - **API Design**: RESTful API with JSON responses
 
 ### Data Storage Solutions
