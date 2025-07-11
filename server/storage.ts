@@ -562,38 +562,32 @@ export class DatabaseStorage implements IStorage {
     completed: boolean, 
     notes?: string
   ): Promise<void> {
-    const [existing] = await db
-      .select()
-      .from(userRoadmapProgress)
-      .where(and(
-        eq(userRoadmapProgress.userId, userId),
-        eq(userRoadmapProgress.roadmapId, roadmapId),
-        eq(userRoadmapProgress.phaseIndex, phaseIndex),
-        eq(userRoadmapProgress.taskIndex, taskIndex)
-      ));
-
-    if (existing) {
-      await db
-        .update(userRoadmapProgress)
-        .set({
+    // Use upsert to handle duplicates properly
+    await db
+      .insert(userRoadmapProgress)
+      .values({
+        userId,
+        roadmapId,
+        phaseIndex,
+        taskIndex,
+        completed,
+        notes: notes || null,
+        completedAt: completed ? new Date() : null
+      })
+      .onConflictDoUpdate({
+        target: [
+          userRoadmapProgress.userId,
+          userRoadmapProgress.roadmapId,
+          userRoadmapProgress.phaseIndex,
+          userRoadmapProgress.taskIndex
+        ],
+        set: {
           completed,
-          notes: notes || existing.notes,
+          notes: notes || null,
           completedAt: completed ? new Date() : null,
           updatedAt: new Date()
-        })
-        .where(eq(userRoadmapProgress.id, existing.id));
-    } else {
-      await db
-        .insert(userRoadmapProgress)
-        .values({
-          userId,
-          roadmapId,
-          phaseIndex,
-          taskIndex,
-          completed,
-          notes
-        });
-    }
+        }
+      });
   }
 
   async getTaskProgress(

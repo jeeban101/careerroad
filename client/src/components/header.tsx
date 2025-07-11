@@ -44,9 +44,8 @@ export default function Header() {
                 </Link>
                 <Link href="/history">
                   <Button
-                    variant={location === "/history" ? "default" : "ghost"}
                     size="sm"
-                    className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-lg font-semibold"
                   >
                     <History className="h-4 w-4" />
                     <span>My Roadmaps</span>
