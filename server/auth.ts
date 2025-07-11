@@ -31,7 +31,13 @@ async function hashPassword(password: string) {
 }
 
 async function comparePasswords(supplied: string, stored: string) {
+  if (!stored || !stored.includes('.')) {
+    return false;
+  }
   const [hashed, salt] = stored.split(".");
+  if (!hashed || !salt) {
+    return false;
+  }
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);
@@ -40,7 +46,7 @@ async function comparePasswords(supplied: string, stored: string) {
 export function setupAuth(app: Express) {
   const PostgresSessionStore = connectPg(session);
   const sessionStore = new PostgresSessionStore({
-    conString: "postgresql://postgres.nwjzidculhziaghdarwx:9qewE+e47@aws-0-ap-south-1.pooler.supabase.com:6543/postgres",
+    conString: process.env.DATABASE_URL,
     createTableIfMissing: false, // We already created the table
     tableName: 'sessions',
   });
