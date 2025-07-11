@@ -158,28 +158,28 @@ export default function HistoryPage() {
     const roleLabel = roleOptions.find(r => r.value === selectedRoadmap.targetRole)?.label || selectedRoadmap.targetRole;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
         <Header />
         <div className="container max-w-6xl mx-auto p-6">
           {/* Back Button */}
           <Button 
             onClick={() => setSelectedRoadmap(null)}
             variant="ghost" 
-            className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-800"
+            className="mb-6 flex items-center gap-2 text-gray-300 hover:text-white bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700/50"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to My Roadmaps
           </Button>
 
           {/* Roadmap Header */}
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <div className="bg-gray-900/80 rounded-2xl shadow-lg p-8 mb-8 border border-purple-500/20 backdrop-blur-glass">
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">Your Career Roadmap</h1>
+              <h1 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Your Career Roadmap</h1>
               <div className="flex items-center justify-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-semibold text-gray-700">{courseLabel}</span>
+                  <span className="text-lg font-semibold text-gray-200">{courseLabel}</span>
                   <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-lg font-semibold text-gray-700">{roleLabel}</span>
+                  <span className="text-lg font-semibold text-gray-200">{roleLabel}</span>
                 </div>
               </div>
             </div>
