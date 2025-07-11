@@ -33,7 +33,8 @@ export function setupAuth(app: Express) {
   const PostgresSessionStore = connectPg(session);
   const sessionStore = new PostgresSessionStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
+    createTableIfMissing: false, // We already created the table
+    tableName: 'sessions',
   });
 
   const sessionSettings: session.SessionOptions = {
@@ -43,7 +44,9 @@ export function setupAuth(app: Express) {
     store: sessionStore,
     cookie: {
       secure: false, // Set to true in production with HTTPS
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      httpOnly: true,
+      sameSite: 'lax'
     }
   };
 
