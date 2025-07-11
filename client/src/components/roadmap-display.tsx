@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users } from "lucide-react";
-import { RoadmapTemplate, RoadmapItem } from "@shared/schema";
+import { RoadmapTemplate, RoadmapItem, UserRoadmapProgress } from "@shared/schema";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import EmailModal from "@/components/email-modal";
 
 interface RoadmapDisplayProps {
@@ -60,9 +64,59 @@ const getPhaseColor = (index: number) => {
 export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisplayProps) {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [roadmapHistoryId, setRoadmapHistoryId] = useState<number | null>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
   const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
   const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
+
+  // Auto-save roadmap to history when user is logged in
+  const saveToHistoryMutation = useMutation({
+    mutationFn: async (roadmapData: any) => {
+      const response = await apiRequest('POST', '/api/user-roadmap-history', roadmapData);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setRoadmapHistoryId(data.id);
+    },
+    onError: (error) => {
+      console.error('Failed to save roadmap to history:', error);
+    }
+  });
+
+  // Save roadmap to history when component mounts (if user is logged in)
+  useEffect(() => {
+    if (user && roadmap && !roadmapHistoryId) {
+      saveToHistoryMutation.mutate({
+        currentCourse: roadmap.currentCourse,
+        targetRole: roadmap.targetRole,
+        title: roadmap.title,
+        phases: roadmap.phases
+      });
+    }
+  }, [user, roadmap, roadmapHistoryId]);
+
+  // Update task progress
+  const updateTaskProgressMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await apiRequest('POST', '/api/update-task-progress', data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Progress Updated",
+        description: "Task progress has been saved",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update task progress",
+        variant: "destructive",
+      });
+    }
+  });
 
   const handleItemCheck = (phaseIndex: number, itemIndex: number, checked: boolean) => {
     const key = `${phaseIndex}-${itemIndex}`;
@@ -73,6 +127,16 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
       newCheckedItems.delete(key);
     }
     setCheckedItems(newCheckedItems);
+
+    // Update progress in database if user is logged in and roadmap is saved
+    if (user && roadmapHistoryId) {
+      updateTaskProgressMutation.mutate({
+        roadmapId: roadmapHistoryId,
+        phaseIndex,
+        taskIndex: itemIndex,
+        completed: checked
+      });
+    }
   };
 
   const totalWeeks = roadmap.phases?.reduce((sum, phase) => sum + phase.duration_weeks, 0) || 0;

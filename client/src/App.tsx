@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Landing from "@/pages/landing";
+import HistoryPage from "@/pages/history-page";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import AuthPage from "@/pages/auth-page";
 
@@ -24,6 +25,7 @@ function Router() {
     <Switch>
       <Route path="/" component={user ? Home : Landing} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/history" component={user ? HistoryPage : Landing} />
       <Route component={NotFound} />
     </Switch>
   );

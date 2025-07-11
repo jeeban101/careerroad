@@ -5,6 +5,8 @@ import {
   customRoadmaps,
   savedRoadmaps,
   sessions,
+  userRoadmapHistory,
+  userRoadmapProgress,
   type User, 
   type InsertUser,
   type WaitlistEntry,
@@ -14,7 +16,11 @@ import {
   type CustomRoadmap,
   type InsertCustomRoadmap,
   type SavedRoadmap,
-  type InsertSavedRoadmap
+  type InsertSavedRoadmap,
+  type UserRoadmapHistory,
+  type InsertUserRoadmapHistory,
+  type UserRoadmapProgress,
+  type InsertUserRoadmapProgress
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
@@ -38,6 +44,16 @@ export interface IStorage {
   createSavedRoadmap(roadmap: InsertSavedRoadmap): Promise<SavedRoadmap>;
   getSavedRoadmapsByUser(userId: number): Promise<SavedRoadmap[]>;
   deleteSavedRoadmap(id: number, userId: number): Promise<void>;
+  
+  // New methods for roadmap history and progress
+  createUserRoadmapHistory(history: InsertUserRoadmapHistory): Promise<UserRoadmapHistory>;
+  getUserRoadmapHistory(userId: number): Promise<UserRoadmapHistory[]>;
+  updateRoadmapAccessCount(roadmapId: number): Promise<void>;
+  
+  createUserRoadmapProgress(progress: InsertUserRoadmapProgress): Promise<UserRoadmapProgress>;
+  getUserRoadmapProgress(userId: number, roadmapId: number): Promise<UserRoadmapProgress[]>;
+  updateTaskProgress(userId: number, roadmapId: number, phaseIndex: number, taskIndex: number, completed: boolean, notes?: string): Promise<void>;
+  getTaskProgress(userId: number, roadmapId: number, phaseIndex: number, taskIndex: number): Promise<UserRoadmapProgress | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -46,11 +62,15 @@ export class MemStorage implements IStorage {
   private roadmapTemplates: Map<string, RoadmapTemplate>;
   private customRoadmaps: Map<number, CustomRoadmap>;
   private savedRoadmaps: Map<number, SavedRoadmap>;
+  private userRoadmapHistories: Map<number, UserRoadmapHistory>;
+  private userRoadmapProgresses: Map<number, UserRoadmapProgress>;
   private currentUserId: number;
   private currentWaitlistId: number;
   private currentTemplateId: number;
   private currentCustomRoadmapId: number;
   private currentSavedRoadmapId: number;
+  private currentHistoryId: number;
+  private currentProgressId: number;
 
   constructor() {
     this.users = new Map();
@@ -58,11 +78,15 @@ export class MemStorage implements IStorage {
     this.roadmapTemplates = new Map();
     this.customRoadmaps = new Map();
     this.savedRoadmaps = new Map();
+    this.userRoadmapHistories = new Map();
+    this.userRoadmapProgresses = new Map();
     this.currentUserId = 1;
     this.currentWaitlistId = 1;
     this.currentTemplateId = 1;
     this.currentCustomRoadmapId = 1;
     this.currentSavedRoadmapId = 1;
+    this.currentHistoryId = 1;
+    this.currentProgressId = 1;
     
     // Initialize with sample roadmap templates
     this.initializeRoadmapTemplates();
@@ -290,6 +314,102 @@ export class MemStorage implements IStorage {
       this.savedRoadmaps.delete(id);
     }
   }
+
+  // New history and progress tracking methods
+  async createUserRoadmapHistory(history: InsertUserRoadmapHistory): Promise<UserRoadmapHistory> {
+    const id = this.currentHistoryId++;
+    const userHistory: UserRoadmapHistory = {
+      ...history,
+      id,
+      accessCount: 1,
+      lastAccessed: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.userRoadmapHistories.set(id, userHistory);
+    return userHistory;
+  }
+
+  async getUserRoadmapHistory(userId: number): Promise<UserRoadmapHistory[]> {
+    return Array.from(this.userRoadmapHistories.values()).filter(
+      history => history.userId === userId
+    ).sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime());
+  }
+
+  async updateRoadmapAccessCount(roadmapId: number): Promise<void> {
+    const history = this.userRoadmapHistories.get(roadmapId);
+    if (history) {
+      history.accessCount = (history.accessCount || 1) + 1;
+      history.lastAccessed = new Date();
+      history.updatedAt = new Date();
+    }
+  }
+
+  async createUserRoadmapProgress(progress: InsertUserRoadmapProgress): Promise<UserRoadmapProgress> {
+    const id = this.currentProgressId++;
+    const userProgress: UserRoadmapProgress = {
+      ...progress,
+      id,
+      completed: progress.completed || false,
+      completedAt: progress.completed ? new Date() : null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.userRoadmapProgresses.set(id, userProgress);
+    return userProgress;
+  }
+
+  async getUserRoadmapProgress(userId: number, roadmapId: number): Promise<UserRoadmapProgress[]> {
+    return Array.from(this.userRoadmapProgresses.values()).filter(
+      progress => progress.userId === userId && progress.roadmapId === roadmapId
+    );
+  }
+
+  async updateTaskProgress(
+    userId: number, 
+    roadmapId: number, 
+    phaseIndex: number, 
+    taskIndex: number, 
+    completed: boolean, 
+    notes?: string
+  ): Promise<void> {
+    const existing = Array.from(this.userRoadmapProgresses.values()).find(
+      progress => progress.userId === userId && 
+                 progress.roadmapId === roadmapId &&
+                 progress.phaseIndex === phaseIndex &&
+                 progress.taskIndex === taskIndex
+    );
+
+    if (existing) {
+      existing.completed = completed;
+      existing.notes = notes || existing.notes;
+      existing.completedAt = completed ? new Date() : null;
+      existing.updatedAt = new Date();
+    } else {
+      await this.createUserRoadmapProgress({
+        userId,
+        roadmapId,
+        phaseIndex,
+        taskIndex,
+        completed,
+        notes
+      });
+    }
+  }
+
+  async getTaskProgress(
+    userId: number, 
+    roadmapId: number, 
+    phaseIndex: number, 
+    taskIndex: number
+  ): Promise<UserRoadmapProgress | undefined> {
+    return Array.from(this.userRoadmapProgresses.values()).find(
+      progress => progress.userId === userId && 
+                 progress.roadmapId === roadmapId &&
+                 progress.phaseIndex === phaseIndex &&
+                 progress.taskIndex === taskIndex
+    );
+  }
 }
 
 // Database storage implementation
@@ -386,6 +506,112 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(savedRoadmaps)
       .where(and(eq(savedRoadmaps.id, id), eq(savedRoadmaps.userId, userId)));
+  }
+
+  // New history and progress tracking methods
+  async createUserRoadmapHistory(history: InsertUserRoadmapHistory): Promise<UserRoadmapHistory> {
+    const [userHistory] = await db
+      .insert(userRoadmapHistory)
+      .values(history)
+      .returning();
+    return userHistory;
+  }
+
+  async getUserRoadmapHistory(userId: number): Promise<UserRoadmapHistory[]> {
+    return await db
+      .select()
+      .from(userRoadmapHistory)
+      .where(eq(userRoadmapHistory.userId, userId))
+      .orderBy(userRoadmapHistory.lastAccessed);
+  }
+
+  async updateRoadmapAccessCount(roadmapId: number): Promise<void> {
+    await db
+      .update(userRoadmapHistory)
+      .set({ 
+        accessCount: userRoadmapHistory.accessCount + 1,
+        lastAccessed: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(userRoadmapHistory.id, roadmapId));
+  }
+
+  async createUserRoadmapProgress(progress: InsertUserRoadmapProgress): Promise<UserRoadmapProgress> {
+    const [userProgress] = await db
+      .insert(userRoadmapProgress)
+      .values(progress)
+      .returning();
+    return userProgress;
+  }
+
+  async getUserRoadmapProgress(userId: number, roadmapId: number): Promise<UserRoadmapProgress[]> {
+    return await db
+      .select()
+      .from(userRoadmapProgress)
+      .where(and(
+        eq(userRoadmapProgress.userId, userId),
+        eq(userRoadmapProgress.roadmapId, roadmapId)
+      ));
+  }
+
+  async updateTaskProgress(
+    userId: number, 
+    roadmapId: number, 
+    phaseIndex: number, 
+    taskIndex: number, 
+    completed: boolean, 
+    notes?: string
+  ): Promise<void> {
+    const [existing] = await db
+      .select()
+      .from(userRoadmapProgress)
+      .where(and(
+        eq(userRoadmapProgress.userId, userId),
+        eq(userRoadmapProgress.roadmapId, roadmapId),
+        eq(userRoadmapProgress.phaseIndex, phaseIndex),
+        eq(userRoadmapProgress.taskIndex, taskIndex)
+      ));
+
+    if (existing) {
+      await db
+        .update(userRoadmapProgress)
+        .set({
+          completed,
+          notes: notes || existing.notes,
+          completedAt: completed ? new Date() : null,
+          updatedAt: new Date()
+        })
+        .where(eq(userRoadmapProgress.id, existing.id));
+    } else {
+      await db
+        .insert(userRoadmapProgress)
+        .values({
+          userId,
+          roadmapId,
+          phaseIndex,
+          taskIndex,
+          completed,
+          notes
+        });
+    }
+  }
+
+  async getTaskProgress(
+    userId: number, 
+    roadmapId: number, 
+    phaseIndex: number, 
+    taskIndex: number
+  ): Promise<UserRoadmapProgress | undefined> {
+    const [progress] = await db
+      .select()
+      .from(userRoadmapProgress)
+      .where(and(
+        eq(userRoadmapProgress.userId, userId),
+        eq(userRoadmapProgress.roadmapId, roadmapId),
+        eq(userRoadmapProgress.phaseIndex, phaseIndex),
+        eq(userRoadmapProgress.taskIndex, taskIndex)
+      ));
+    return progress;
   }
 }
 

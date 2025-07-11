@@ -64,6 +64,32 @@ export const customRoadmaps = pgTable("custom_roadmaps", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const userRoadmapHistory = pgTable("user_roadmap_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  currentCourse: varchar("current_course", { length: 255 }).notNull(),
+  targetRole: varchar("target_role", { length: 255 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  phases: jsonb("phases").notNull().$type<RoadmapPhase[]>(),
+  accessCount: integer("access_count").default(1),
+  lastAccessed: timestamp("last_accessed").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const userRoadmapProgress = pgTable("user_roadmap_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
+  phaseIndex: integer("phase_index").notNull(),
+  taskIndex: integer("task_index").notNull(),
+  completed: boolean("completed").default(false),
+  notes: text("notes"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -102,6 +128,23 @@ export const insertCustomRoadmapSchema = createInsertSchema(customRoadmaps).pick
   phases: true,
 });
 
+export const insertUserRoadmapHistorySchema = createInsertSchema(userRoadmapHistory).pick({
+  userId: true,
+  currentCourse: true,
+  targetRole: true,
+  title: true,
+  phases: true,
+});
+
+export const insertUserRoadmapProgressSchema = createInsertSchema(userRoadmapProgress).pick({
+  userId: true,
+  roadmapId: true,
+  phaseIndex: true,
+  taskIndex: true,
+  completed: true,
+  notes: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertSavedRoadmap = z.infer<typeof insertSavedRoadmapSchema>;
@@ -112,6 +155,10 @@ export type InsertRoadmapTemplate = z.infer<typeof insertRoadmapTemplateSchema>;
 export type RoadmapTemplate = typeof roadmapTemplates.$inferSelect;
 export type InsertCustomRoadmap = z.infer<typeof insertCustomRoadmapSchema>;
 export type CustomRoadmap = typeof customRoadmaps.$inferSelect;
+export type InsertUserRoadmapHistory = z.infer<typeof insertUserRoadmapHistorySchema>;
+export type UserRoadmapHistory = typeof userRoadmapHistory.$inferSelect;
+export type InsertUserRoadmapProgress = z.infer<typeof insertUserRoadmapProgressSchema>;
+export type UserRoadmapProgress = typeof userRoadmapProgress.$inferSelect;
 
 export interface RoadmapPhase {
   title: string;

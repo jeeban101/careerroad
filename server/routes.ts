@@ -2,7 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { createWaitlistEntry, getWaitlistEntries } from "./database";
 import { setupAuth } from "./auth";
-import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema } from "@shared/schema";
+import { storage } from "./storage";
+import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema, insertUserRoadmapHistorySchema } from "@shared/schema";
 import { generateRoadmap } from "./gemini";
 
 function isAuthenticated(req: any, res: any, next: any) {
@@ -188,6 +189,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to delete saved roadmap:", error);
       res.status(500).json({ message: "Failed to delete saved roadmap" });
+    }
+  });
+
+  // User roadmap history routes
+  app.get("/api/user-roadmap-history", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const history = await storage.getUserRoadmapHistory(user.id);
+      res.json(history);
+    } catch (error) {
+      console.error("Error fetching user roadmap history:", error);
+      res.status(500).json({ error: "Failed to fetch roadmap history" });
+    }
+  });
+
+  app.post("/api/user-roadmap-history", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const validation = insertUserRoadmapHistorySchema.safeParse({
+        ...req.body,
+        userId: user.id
+      });
+      
+      if (!validation.success) {
+        return res.status(400).json({ message: "Invalid roadmap history data" });
+      }
+      
+      const history = await storage.createUserRoadmapHistory(validation.data);
+      res.status(201).json(history);
+    } catch (error) {
+      console.error("Error creating user roadmap history:", error);
+      res.status(500).json({ error: "Failed to create roadmap history" });
+    }
+  });
+
+  // Task progress routes
+  app.get("/api/roadmap-progress/:roadmapId", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const roadmapId = parseInt(req.params.roadmapId);
+      const progress = await storage.getUserRoadmapProgress(user.id, roadmapId);
+      res.json(progress);
+    } catch (error) {
+      console.error("Error fetching roadmap progress:", error);
+      res.status(500).json({ error: "Failed to fetch roadmap progress" });
+    }
+  });
+
+  app.post("/api/update-task-progress", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { roadmapId, phaseIndex, taskIndex, completed, notes } = req.body;
+      
+      await storage.updateTaskProgress(
+        user.id,
+        roadmapId,
+        phaseIndex,
+        taskIndex,
+        completed,
+        notes
+      );
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating task progress:", error);
+      res.status(500).json({ error: "Failed to update task progress" });
     }
   });
 
