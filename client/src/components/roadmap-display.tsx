@@ -36,15 +36,15 @@ const getItemIcon = (type: string) => {
 const getItemColor = (type: string) => {
   switch (type) {
     case "resource":
-      return "bg-blue-600/20 border-blue-500/30 text-blue-300";
+      return "bg-blue-600 border-blue-400 text-white";
     case "tool":
-      return "bg-purple-600/20 border-purple-500/30 text-purple-300";
+      return "bg-purple-600 border-purple-400 text-white";
     case "task":
-      return "bg-emerald-600/20 border-emerald-500/30 text-emerald-300";
+      return "bg-emerald-600 border-emerald-400 text-white";
     case "community":
-      return "bg-amber-600/20 border-amber-500/30 text-amber-300";
+      return "bg-amber-600 border-amber-400 text-white";
     default:
-      return "bg-blue-600/20 border-blue-500/30 text-blue-300";
+      return "bg-blue-600 border-blue-400 text-white";
   }
 };
 
