@@ -30,10 +30,17 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  const PostgresSessionStore = connectPg(session);
+  const sessionStore = new PostgresSessionStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: true,
+  });
+
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "dev-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
+    store: sessionStore,
     cookie: {
       secure: false, // Set to true in production with HTTPS
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
