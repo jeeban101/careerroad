@@ -32,10 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Force redirect to home page after successful login
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
+      // Success toast and let router handle the redirect
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+        variant: "default",
+      });
     },
     onError: (error: Error) => {
       toast({
@@ -53,10 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: User) => {
       queryClient.setQueryData(["/api/user"], user);
-      // Force redirect to home page after successful registration
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
+      // Success toast and let router handle the redirect
+      toast({
+        title: "Account created",
+        description: "Welcome to CareerRoad!",
+        variant: "default",
+      });
     },
     onError: (error: Error) => {
       toast({

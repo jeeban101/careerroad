@@ -20,8 +20,7 @@ export default function AuthPage() {
 
   // Redirect if already logged in
   if (user) {
-    // Use window.location to ensure proper page reload
-    window.location.href = "/";
+    setLocation("/");
     return null;
   }
 
