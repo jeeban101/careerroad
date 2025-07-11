@@ -11,6 +11,8 @@ import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
 import { RoadmapTemplate } from "@shared/schema";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface RoadmapBuilderProps {
   onRoadmapGenerated: (roadmap: RoadmapTemplate) => void;
@@ -26,6 +28,8 @@ interface FormData {
 export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderProps) {
   const [showCustomCourse, setShowCustomCourse] = useState(false);
   const [showCustomRole, setShowCustomRole] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
   
   const form = useForm<FormData>({
     defaultValues: {
@@ -46,8 +50,33 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
       }
       return response as RoadmapTemplate;
     },
-    onSuccess: (roadmap) => {
+    onSuccess: async (roadmap) => {
       onRoadmapGenerated(roadmap);
+      
+      // Auto-save to history if user is logged in
+      if (user && roadmap) {
+        try {
+          await apiRequest("POST", "/api/user-roadmap-history", {
+            currentCourse: roadmap.currentCourse,
+            targetRole: roadmap.targetRole,
+            title: roadmap.title,
+            phases: roadmap.phases
+          });
+          
+          toast({
+            title: "Roadmap Generated!",
+            description: "Your roadmap has been automatically saved to your history.",
+          });
+        } catch (error) {
+          console.error("Failed to save roadmap to history:", error);
+          toast({
+            title: "Roadmap Generated!",
+            description: "Roadmap generated successfully but couldn't save to history.",
+            variant: "destructive",
+          });
+        }
+      }
+      
       setTimeout(() => {
         document.getElementById('roadmap-display')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
