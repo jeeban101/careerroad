@@ -109,7 +109,7 @@ export default function TaskCard({
   };
 
   return (
-    <div className="group p-5 rounded-2xl bg-gradient-to-br from-white/5 via-white/10 to-purple-500/10 border-2 border-white/20 hover:border-purple-400/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] backdrop-blur-glass shimmer">
+    <div className="group p-4 rounded-xl bg-gray-800/60 border-2 border-gray-700/50 hover:border-purple-400/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] backdrop-blur-glass shimmer hover:bg-gray-800/80">
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
           <Checkbox 
@@ -118,7 +118,7 @@ export default function TaskCard({
             className="mt-1 h-5 w-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 transition-all duration-200 border-gray-400 data-[state=unchecked]:border-gray-400"
           />
         </div>
-        <div className={`flex-shrink-0 w-12 h-12 ${itemColor} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md glow-pulse`}>
+        <div className={`flex-shrink-0 w-12 h-12 ${itemColor} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md glow-pulse border border-white/20`}>
           <ItemIcon className="text-white" size={18} />
         </div>
         <div className="flex-1 min-w-0">
@@ -127,7 +127,7 @@ export default function TaskCard({
               {item.label}
             </h4>
             <div className="flex items-center space-x-3 flex-wrap">
-              <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm`}>
+              <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm border border-white/20`}>
                 {item.type}
               </span>
               

@@ -223,13 +223,13 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                       <PhaseIcon className="text-white text-2xl" size={28} />
                       <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl opacity-30 animate-pulse"></div>
                     </div>
-                    <Card className="ml-8 flex-1 border-0 shadow-xl bg-white/5 backdrop-blur-glass hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 rounded-2xl overflow-hidden">
+                    <Card className="ml-8 flex-1 border-2 border-purple-500/20 shadow-xl bg-gray-900/70 backdrop-blur-glass hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 rounded-2xl overflow-hidden hover:border-purple-400/40">
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400"></div>
                       <CardContent className="p-8">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                           <div>
                             <div className="flex items-center mb-2">
-                              <span className="text-sm font-semibold text-purple-300 bg-purple-600/20 px-3 py-1 rounded-full">
+                              <span className="text-sm font-semibold text-purple-200 bg-purple-600/30 px-3 py-1 rounded-full border border-purple-500/30">
                                 Phase {phaseIndex + 1}
                               </span>
                             </div>
@@ -237,7 +237,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                               {phase.title}
                             </h3>
                           </div>
-                          <div className={`${phaseColor} text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg w-fit`}>
+                          <div className={`${phaseColor} text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg w-fit border border-white/20`}>
                             <div className="flex items-center space-x-1">
                               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
@@ -246,7 +246,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                             </div>
                           </div>
                         </div>
-                        <div className="grid gap-4">
+                        <div className="space-y-3">
                           {phase.items.map((item, itemIndex) => {
                             const ItemIcon = getItemIcon(item.type);
                             const itemColor = getItemColor(item.type);

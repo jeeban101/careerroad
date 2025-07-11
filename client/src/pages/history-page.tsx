@@ -299,7 +299,7 @@ export default function HistoryPage() {
             return (
               <Card 
                 key={roadmap.id} 
-                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/20 hover:border-purple-400 bg-white/5 hover:bg-white/10 backdrop-blur-glass hover:scale-105 transform"
+                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400/60 bg-gray-900/80 hover:bg-gray-800/90 backdrop-blur-glass hover:scale-105 transform shadow-lg"
                 onClick={() => setSelectedRoadmap(roadmap)}
               >
                 <CardHeader className="pb-3 relative">
@@ -307,7 +307,7 @@ export default function HistoryPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600/20 hover:text-red-400 z-10"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600/20 hover:text-red-400 z-10 text-gray-400"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (confirm('Are you sure you want to delete this roadmap?')) {
@@ -319,15 +319,15 @@ export default function HistoryPage() {
                   </Button>
                   
                   <div className="flex items-center justify-between pr-8">
-                    <Badge variant="outline" className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-300 border-purple-500/30 font-semibold">
+                    <Badge variant="outline" className="bg-gradient-to-r from-purple-600/30 to-blue-600/30 text-purple-200 border-purple-400/50 font-semibold">
                       {roleLabel}
                     </Badge>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-gray-300">
                       <Calendar className="h-4 w-4" />
                       <span>{format(new Date(roadmap.createdAt), 'MMM dd')}</span>
                     </div>
                   </div>
-                  <CardTitle className="text-xl text-white line-clamp-2 font-bold">
+                  <CardTitle className="text-xl text-white line-clamp-2 font-bold mt-2">
                     {courseLabel} → {roleLabel}
                   </CardTitle>
                 </CardHeader>
@@ -335,27 +335,27 @@ export default function HistoryPage() {
                   <div className="space-y-4">
                     {/* Stats with icons */}
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2 p-3 bg-blue-600/20 rounded-lg">
-                        <Brain className="h-5 w-5 text-blue-400" />
+                      <div className="flex items-center gap-2 p-3 bg-blue-600/30 rounded-lg border border-blue-500/30">
+                        <Brain className="h-5 w-5 text-blue-300" />
                         <div>
-                          <div className="text-sm font-semibold text-blue-200">{roadmap.phases.length}</div>
-                          <div className="text-xs text-blue-300">Phases</div>
+                          <div className="text-sm font-semibold text-blue-100">{roadmap.phases.length}</div>
+                          <div className="text-xs text-blue-200">Phases</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 p-3 bg-emerald-600/20 rounded-lg">
-                        <CheckSquare className="h-5 w-5 text-emerald-400" />
+                      <div className="flex items-center gap-2 p-3 bg-emerald-600/30 rounded-lg border border-emerald-500/30">
+                        <CheckSquare className="h-5 w-5 text-emerald-300" />
                         <div>
-                          <div className="text-sm font-semibold text-emerald-200">
+                          <div className="text-sm font-semibold text-emerald-100">
                             {roadmap.phases.reduce((total, phase) => total + phase.items.length, 0)}
                           </div>
-                          <div className="text-xs text-emerald-300">Tasks</div>
+                          <div className="text-xs text-emerald-200">Tasks</div>
                         </div>
                       </div>
                     </div>
                     
                     {/* Last Accessed */}
-                    <div className="flex items-center justify-between text-sm p-2 bg-white/10 rounded-lg">
-                      <span className="text-gray-300 flex items-center gap-1">
+                    <div className="flex items-center justify-between text-sm p-3 bg-gray-800/60 rounded-lg border border-gray-700/50">
+                      <span className="text-gray-200 flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         Last viewed
                       </span>
