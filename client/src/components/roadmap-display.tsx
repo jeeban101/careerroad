@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users, Save, Heart, Bookmark, Star } from "lucide-react";
+import TaskCard from "@/components/task-card";
 import { RoadmapTemplate, RoadmapItem, UserRoadmapProgress } from "@shared/schema";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
 import { useAuth } from "@/hooks/useAuth";
@@ -253,46 +254,18 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                             const isChecked = checkedItems.has(itemKey);
                             
                             return (
-                              <div 
-                                key={itemIndex} 
-                                className={`group flex items-start p-5 ${itemColor} rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${isChecked ? 'opacity-75 scale-95' : ''} cursor-pointer`}
-                                style={{ animationDelay: `${(phaseIndex * 200) + (itemIndex * 100)}ms` }}
-                              >
-                                <Checkbox
-                                  checked={isChecked}
-                                  onCheckedChange={(checked) => handleItemCheck(phaseIndex, itemIndex, checked as boolean)}
-                                  className="mt-1 mr-4 transform transition-transform duration-200 hover:scale-110"
-                                />
-                                <div className="flex-1">
-                                  <div className="flex items-center mb-3">
-                                    <div className={`p-2 rounded-lg mr-3 ${getItemColor(item.type).replace('bg-', 'bg-').replace('50', '100')} transition-colors duration-200 group-hover:scale-110`}>
-                                      <ItemIcon className={`${getItemColor(item.type).split(' ')[2]}`} size={18} />
-                                    </div>
-                                    <span className="font-semibold capitalize text-sm px-3 py-1 bg-white/80 rounded-full text-gray-700 border">
-                                      {item.type}
-                                    </span>
-                                  </div>
-                                  <h4 className="font-bold text-gray-900 mb-2 text-lg group-hover:text-gray-700 transition-colors duration-200">
-                                    {item.label}
-                                  </h4>
-                                  {item.description && (
-                                    <p className="text-gray-600 mb-3 leading-relaxed">{item.description}</p>
-                                  )}
-                                  {item.link && (
-                                    <a 
-                                      href={item.link} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200 hover:underline"
-                                    >
-                                      <span>View Resource</span>
-                                      <svg className="w-4 h-4 transform transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                      </svg>
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
+                              <TaskCard
+                                key={itemIndex}
+                                item={item}
+                                phaseIndex={phaseIndex}
+                                itemIndex={itemIndex}
+                                isChecked={isChecked}
+                                roadmapHistoryId={roadmapHistoryId}
+                                onTaskCheck={handleItemCheck}
+                                user={user}
+                                itemColor={itemColor}
+                                ItemIcon={ItemIcon}
+                              />
                             );
                           })}
                         </div>

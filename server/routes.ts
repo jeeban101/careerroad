@@ -241,8 +241,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const roadmapId = parseInt(req.params.roadmapId);
-      const progress = await storage.getUserRoadmapProgress(user.id, roadmapId);
-      res.json(progress);
+      const phaseIndex = req.query.phaseIndex;
+      const taskIndex = req.query.taskIndex;
+      
+      // If specific task requested, get individual task progress
+      if (phaseIndex !== undefined && taskIndex !== undefined) {
+        const progress = await storage.getTaskProgress(
+          user.id, 
+          roadmapId, 
+          parseInt(phaseIndex as string), 
+          parseInt(taskIndex as string)
+        );
+        res.json(progress);
+      } else {
+        // Get all progress for the roadmap
+        const progress = await storage.getUserRoadmapProgress(user.id, roadmapId);
+        res.json(progress);
+      }
     } catch (error) {
       console.error("Error fetching roadmap progress:", error);
       res.status(500).json({ error: "Failed to fetch roadmap progress" });

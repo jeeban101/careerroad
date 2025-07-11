@@ -44,19 +44,23 @@ export default function HistoryPage() {
 
   if (!history || history.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
         <Header />
         <div className="container max-w-4xl mx-auto p-6">
           <div className="text-center py-12">
-            <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">No Roadmap History Found</h2>
-            <p className="text-gray-600">
-              Once you generate roadmaps, they'll appear here for easy access and progress tracking.
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Debug Info: User {user?.id ? `ID: ${user.id}` : 'not found'}, 
-              History: {history ? `${history.length} items` : 'null/undefined'}
-            </p>
+            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
+              <Target className="h-16 w-16 text-purple-400 mx-auto mb-6" />
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Start Your Career Journey</h2>
+              <p className="text-gray-600 mb-6">
+                No roadmaps yet? Generate your first personalized career roadmap to start tracking your progress and building your future.
+              </p>
+              <Button 
+                onClick={() => window.location.href = '/'}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              >
+                Generate Your First Roadmap
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -64,13 +68,15 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <Header />
       <div className="container max-w-6xl mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Roadmap History</h1>
-          <p className="text-gray-600">
-            Track your progress and revisit your career roadmaps
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            My Career Roadmaps
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Track your progress and continue building your career journey
           </p>
         </div>
 
