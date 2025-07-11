@@ -232,6 +232,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete user roadmap history
+  app.delete("/api/user-roadmap-history/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const roadmapId = parseInt(req.params.id);
+      await storage.deleteUserRoadmapHistory(roadmapId, user.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting user roadmap history:", error);
+      res.status(500).json({ error: "Failed to delete roadmap history" });
+    }
+  });
+
   // Task progress routes
   app.get("/api/roadmap-progress/:roadmapId", isAuthenticated, async (req: any, res) => {
     try {

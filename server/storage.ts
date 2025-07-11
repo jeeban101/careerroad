@@ -48,6 +48,7 @@ export interface IStorage {
   // New methods for roadmap history and progress
   createUserRoadmapHistory(history: InsertUserRoadmapHistory): Promise<UserRoadmapHistory>;
   getUserRoadmapHistory(userId: number): Promise<UserRoadmapHistory[]>;
+  deleteUserRoadmapHistory(roadmapId: number, userId: number): Promise<void>;
   updateRoadmapAccessCount(roadmapId: number): Promise<void>;
   
   createUserRoadmapProgress(progress: InsertUserRoadmapProgress): Promise<UserRoadmapProgress>;
@@ -336,6 +337,13 @@ export class MemStorage implements IStorage {
     ).sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime());
   }
 
+  async deleteUserRoadmapHistory(roadmapId: number, userId: number): Promise<void> {
+    const history = this.userRoadmapHistories.get(roadmapId);
+    if (history && history.userId === userId) {
+      this.userRoadmapHistories.delete(roadmapId);
+    }
+  }
+
   async updateRoadmapAccessCount(roadmapId: number): Promise<void> {
     const history = this.userRoadmapHistories.get(roadmapId);
     if (history) {
@@ -523,6 +531,12 @@ export class DatabaseStorage implements IStorage {
       .from(userRoadmapHistory)
       .where(eq(userRoadmapHistory.userId, userId))
       .orderBy(userRoadmapHistory.lastAccessed);
+  }
+
+  async deleteUserRoadmapHistory(roadmapId: number, userId: number): Promise<void> {
+    await db
+      .delete(userRoadmapHistory)
+      .where(and(eq(userRoadmapHistory.id, roadmapId), eq(userRoadmapHistory.userId, userId)));
   }
 
   async updateRoadmapAccessCount(roadmapId: number): Promise<void> {

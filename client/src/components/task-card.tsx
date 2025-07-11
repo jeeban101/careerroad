@@ -4,7 +4,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { ExternalLink, StickyNote, Save, X } from "lucide-react";
+import { ExternalLink, StickyNote, Save, X, Link2, FileText } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { RoadmapItem } from "@shared/schema";
@@ -130,24 +131,46 @@ export default function TaskCard({
                 {item.type}
               </span>
               {user && roadmapHistoryId && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleNotesToggle}
-                  className={`p-1 h-6 w-6 ${(notes || taskProgress?.notes) ? 'text-purple-600' : 'text-gray-400'} hover:text-purple-700`}
-                >
-                  <StickyNote size={12} />
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleNotesToggle}
+                        className={`p-1 h-8 w-8 rounded-full transition-all duration-200 ${
+                          (notes || taskProgress?.notes) 
+                            ? 'text-purple-600 bg-purple-100 hover:bg-purple-200' 
+                            : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+                        }`}
+                      >
+                        <StickyNote size={14} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{(notes || taskProgress?.notes) ? 'Edit notes' : 'Add notes'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               {item.link && (
-                <a 
-                  href={item.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-800 transition-colors duration-200"
-                >
-                  <ExternalLink size={14} />
-                </a>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a 
+                        href={item.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="p-1 h-8 w-8 rounded-full flex items-center justify-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-all duration-200"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Open external resource</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </div>
           </div>

@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Clock, Target, Calendar, TrendingUp, CheckCircle, ArrowLeft, Book, Wrench, CheckSquare, Users, Brain, Hammer, Rocket, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { Clock, Target, Calendar, TrendingUp, CheckCircle, ArrowLeft, Book, Wrench, CheckSquare, Users, Brain, Hammer, Rocket, ExternalLink, ChevronDown, ChevronUp, Trash2, Edit, StickyNote, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { UserRoadmapHistory, UserRoadmapProgress, RoadmapItem } from "@shared/schema";
 import Header from "@/components/header";
 import TaskCard from "@/components/task-card";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 
 // Helper functions for styling
 const getItemIcon = (type: string) => {
@@ -51,6 +53,31 @@ export default function HistoryPage() {
   const [selectedRoadmap, setSelectedRoadmap] = useState<UserRoadmapHistory | null>(null);
   const [expandedPhases, setExpandedPhases] = useState<Set<number>>(new Set([0]));
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+
+  // Delete roadmap mutation
+  const deleteRoadmapMutation = useMutation({
+    mutationFn: async (roadmapId: number) => {
+      await apiRequest('DELETE', `/api/user-roadmap-history/${roadmapId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user-roadmap-history"] });
+      if (selectedRoadmap) {
+        setSelectedRoadmap(null);
+      }
+      toast({
+        title: "Roadmap Deleted",
+        description: "Your roadmap has been successfully removed.",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Delete Failed",
+        description: "Could not delete the roadmap. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: history, isLoading: historyLoading, error: historyError } = useQuery({
     queryKey: ["/api/user-roadmap-history"],
@@ -247,49 +274,81 @@ export default function HistoryPage() {
             return (
               <Card 
                 key={roadmap.id} 
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-purple-200 bg-white"
+                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 hover:border-purple-300 bg-gradient-to-br from-white to-blue-50 hover:from-blue-50 hover:to-purple-50 hover:scale-105 transform"
                 onClick={() => setSelectedRoadmap(roadmap)}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200">
+                <CardHeader className="pb-3 relative">
+                  {/* Delete Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-50 hover:text-red-600 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm('Are you sure you want to delete this roadmap?')) {
+                        deleteRoadmapMutation.mutate(roadmap.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  
+                  <div className="flex items-center justify-between pr-8">
+                    <Badge variant="outline" className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 border-purple-200 font-semibold">
                       {roleLabel}
                     </Badge>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <Calendar className="h-4 w-4" />
-                      <span>{format(new Date(roadmap.createdAt), 'MMM dd, yyyy')}</span>
+                      <span>{format(new Date(roadmap.createdAt), 'MMM dd')}</span>
                     </div>
                   </div>
-                  <CardTitle className="text-xl text-gray-900 line-clamp-2">
+                  <CardTitle className="text-xl text-gray-900 line-clamp-2 font-bold">
                     {courseLabel} → {roleLabel}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Phases</span>
-                      <span className="font-semibold text-gray-900">{roadmap.phases.length}</span>
+                  <div className="space-y-4">
+                    {/* Stats with icons */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                        <Brain className="h-5 w-5 text-blue-600" />
+                        <div>
+                          <div className="text-sm font-semibold text-blue-800">{roadmap.phases.length}</div>
+                          <div className="text-xs text-blue-600">Phases</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-3 bg-emerald-50 rounded-lg">
+                        <CheckSquare className="h-5 w-5 text-emerald-600" />
+                        <div>
+                          <div className="text-sm font-semibold text-emerald-800">
+                            {roadmap.phases.reduce((total, phase) => total + phase.items.length, 0)}
+                          </div>
+                          <div className="text-xs text-emerald-600">Tasks</div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Total Tasks</span>
-                      <span className="font-semibold text-gray-900">
-                        {roadmap.phases.reduce((total, phase) => total + phase.items.length, 0)}
+                    
+                    {/* Last Accessed */}
+                    <div className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded-lg">
+                      <span className="text-gray-600 flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        Last viewed
                       </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Last Accessed</span>
                       <span className="font-semibold text-gray-900">
                         {format(new Date(roadmap.lastAccessed), 'MMM dd')}
                       </span>
                     </div>
+                    
+                    {/* Action Button */}
                     <div className="pt-2">
                       <Button 
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedRoadmap(roadmap);
                         }}
                       >
+                        <Target className="h-4 w-4 mr-2" />
                         View & Track Progress
                       </Button>
                     </div>
