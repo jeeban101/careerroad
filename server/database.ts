@@ -56,3 +56,25 @@ export async function getWaitlistEntries() {
   const result = await pool.query(query);
   return result.rows;
 }
+
+export async function createResetToken(email: string, token: string, expiry: Date) {
+  await pool.query(
+    'UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3',
+    [token, expiry, email]
+  );
+}
+
+export async function getUserByResetToken(token: string) {
+  const result = await pool.query(
+    'SELECT id, email, username, first_name, last_name FROM users WHERE reset_token = $1 AND reset_token_expiry > NOW()',
+    [token]
+  );
+  return result.rows[0];
+}
+
+export async function updatePassword(userId: number, hashedPassword: string) {
+  await pool.query(
+    'UPDATE users SET password = $1, reset_token = NULL, reset_token_expiry = NULL WHERE id = $2',
+    [hashedPassword, userId]
+  );
+}

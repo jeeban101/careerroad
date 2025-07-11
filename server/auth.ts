@@ -4,7 +4,7 @@ import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { createUser, getUserByEmail, getUserById } from "./database";
+import { createUser, getUserByEmail, getUserById, createResetToken, getUserByResetToken, updatePassword } from "./database";
 import connectPg from "connect-pg-simple";
 
 declare global {
@@ -137,5 +137,52 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const user = req.user!;
     res.json({ id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name });
+  });
+
+  // Password reset endpoints
+  app.post("/api/reset-password-request", async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await getUserByEmail(email);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Generate reset token
+      const token = randomBytes(32).toString("hex");
+      const expiry = new Date(Date.now() + 3600000); // 1 hour from now
+      
+      await createResetToken(email, token, expiry);
+      
+      // In production, you would send an email here
+      res.json({ 
+        message: "Password reset initiated", 
+        token, // Only for development - remove in production
+        resetUrl: `${req.protocol}://${req.get('host')}/reset-password?token=${token}`
+      });
+    } catch (error) {
+      console.error("Reset password request error:", error);
+      res.status(500).json({ error: "Server error" });
+    }
+  });
+
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      const user = await getUserByResetToken(token);
+      if (!user) {
+        return res.status(400).json({ error: "Invalid or expired token" });
+      }
+
+      const hashedPassword = await hashPassword(newPassword);
+      await updatePassword(user.id, hashedPassword);
+      
+      res.json({ message: "Password reset successful" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ error: "Server error" });
+    }
   });
 }

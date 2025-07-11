@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
@@ -116,6 +116,13 @@ export default function AuthPage() {
                     >
                       {loginMutation.isPending ? "Signing in..." : "Sign In"}
                     </Button>
+                    <div className="text-center mt-4">
+                      <Link href="/reset-password">
+                        <Button variant="link" className="text-gray-400 hover:text-white text-sm">
+                          Forgot your password?
+                        </Button>
+                      </Link>
+                    </div>
                   </form>
                 </CardContent>
               </Card>

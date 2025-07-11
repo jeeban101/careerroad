@@ -21,6 +21,8 @@ export const users = pgTable("users", {
   password: varchar("password", { length: 255 }).notNull(),
   firstName: varchar("first_name", { length: 255 }),
   lastName: varchar("last_name", { length: 255 }),
+  resetToken: varchar("reset_token", { length: 255 }),
+  resetTokenExpiry: timestamp("reset_token_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -181,4 +183,16 @@ export const emailRequestSchema = z.object({
   roadmapTitle: z.string(),
 });
 
+// Password reset schemas
+export const resetPasswordRequestSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string(),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 export type EmailRequest = z.infer<typeof emailRequestSchema>;
+export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;
+export type ResetPassword = z.infer<typeof resetPasswordSchema>;

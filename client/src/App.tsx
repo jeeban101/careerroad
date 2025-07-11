@@ -9,6 +9,7 @@ import Landing from "@/pages/landing";
 import HistoryPage from "@/pages/history-page";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import AuthPage from "@/pages/auth-page";
+import ResetPasswordPage from "@/pages/reset-password-page";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -25,6 +26,7 @@ function Router() {
     <Switch>
       <Route path="/" component={user ? Home : Landing} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/reset-password" component={ResetPasswordPage} />
       <Route path="/history" component={user ? HistoryPage : Landing} />
       <Route component={NotFound} />
     </Switch>
