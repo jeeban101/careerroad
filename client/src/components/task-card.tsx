@@ -122,65 +122,65 @@ export default function TaskCard({
           <ItemIcon className="text-white" size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className={`text-sm font-semibold text-white group-hover:text-purple-300 transition-colors duration-200 ${isChecked ? 'line-through text-gray-400' : ''}`}>
-              {item.label}
-            </h4>
-            <div className="flex items-center space-x-3 flex-wrap">
-              <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm border border-white/20`}>
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex-1 min-w-0 pr-4">
+              <h4 className={`text-sm font-semibold text-white group-hover:text-purple-300 transition-colors duration-200 ${isChecked ? 'line-through text-gray-400' : ''}`}>
+                {item.label}
+              </h4>
+            </div>
+            <div className="flex items-center space-x-2 flex-shrink-0">
+              <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm border border-white/20 whitespace-nowrap`}>
                 {item.type}
               </span>
               
               {/* Enhanced Action Buttons */}
-              <div className="flex items-center space-x-2">
-                {user && roadmapHistoryId && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleNotesToggle}
-                          className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer ${
-                            (notes || taskProgress?.notes) 
-                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg' 
-                              : 'bg-white/10 text-gray-300 border-gray-500 hover:border-purple-400 hover:text-purple-300 hover:bg-purple-500/20'
-                          }`}
-                        >
-                          <StickyNote size={12} className="mr-1" />
-                          {(notes || taskProgress?.notes) ? 'Edit Notes' : 'Add Notes'}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-sm">
-                          {(notes || taskProgress?.notes) ? 'Click to edit your personal notes' : 'Click to add personal notes and track your progress'}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                
-                {item.link && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <a 
-                          href={item.link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="px-3 py-1 h-8 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-2 border-blue-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg flex items-center space-x-1 shimmer"
-                        >
-                          <ExternalLink size={12} />
-                          <span>Open Resource</span>
-                        </a>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-sm">Click to open external learning resource in a new tab</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
+              {user && roadmapHistoryId && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleNotesToggle}
+                        className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer whitespace-nowrap ${
+                          (notes || taskProgress?.notes) 
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg' 
+                            : 'bg-white/10 text-gray-300 border-gray-500 hover:border-purple-400 hover:text-purple-300 hover:bg-purple-500/20'
+                        }`}
+                      >
+                        <StickyNote size={12} className="mr-1" />
+                        {(notes || taskProgress?.notes) ? 'Edit Notes' : 'Add Notes'}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm">
+                        {(notes || taskProgress?.notes) ? 'Click to edit your personal notes' : 'Click to add personal notes and track your progress'}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              
+              {item.link && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a 
+                        href={item.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 h-8 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-2 border-blue-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg flex items-center space-x-1 shimmer whitespace-nowrap"
+                      >
+                        <ExternalLink size={12} />
+                        <span>Open Resource</span>
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm">Click to open external learning resource in a new tab</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
           </div>
           {item.description && (
