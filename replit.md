@@ -8,7 +8,7 @@ CareerRoad is a full-stack web application that helps students and early graduat
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (July 11, 2025)
+## Recent Changes (July 12, 2025)
 
 ✓ Redesigned landing page to match minimalist design requirements
 ✓ Implemented AI-powered roadmap generation using Gemini 2.5 Flash
@@ -57,6 +57,11 @@ Preferred communication style: Simple, everyday language.
 ✓ COMPLETED: CRITICAL FIX - Roadmap display cards formatting and alignment with consistent spacing and styling
 ✓ COMPLETED: Full dark theme consistency across all application components with proper text contrast
 ✓ COMPLETED: Production-ready UI with professional dark theme suitable for deployment and presentation
+✓ COMPLETED: Password reset functionality with secure token generation and email workflow
+✓ COMPLETED: "Forgot Password" link added to authentication page with complete reset flow
+✓ COMPLETED: Task card formatting alignment fixed between fresh roadmaps and history view
+✓ COMPLETED: Created comprehensive documentation including README.md and TECH_STACK.md
+✓ COMPLETED: Detailed environment variables documentation and setup instructions
 
 ## System Architecture
 
