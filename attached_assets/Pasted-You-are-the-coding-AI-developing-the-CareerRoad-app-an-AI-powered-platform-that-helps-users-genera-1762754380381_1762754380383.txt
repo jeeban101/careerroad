@@ -1,0 +1,131 @@
+You are the coding AI developing the CareerRoad app — an AI-powered platform that helps users generate personalized career and skill roadmaps using Gemini API.
+
+The app already includes:
+
+Authentication and Supabase backend
+
+Roadmap generation via Gemini
+
+“Build Skill” feature where users select a skill, proficiency, and timeframe
+
+A functional but static roadmap view
+
+Now, revamp the “Build Skill” roadmap visualization into an engaging, interactive, and gamified learning experience that keeps users motivated and makes them want to learn inside the app instead of leaving.
+
+🎯 Objective
+
+Transform the current static roadmap (a list of stages, tasks, and resources) into a progressive, step-based, learning journey that feels dynamic, visual, and interactive — not just a document to read.
+
+🧭 Core Redesign Requirements
+
+Visual Journey Layout
+
+Replace the long scroll with a horizontal or step-based learning flow (like a journey or timeline).
+
+Each stage (Beginner → Intermediate → Advanced) should appear as a step with progress lines connecting them.
+
+The user can click each step to expand and view that stage’s tasks, milestones, and resources.
+
+Interactive Tasks
+
+Make each “Task” checkable — users can mark it as done.
+
+When a task is completed, show a mini animation (like a checkmark pulse or XP counter).
+
+Show a stage progress bar (“3/7 tasks done”) and an overall roadmap completion bar at the top.
+
+Clickable, Rich Resource Cards
+
+Replace plain links with visually rich resource cards that include:
+
+Icons based on resource type (📺 YouTube, 📘 Docs, 💻 CodePen)
+
+Buttons like “Open” and “Preview”
+
+Embedded YouTube/CodePen previews inside modals
+
+Make them colorful, clickable, and exciting — not plain text.
+
+Gamified Learning
+
+Introduce a XP and Badge system:
+
++10 XP per completed task
+
++50 XP per completed stage
+
+Badges for finishing all stages (“Skill Mastered 🎓”)
+
+Add a top-right “XP meter” showing progress and small celebratory animations (like confetti or emoji bursts) when levels or badges unlock.
+
+In-App Learning Mode
+
+Add a simple note-taking area below each stage: “Add your notes or reflections.”
+
+Store notes locally or in Supabase (if available).
+
+Let users reopen a stage and review their notes anytime.
+
+Motivational Feedback
+
+Show encouraging messages dynamically:
+
+“🔥 You’re on fire — 60% done!”
+
+“Nice work! You’ve mastered Stage 2!”
+
+“Keep going — your next milestone is in sight 🚀”
+
+These should appear after task/stage completion or progress updates.
+
+Animations & Feel
+
+Use smooth GSAP or Framer Motion animations for transitions between stages, expanding sections, and task completions.
+
+Avoid overloading — subtle, clean motion that feels rewarding.
+
+Example: cards slide up, progress bars animate, checkboxes pulse, and confetti triggers on full completion.
+
+Clean Visual Theme
+
+Keep CareerRoad’s dark gradient theme (purple → pink) but add subtle neon accents per stage.
+
+Give each stage a color identity (e.g., Beginner = purple, Intermediate = blue, Advanced = green).
+
+Use glowing icons, soft shadows, and smooth hover transitions.
+
+📚 User Flow Summary
+
+User enters skill, proficiency, and timeframe → clicks Generate Skill Roadmap.
+
+Gemini API returns a JSON roadmap (same structure as now).
+
+The new interactive layout renders:
+
+Step-by-step roadmap
+
+Progress bars and XP
+
+Clickable resources
+
+Notes and reflections
+
+As the user marks tasks, progress updates dynamically with visual feedback and gamified rewards.
+
+When the roadmap is completed, show a “🎉 Congratulations — You’ve mastered [Skill]!” modal with share option.
+
+🌈 Desired Vibe
+
+Think of this as Notion meets Duolingo meets roadmap.
+It should feel alive, motivating, and satisfying to interact with — not like reading a document.
+Every click, animation, and card should feel rewarding and guide the user’s learning journey visually.
+
+⚡ Key Goals to Keep in Mind
+
+Make users want to stay and learn — reduce drop-off by adding interactivity.
+
+Focus on visual clarity, progression, and a sense of achievement.
+
+Maintain accessibility and performance (light animations, semantic HTML).
+
+Keep the same backend and Gemini integration — only transform how the roadmap is visualized and interacted with.
