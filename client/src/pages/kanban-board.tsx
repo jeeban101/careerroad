@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Trash2, GripVertical, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Header from "@/components/header";
 
 interface KanbanTask {
   id: number;
@@ -25,6 +26,8 @@ interface KanbanBoard {
   userId: number;
   name: string;
   description: string | null;
+  roadmapId?: number | null;
+  roadmapType?: string | null;
   createdAt: Date;
   updatedAt: Date;
   tasks?: KanbanTask[];
@@ -167,15 +170,20 @@ export default function KanbanBoardPage() {
 
   if (boardsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950 flex items-center justify-center">
-        <p className="text-lg text-slate-600 dark:text-slate-400">Loading boards...</p>
-      </div>
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950 flex items-center justify-center">
+          <p className="text-lg text-slate-600 dark:text-slate-400">Loading boards...</p>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950">
-      <div className="container mx-auto px-4 py-8">
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950">
+        <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Kanban Boards</h1>
           
@@ -417,5 +425,6 @@ export default function KanbanBoardPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

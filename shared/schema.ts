@@ -104,8 +104,9 @@ export const kanbanBoards = pgTable("kanban_boards", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
-  title: varchar("title", { length: 255 }).notNull(),
-  roadmapType: varchar("roadmap_type", { length: 50 }).notNull().default("career"),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  roadmapType: varchar("roadmap_type", { length: 50 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -114,7 +115,7 @@ export const kanbanBoards = pgTable("kanban_boards", {
 export const kanbanTasks = pgTable("kanban_tasks", {
   id: serial("id").primaryKey(),
   boardId: integer("board_id").references(() => kanbanBoards.id, { onDelete: "cascade" }).notNull(),
-  task: varchar("task", { length: 500 }).notNull(),
+  title: varchar("title", { length: 500 }).notNull(),
   description: text("description"),
   resources: jsonb("resources").$type<string[]>(),
   estimatedTime: varchar("estimated_time", { length: 100 }),
@@ -190,13 +191,14 @@ export const insertUserRoadmapProgressSchema = createInsertSchema(userRoadmapPro
 export const insertKanbanBoardSchema = createInsertSchema(kanbanBoards).pick({
   userId: true,
   roadmapId: true,
-  title: true,
+  name: true,
+  description: true,
   roadmapType: true,
 });
 
 export const insertKanbanTaskSchema = createInsertSchema(kanbanTasks).pick({
   boardId: true,
-  task: true,
+  title: true,
   description: true,
   resources: true,
   estimatedTime: true,
