@@ -25,9 +25,9 @@ interface KanbanBoard {
 }
 
 const KANBAN_COLUMNS = [
-  { id: "todo", title: "To Do", color: "bg-slate-100 dark:bg-slate-800" },
-  { id: "in_progress", title: "In Progress", color: "bg-blue-50 dark:bg-blue-900/20" },
-  { id: "done", title: "Done", color: "bg-green-50 dark:bg-green-900/20" }
+  { id: "todo", title: "To Do", color: "bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm" },
+  { id: "in_progress", title: "In Progress", color: "bg-blue-900/30 border border-blue-700/50 backdrop-blur-sm" },
+  { id: "done", title: "Done", color: "bg-green-900/30 border border-green-700/50 backdrop-blur-sm" }
 ];
 
 export default function KanbanBoardPage() {
@@ -48,6 +48,10 @@ export default function KanbanBoardPage() {
   const [isEditingTask, setIsEditingTask] = useState(false);
   const [editTaskTitle, setEditTaskTitle] = useState("");
   const [editTaskDescription, setEditTaskDescription] = useState("");
+  const [editTaskCategory, setEditTaskCategory] = useState("");
+  const [editTaskEstimatedTime, setEditTaskEstimatedTime] = useState("");
+  const [editTaskResources, setEditTaskResources] = useState<string[]>([]);
+  const [newResource, setNewResource] = useState("");
 
   // Auto-select board from URL parameter
   useEffect(() => {
@@ -154,8 +158,21 @@ export default function KanbanBoardPage() {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async ({ taskId, title, description }: { taskId: number; title: string; description: string }) => {
-      const res = await apiRequest("PATCH", `/api/kanban/tasks/${taskId}`, { title, description });
+    mutationFn: async ({ taskId, title, description, category, estimatedTime, resources }: { 
+      taskId: number; 
+      title: string; 
+      description: string;
+      category?: string;
+      estimatedTime?: string;
+      resources?: string[];
+    }) => {
+      const res = await apiRequest("PATCH", `/api/kanban/tasks/${taskId}`, { 
+        title, 
+        description,
+        category,
+        estimatedTime,
+        resources
+      });
       return await res.json();
     },
     onSuccess: () => {
@@ -196,6 +213,10 @@ export default function KanbanBoardPage() {
     setSelectedTask(task);
     setEditTaskTitle(task.title);
     setEditTaskDescription(task.description || "");
+    setEditTaskCategory(task.category || "");
+    setEditTaskEstimatedTime(task.estimatedTime || "");
+    setEditTaskResources(task.resources || []);
+    setNewResource("");
     setIsEditingTask(false);
     setIsTaskDetailsOpen(true);
   };
@@ -205,16 +226,48 @@ export default function KanbanBoardPage() {
     updateTaskMutation.mutate({
       taskId: selectedTask.id,
       title: editTaskTitle,
-      description: editTaskDescription
+      description: editTaskDescription,
+      category: editTaskCategory,
+      estimatedTime: editTaskEstimatedTime,
+      resources: editTaskResources
     });
+  };
+
+  const handleAddResource = () => {
+    if (newResource.trim()) {
+      setEditTaskResources([...editTaskResources, newResource.trim()]);
+      setNewResource("");
+    }
+  };
+
+  const handleRemoveResource = (index: number) => {
+    setEditTaskResources(editTaskResources.filter((_, i) => i !== index));
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    if (!selectedTask) return;
+    const tasksInNewColumn = getTasksByStatus(newStatus);
+    const newPosition = tasksInNewColumn.length;
+    
+    updateTaskStatusMutation.mutate({
+      taskId: selectedTask.id,
+      status: newStatus,
+      position: newPosition
+    });
+    
+    setSelectedTask({ ...selectedTask, status: newStatus });
   };
 
   if (boardsLoading) {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950 flex items-center justify-center">
-          <p className="text-lg text-slate-600 dark:text-slate-400">Loading boards...</p>
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
+          <div className="absolute inset-0 bg-background">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,53,234,0.3),transparent_50%)] animate-pulse"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.3),transparent_50%)] animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
+          <p className="relative z-10 text-lg text-white">Loading boards...</p>
         </div>
       </>
     );
@@ -223,10 +276,17 @@ export default function KanbanBoardPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Dark theme background with animated gradients - matching main app */}
+        <div className="absolute inset-0 bg-background">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,53,234,0.3),transparent_50%)] animate-pulse"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.3),transparent_50%)] animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,rgba(16,185,129,0.2),transparent_50%)] animate-pulse" style={{ animationDelay: '4s' }}></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Kanban Boards</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">Kanban Boards</h1>
           
           <Dialog open={isCreateBoardOpen} onOpenChange={setIsCreateBoardOpen}>
             <DialogTrigger asChild>
@@ -563,71 +623,136 @@ export default function KanbanBoardPage() {
               )}
             </div>
 
-            {/* Status */}
+            {/* Status - Always editable */}
             <div>
               <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <Tag className="h-4 w-4" />
                 Status
               </label>
-              <div className="mt-1">
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  selectedTask.status === 'done' 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
-                    : selectedTask.status === 'in_progress'
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                    : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-400'
-                }`}>
-                  {KANBAN_COLUMNS.find(col => col.id === selectedTask.status)?.title || selectedTask.status}
-                </span>
-              </div>
+              <select
+                value={selectedTask.status}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                data-testid="select-task-status"
+              >
+                {KANBAN_COLUMNS.map(col => (
+                  <option key={col.id} value={col.id}>{col.title}</option>
+                ))}
+              </select>
             </div>
 
-            {/* Category */}
-            {selectedTask.category && (
-              <div>
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
-                  Category
-                </label>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">{selectedTask.category}</p>
-              </div>
-            )}
+            {/* Category - Editable */}
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                Category
+              </label>
+              {isEditingTask ? (
+                <Input
+                  value={editTaskCategory}
+                  onChange={(e) => setEditTaskCategory(e.target.value)}
+                  placeholder="e.g., HTML, Foundation Phase"
+                  className="mt-1"
+                  data-testid="input-edit-task-category"
+                />
+              ) : (
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
+                  {selectedTask.category || "No category"}
+                </p>
+              )}
+            </div>
 
-            {/* Estimated Time */}
-            {selectedTask.estimatedTime && (
-              <div>
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Estimated Time
-                </label>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">{selectedTask.estimatedTime}</p>
-              </div>
-            )}
+            {/* Estimated Time - Editable */}
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Estimated Time
+              </label>
+              {isEditingTask ? (
+                <Input
+                  value={editTaskEstimatedTime}
+                  onChange={(e) => setEditTaskEstimatedTime(e.target.value)}
+                  placeholder="e.g., 5 hours, 2 weeks"
+                  className="mt-1"
+                  data-testid="input-edit-task-time"
+                />
+              ) : (
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
+                  {selectedTask.estimatedTime || "No time estimate"}
+                </p>
+              )}
+            </div>
 
-            {/* Resources */}
-            {selectedTask.resources && selectedTask.resources.length > 0 && (
-              <div>
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <ExternalLink className="h-4 w-4" />
-                  Resources
-                </label>
+            {/* Resources - Editable */}
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <ExternalLink className="h-4 w-4" />
+                Resources
+              </label>
+              {isEditingTask ? (
                 <div className="mt-2 space-y-2">
-                  {selectedTask.resources.map((resource, index) => (
-                    <a
-                      key={index}
-                      href={resource}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline"
-                      data-testid={`link-resource-${index}`}
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      <span className="text-sm truncate">{resource}</span>
-                    </a>
+                  {editTaskResources.map((resource, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={resource}
+                        onChange={(e) => {
+                          const newResources = [...editTaskResources];
+                          newResources[index] = e.target.value;
+                          setEditTaskResources(newResources);
+                        }}
+                        className="flex-1"
+                        data-testid={`input-resource-${index}`}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveResource(index)}
+                        data-testid={`button-remove-resource-${index}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
                   ))}
+                  <div className="flex gap-2">
+                    <Input
+                      value={newResource}
+                      onChange={(e) => setNewResource(e.target.value)}
+                      placeholder="Add resource URL..."
+                      onKeyPress={(e) => e.key === 'Enter' && handleAddResource()}
+                      data-testid="input-new-resource"
+                    />
+                    <Button
+                      onClick={handleAddResource}
+                      variant="outline"
+                      size="sm"
+                      data-testid="button-add-resource"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="mt-2 space-y-2">
+                  {selectedTask.resources && selectedTask.resources.length > 0 ? (
+                    selectedTask.resources.map((resource, index) => (
+                      <a
+                        key={index}
+                        href={resource}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline"
+                        data-testid={`link-resource-${index}`}
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        <span className="text-sm truncate">{resource}</span>
+                      </a>
+                    ))
+                  ) : (
+                    <p className="text-slate-600 dark:text-slate-400 text-sm">No resources</p>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Metadata */}
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
