@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRoute } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,6 +42,7 @@ const KANBAN_COLUMNS = [
 
 export default function KanbanBoardPage() {
   const { toast } = useToast();
+  const [match, params] = useRoute("/kanban/:id?");
   const [selectedBoard, setSelectedBoard] = useState<number | null>(null);
   const [newBoardName, setNewBoardName] = useState("");
   const [newBoardDescription, setNewBoardDescription] = useState("");
@@ -49,6 +51,16 @@ export default function KanbanBoardPage() {
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState("todo");
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+
+  // Auto-select board from URL parameter
+  useEffect(() => {
+    if (params?.id) {
+      const boardId = parseInt(params.id);
+      if (!isNaN(boardId)) {
+        setSelectedBoard(boardId);
+      }
+    }
+  }, [params?.id]);
 
   const { data: boards, isLoading: boardsLoading } = useQuery<KanbanBoard[]>({
     queryKey: ["/api/kanban/boards"],

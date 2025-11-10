@@ -29,7 +29,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route path="/history" component={user ? HistoryPage : Landing} />
-      <Route path="/kanban" component={user ? KanbanBoardPage : Landing} />
+      <Route path="/kanban/:id?" component={user ? KanbanBoardPage : Landing} />
       <Route component={NotFound} />
     </Switch>
   );
