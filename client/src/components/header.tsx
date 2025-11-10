@@ -1,4 +1,4 @@
-import { Route, LogOut, History } from "lucide-react";
+import { Route, LogOut, History, Kanban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
 import { useLocation, Link } from "wouter";
@@ -81,6 +81,15 @@ export default function Header() {
                   >
                     <History className="h-4 w-4" />
                     <span>My Roadmaps</span>
+                  </Button>
+                </Link>
+                <Link href="/kanban">
+                  <Button
+                    size="sm"
+                    className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-lg font-semibold shimmer"
+                  >
+                    <Kanban className="h-4 w-4" />
+                    <span>Kanban Board</span>
                   </Button>
                 </Link>
               </nav>

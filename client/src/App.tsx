@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Landing from "@/pages/landing";
 import HistoryPage from "@/pages/history-page";
+import KanbanBoardPage from "@/pages/kanban-board";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import AuthPage from "@/pages/auth-page";
 import ResetPasswordPage from "@/pages/reset-password-page";
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route path="/history" component={user ? HistoryPage : Landing} />
+      <Route path="/kanban" component={user ? KanbanBoardPage : Landing} />
       <Route component={NotFound} />
     </Switch>
   );

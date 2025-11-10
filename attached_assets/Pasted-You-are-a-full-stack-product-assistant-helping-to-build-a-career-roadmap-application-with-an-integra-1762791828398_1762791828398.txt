@@ -1,0 +1,135 @@
+You are a full-stack product assistant helping to build a career roadmap application with an integrated Kanban Board feature for task tracking.
+
+🧠 Feature: Kanban Board + Board History Tab
+🎯 Goal
+
+Create a Kanban Board feature that generates a visual, interactive task board for each career roadmap a user generates.
+
+🧭 User Flow
+
+User visits the portal and selects a career path or skill (e.g., “Front-End Developer”).
+
+The user clicks “Generate Roadmap”, which creates the learning roadmap.
+
+A button “Generate To-Do Tracker / Board” appears at the top.
+
+When clicked, it invokes a new API call to generate the Kanban board for the selected career path using the roadmap data.
+
+🧱 Board Structure & Layout
+
+The board page should inherit the website’s main theme colors and main navbar for consistent branding.
+
+Include a board title (e.g., Front-End Developer Tracker) with a top navigation bar.
+
+Below the title, create three main sections (columns):
+
+To Do
+
+In Progress
+
+Done
+
+Each column should display task cards that can be dragged and dropped between statuses.
+
+🗂 Task Card Design
+
+Each task card should display:
+
+task_id
+
+task_title
+
+truncated description (first ~100 characters)
+
+Color-coded based on status:
+
+🟦 To Do: light blue
+
+🟧 In Progress: orange
+
+🟩 Done: green
+
+💡 Task Interaction
+
+Clicking on a task opens a modal with the full task details:
+
+id
+
+task
+
+description
+
+resources (with clickable links)
+
+estimated_time
+
+category
+
+status
+
+The modal can be closed to return to the board.
+
+✏️ Editing & Interaction Rules
+
+By default, only the status (via drag-and-drop or dropdown) is editable.
+
+When Edit Mode is activated:
+
+All fields become editable (task, description, estimated_time, category, resources).
+
+The user can save or cancel changes.
+
+There should be a button to add a new custom task in the top-right corner of the board.
+
+📜 Board History Feature
+
+In the main navbar, include a “Kanban History” tab.
+
+It should display a list of all previously generated boards, each labeled with:
+
+Career title (e.g., Front-End Developer Board)
+
+Creation date
+
+Clicking on any board in history opens that saved board view with tasks and current statuses.
+
+🧩 Data Example (For One Task)
+{
+  "id": 1,
+  "task": "Learn HTML Basics",
+  "description": "Understand elements, tags, and structure of web pages.",
+  "resources": [
+    "https://developer.mozilla.org/en-US/docs/Learn/HTML",
+    "https://www.freecodecamp.org/learn/html"
+  ],
+  "estimated_time": "5 hours",
+  "category": "HTML",
+  "status": "todo"
+}
+
+🧰 Technical Notes
+
+Drag-and-drop: Use a library like react-beautiful-dnd or dnd-kit.
+
+Modal & UI: Use shadcn/ui, TailwindCSS, and Framer Motion for smooth animations.
+
+State Management: Maintain board state locally or persist via backend API.
+
+Color Scheme: Follow the main website theme (reuse CSS variables or Tailwind config).
+
+✅ Deliverables (when this feature is generated)
+
+Fully functional Kanban board page.
+
+Modal view for full task details.
+
+Edit mode functionality.
+
+Add new task button.
+
+Board history tab in the main navbar.
+
+Persistent theme colors and navbar across pages.
+
+
+it should be available with skills generator too.

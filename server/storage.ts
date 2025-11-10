@@ -7,6 +7,8 @@ import {
   sessions,
   userRoadmapHistory,
   userRoadmapProgress,
+  kanbanBoards,
+  kanbanTasks,
   type User, 
   type InsertUser,
   type WaitlistEntry,
@@ -20,10 +22,14 @@ import {
   type UserRoadmapHistory,
   type InsertUserRoadmapHistory,
   type UserRoadmapProgress,
-  type InsertUserRoadmapProgress
+  type InsertUserRoadmapProgress,
+  type KanbanBoard,
+  type InsertKanbanBoard,
+  type KanbanTask,
+  type InsertKanbanTask
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -55,6 +61,20 @@ export interface IStorage {
   getUserRoadmapProgress(userId: number, roadmapId: number): Promise<UserRoadmapProgress[]>;
   updateTaskProgress(userId: number, roadmapId: number, phaseIndex: number, taskIndex: number, completed: boolean, notes?: string): Promise<void>;
   getTaskProgress(userId: number, roadmapId: number, phaseIndex: number, taskIndex: number): Promise<UserRoadmapProgress | undefined>;
+  
+  // Kanban Board methods
+  createKanbanBoard(board: InsertKanbanBoard): Promise<KanbanBoard>;
+  getKanbanBoardsByUser(userId: number): Promise<KanbanBoard[]>;
+  getKanbanBoard(boardId: number, userId: number): Promise<KanbanBoard | undefined>;
+  deleteKanbanBoard(boardId: number, userId: number): Promise<void>;
+  generateKanbanBoardWithTasks(board: InsertKanbanBoard, tasks: Omit<InsertKanbanTask, 'boardId'>[]): Promise<{ board: KanbanBoard; tasks: KanbanTask[] }>;
+  
+  // Kanban Task methods
+  createKanbanTask(task: InsertKanbanTask): Promise<KanbanTask>;
+  getKanbanTasksByBoard(boardId: number, userId: number): Promise<KanbanTask[]>;
+  updateKanbanTask(taskId: number, userId: number, updates: Partial<InsertKanbanTask>): Promise<KanbanTask>;
+  updateKanbanTaskStatus(taskId: number, userId: number, status: string, position: number): Promise<KanbanTask>;
+  deleteKanbanTask(taskId: number, userId: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -620,6 +640,167 @@ export class DatabaseStorage implements IStorage {
         eq(userRoadmapProgress.taskIndex, taskIndex)
       ));
     return progress;
+  }
+
+  // Kanban Board methods
+  async createKanbanBoard(board: InsertKanbanBoard): Promise<KanbanBoard> {
+    const [kanbanBoard] = await db
+      .insert(kanbanBoards)
+      .values(board)
+      .returning();
+    return kanbanBoard;
+  }
+
+  async getKanbanBoardsByUser(userId: number): Promise<KanbanBoard[]> {
+    return await db
+      .select()
+      .from(kanbanBoards)
+      .where(eq(kanbanBoards.userId, userId))
+      .orderBy(desc(kanbanBoards.createdAt));
+  }
+
+  async getKanbanBoard(boardId: number, userId: number): Promise<KanbanBoard | undefined> {
+    const [board] = await db
+      .select()
+      .from(kanbanBoards)
+      .where(and(
+        eq(kanbanBoards.id, boardId),
+        eq(kanbanBoards.userId, userId)
+      ));
+    return board;
+  }
+
+  async deleteKanbanBoard(boardId: number, userId: number): Promise<void> {
+    const result = await db
+      .delete(kanbanBoards)
+      .where(and(
+        eq(kanbanBoards.id, boardId),
+        eq(kanbanBoards.userId, userId)
+      ))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error('Board not found or access denied');
+    }
+  }
+
+  async generateKanbanBoardWithTasks(
+    board: InsertKanbanBoard, 
+    tasks: Omit<InsertKanbanTask, 'boardId'>[]
+  ): Promise<{ board: KanbanBoard; tasks: KanbanTask[] }> {
+    return await db.transaction(async (tx) => {
+      const [newBoard] = await tx
+        .insert(kanbanBoards)
+        .values(board)
+        .returning();
+
+      const tasksWithBoardId = tasks.map(task => ({
+        ...task,
+        boardId: newBoard.id
+      }));
+
+      const newTasks = await tx
+        .insert(kanbanTasks)
+        .values(tasksWithBoardId)
+        .returning();
+
+      return { board: newBoard, tasks: newTasks };
+    });
+  }
+
+  // Kanban Task methods
+  async createKanbanTask(task: InsertKanbanTask): Promise<KanbanTask> {
+    const [kanbanTask] = await db
+      .insert(kanbanTasks)
+      .values(task)
+      .returning();
+    return kanbanTask;
+  }
+
+  async getKanbanTasksByBoard(boardId: number, userId: number): Promise<KanbanTask[]> {
+    const board = await this.getKanbanBoard(boardId, userId);
+    if (!board) {
+      throw new Error('Board not found or access denied');
+    }
+    
+    return await db
+      .select()
+      .from(kanbanTasks)
+      .where(eq(kanbanTasks.boardId, boardId))
+      .orderBy(kanbanTasks.position);
+  }
+
+  async updateKanbanTask(taskId: number, userId: number, updates: Partial<InsertKanbanTask>): Promise<KanbanTask> {
+    const [task] = await db
+      .select({ boardId: kanbanTasks.boardId })
+      .from(kanbanTasks)
+      .where(eq(kanbanTasks.id, taskId));
+    
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const board = await this.getKanbanBoard(task.boardId, userId);
+    if (!board) {
+      throw new Error('Access denied');
+    }
+
+    const [updatedTask] = await db
+      .update(kanbanTasks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(kanbanTasks.id, taskId))
+      .returning();
+    
+    return updatedTask;
+  }
+
+  async updateKanbanTaskStatus(taskId: number, userId: number, status: string, position: number): Promise<KanbanTask> {
+    const [task] = await db
+      .select({ boardId: kanbanTasks.boardId })
+      .from(kanbanTasks)
+      .where(eq(kanbanTasks.id, taskId));
+    
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const board = await this.getKanbanBoard(task.boardId, userId);
+    if (!board) {
+      throw new Error('Access denied');
+    }
+
+    const [updatedTask] = await db
+      .update(kanbanTasks)
+      .set({ status, position, updatedAt: new Date() })
+      .where(eq(kanbanTasks.id, taskId))
+      .returning();
+    
+    return updatedTask;
+  }
+
+  async deleteKanbanTask(taskId: number, userId: number): Promise<void> {
+    const [task] = await db
+      .select({ boardId: kanbanTasks.boardId })
+      .from(kanbanTasks)
+      .where(eq(kanbanTasks.id, taskId));
+    
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const board = await this.getKanbanBoard(task.boardId, userId);
+    if (!board) {
+      throw new Error('Access denied');
+    }
+
+    const result = await db
+      .delete(kanbanTasks)
+      .where(eq(kanbanTasks.id, taskId))
+      .returning();
+    
+    if (result.length === 0) {
+      throw new Error('Task deletion failed');
+    }
   }
 }
 

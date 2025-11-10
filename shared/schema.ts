@@ -99,6 +99,32 @@ export const userRoadmapProgress = pgTable("user_roadmap_progress", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Kanban Boards
+export const kanbanBoards = pgTable("kanban_boards", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  roadmapType: varchar("roadmap_type", { length: 50 }).notNull().default("career"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Kanban Tasks
+export const kanbanTasks = pgTable("kanban_tasks", {
+  id: serial("id").primaryKey(),
+  boardId: integer("board_id").references(() => kanbanBoards.id, { onDelete: "cascade" }).notNull(),
+  task: varchar("task", { length: 500 }).notNull(),
+  description: text("description"),
+  resources: jsonb("resources").$type<string[]>(),
+  estimatedTime: varchar("estimated_time", { length: 100 }),
+  category: varchar("category", { length: 100 }),
+  status: varchar("status", { length: 50 }).notNull().default("todo"),
+  position: integer("position").notNull().default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -161,6 +187,24 @@ export const insertUserRoadmapProgressSchema = createInsertSchema(userRoadmapPro
   notes: true,
 });
 
+export const insertKanbanBoardSchema = createInsertSchema(kanbanBoards).pick({
+  userId: true,
+  roadmapId: true,
+  title: true,
+  roadmapType: true,
+});
+
+export const insertKanbanTaskSchema = createInsertSchema(kanbanTasks).pick({
+  boardId: true,
+  task: true,
+  description: true,
+  resources: true,
+  estimatedTime: true,
+  category: true,
+  status: true,
+  position: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertSavedRoadmap = z.infer<typeof insertSavedRoadmapSchema>;
@@ -175,6 +219,10 @@ export type InsertUserRoadmapHistory = z.infer<typeof insertUserRoadmapHistorySc
 export type UserRoadmapHistory = typeof userRoadmapHistory.$inferSelect;
 export type InsertUserRoadmapProgress = z.infer<typeof insertUserRoadmapProgressSchema>;
 export type UserRoadmapProgress = typeof userRoadmapProgress.$inferSelect;
+export type InsertKanbanBoard = z.infer<typeof insertKanbanBoardSchema>;
+export type KanbanBoard = typeof kanbanBoards.$inferSelect;
+export type InsertKanbanTask = z.infer<typeof insertKanbanTaskSchema>;
+export type KanbanTask = typeof kanbanTasks.$inferSelect;
 
 export interface RoadmapPhase {
   title: string;
