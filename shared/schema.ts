@@ -226,6 +226,22 @@ export type KanbanBoard = typeof kanbanBoards.$inferSelect;
 export type InsertKanbanTask = z.infer<typeof insertKanbanTaskSchema>;
 export type KanbanTask = typeof kanbanTasks.$inferSelect;
 
+// Kanban generation from roadmap
+export const kanbanTaskGenerationSchema = z.object({
+  tasks: z.array(z.object({
+    title: z.string().max(500),
+    description: z.string().optional(),
+    status: z.enum(["todo", "in_progress", "done"]),
+    position: z.number(),
+    resources: z.array(z.string()).optional(),
+    estimatedTime: z.string().max(100).optional(),
+    category: z.string().max(100).optional(),
+  })),
+  boardSummary: z.string().max(500).optional(),
+});
+
+export type KanbanTaskGeneration = z.infer<typeof kanbanTaskGenerationSchema>;
+
 export interface RoadmapPhase {
   title: string;
   duration_weeks: number;

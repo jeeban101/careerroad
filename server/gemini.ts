@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { RoadmapPhase, SkillRoadmapContent, GenerateSkillRoadmap } from "@shared/schema";
+import { RoadmapPhase, SkillRoadmapContent, GenerateSkillRoadmap, kanbanTaskGenerationSchema, KanbanTaskGeneration, UserRoadmapHistory } from "@shared/schema";
 import { z } from "zod";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -194,5 +194,85 @@ function mapTimeframeToStages(timeFrame: string): number {
       return 5;
     default:
       return 3;
+  }
+}
+
+export async function generateKanbanTasksFromRoadmap(roadmap: UserRoadmapHistory): Promise<KanbanTaskGeneration> {
+  try {
+    const isCareerRoadmap = roadmap.roadmapType === "career";
+    const roadmapDescription = isCareerRoadmap
+      ? `Career roadmap from ${roadmap.currentCourse} to ${roadmap.targetRole}`
+      : `Skill roadmap for ${roadmap.skill} at ${roadmap.proficiencyLevel} proficiency level (${roadmap.timeFrame} timeframe)`;
+
+    const systemPrompt = `You are a project management expert. Convert a learning roadmap into actionable Kanban board tasks.
+
+Your goal is to transform roadmap phases and items into concrete, trackable tasks organized across three Kanban columns:
+- "todo": Tasks to start with (early foundational items)
+- "in_progress": Current focus tasks (intermediate items)
+- "done": Prerequisites or quick wins that can be marked complete early
+
+For each task:
+- title: Clear, actionable task name (max 500 chars)
+- description: Brief explanation of what to do and why
+- status: Assign logically ("todo", "in_progress", or "done")
+- position: Sequential number within each column (0, 1, 2...)
+- resources: Array of links or resource names (optional)
+- estimatedTime: Time estimate like "2-3 hours", "1 week" (optional)
+- category: Phase name or skill area (optional)
+
+Distribute tasks sensibly:
+- todo column: 40-50% of tasks (foundational learning, setup)
+- in_progress column: 30-40% of tasks (main skill building)
+- done column: 10-20% of tasks (prerequisites, quick environment setup)
+
+Output strict JSON matching this schema:
+{
+  "tasks": [{"title": string, "description": string, "status": "todo"|"in_progress"|"done", "position": number, "resources"?: string[], "estimatedTime"?: string, "category"?: string}],
+  "boardSummary": "Brief board purpose" (optional)
+}
+
+No extra commentary. Pure JSON output only.`;
+
+    const userMessage = isCareerRoadmap
+      ? `${roadmapDescription}
+
+Roadmap Phases:
+${JSON.stringify(roadmap.phases, null, 2)}
+
+Convert these phases into 12-20 actionable Kanban tasks distributed across todo, in_progress, and done columns.`
+      : `${roadmapDescription}
+
+Skill Content:
+${JSON.stringify(roadmap.skillContent, null, 2)}
+
+Convert this skill roadmap into 10-18 actionable Kanban tasks distributed across todo, in_progress, and done columns.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      config: {
+        systemInstruction: systemPrompt,
+        responseMimeType: "application/json"
+      },
+      contents: userMessage
+    });
+
+    const rawJson = response.text;
+    
+    if (!rawJson) {
+      throw new Error("Empty response from Gemini");
+    }
+
+    const parsedData = JSON.parse(rawJson);
+    const validation = kanbanTaskGenerationSchema.safeParse(parsedData);
+    
+    if (!validation.success) {
+      console.error("Kanban generation validation error:", validation.error);
+      throw new Error("Invalid Kanban task structure from AI");
+    }
+
+    return validation.data;
+  } catch (error) {
+    console.error("Failed to generate Kanban tasks:", error);
+    throw new Error(`Failed to generate Kanban tasks: ${error}`);
   }
 }

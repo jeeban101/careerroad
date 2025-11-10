@@ -4,7 +4,7 @@ import { createWaitlistEntry, getWaitlistEntries } from "./database";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema, insertUserRoadmapHistorySchema, generateSkillRoadmapSchema, insertKanbanBoardSchema, insertKanbanTaskSchema } from "@shared/schema";
-import { generateRoadmap, generateSkillRoadmap } from "./gemini";
+import { generateRoadmap, generateSkillRoadmap, generateKanbanTasksFromRoadmap } from "./gemini";
 
 function isAuthenticated(req: any, res: any, next: any) {
   if (!req.isAuthenticated()) {
@@ -278,6 +278,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting user roadmap history:", error);
       res.status(500).json({ error: "Failed to delete roadmap history" });
+    }
+  });
+
+  // Generate Kanban board from roadmap
+  app.post("/api/roadmaps/:historyId/generate-kanban", isAuthenticated, async (req: any, res) => {
+    try {
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const historyId = parseInt(req.params.historyId);
+      if (isNaN(historyId)) {
+        return res.status(400).json({ message: "Invalid roadmap history ID" });
+      }
+
+      // Fetch roadmap from history
+      const roadmaps = await storage.getUserRoadmapHistory(user.id);
+      const roadmap = roadmaps.find(r => r.id === historyId);
+
+      if (!roadmap) {
+        return res.status(404).json({ message: "Roadmap not found" });
+      }
+
+      // Generate Kanban tasks from roadmap using AI
+      const kanbanData = await generateKanbanTasksFromRoadmap(roadmap);
+
+      // Create board name and description
+      const isCareerRoadmap = roadmap.roadmapType === "career";
+      const boardName = isCareerRoadmap
+        ? `${roadmap.currentCourse} → ${roadmap.targetRole}`
+        : `${roadmap.skill} - ${roadmap.proficiencyLevel}`;
+      
+      const boardDescription = kanbanData.boardSummary || 
+        (isCareerRoadmap 
+          ? `Career roadmap action plan: ${roadmap.title}`
+          : `Skill development plan for ${roadmap.skill}`);
+
+      // Prepare board data
+      const boardData = {
+        userId: user.id,
+        roadmapId: historyId,
+        name: boardName,
+        description: boardDescription,
+        roadmapType: roadmap.roadmapType,
+      };
+
+      // Validate board
+      const boardValidation = insertKanbanBoardSchema.safeParse(boardData);
+      if (!boardValidation.success) {
+        console.error("Board validation error:", boardValidation.error);
+        return res.status(400).json({ 
+          message: "Invalid board data",
+          errors: boardValidation.error.errors 
+        });
+      }
+
+      // Validate and prepare tasks
+      const validatedTasks = [];
+      for (let i = 0; i < kanbanData.tasks.length; i++) {
+        const task = kanbanData.tasks[i];
+        const taskValidation = insertKanbanTaskSchema.omit({ boardId: true }).safeParse(task);
+        if (!taskValidation.success) {
+          console.error(`Task ${i} validation error:`, taskValidation.error);
+          return res.status(400).json({ 
+            message: `Invalid task data at index ${i}`,
+            errors: taskValidation.error.errors 
+        });
+        }
+        validatedTasks.push(taskValidation.data);
+      }
+
+      // Create board with tasks in one transaction
+      const result = await storage.generateKanbanBoardWithTasks(
+        boardValidation.data,
+        validatedTasks
+      );
+
+      res.status(201).json({ 
+        boardId: result.board.id,
+        board: result.board,
+        tasksCount: result.tasks.length 
+      });
+    } catch (error) {
+      console.error("Error generating Kanban from roadmap:", error);
+      if (error instanceof Error && error.message.includes("Failed to generate Kanban tasks")) {
+        return res.status(502).json({ 
+          error: "AI generation failed. Please try again.",
+          details: error.message 
+        });
+      }
+      res.status(500).json({ error: "Failed to generate Kanban board" });
     }
   });
 

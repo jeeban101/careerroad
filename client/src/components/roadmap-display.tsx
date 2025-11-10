@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users, Save, Heart, Bookmark, Star } from "lucide-react";
+import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users, Save, Heart, Bookmark, Star, Kanban } from "lucide-react";
 import TaskCard from "@/components/task-card";
 import { RoadmapTemplate, RoadmapItem, UserRoadmapProgress } from "@shared/schema";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import EmailModal from "@/components/email-modal";
 
 interface RoadmapDisplayProps {
@@ -68,6 +69,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
   const [roadmapHistoryId, setRoadmapHistoryId] = useState<number | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
   const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
@@ -118,6 +120,49 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
       });
     }
   });
+
+  // Generate Kanban board from roadmap
+  const generateKanbanMutation = useMutation({
+    mutationFn: async (historyId: number) => {
+      const response = await apiRequest('POST', `/api/roadmaps/${historyId}/generate-kanban`, {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Kanban Board Created!",
+        description: "Your roadmap has been converted into actionable tasks.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/kanban/boards'] });
+      navigate(`/kanban/${data.boardId}`);
+    },
+    onError: (error) => {
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate Kanban board. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Failed to generate Kanban:", error);
+    }
+  });
+
+  const handleGenerateKanban = () => {
+    if (!user) {
+      setShowEmailModal(true);
+      return;
+    }
+
+    if (!roadmapHistoryId) {
+      toast({
+        title: "Please wait",
+        description: "Roadmap is being saved...",
+        variant: "default",
+      });
+      return;
+    }
+
+    generateKanbanMutation.mutate(roadmapHistoryId);
+  };
 
   const handleItemCheck = (phaseIndex: number, itemIndex: number, checked: boolean) => {
     const key = `${phaseIndex}-${itemIndex}`;
@@ -178,6 +223,15 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
                 </span>
               </div>
             )}
+            <Button 
+              onClick={handleGenerateKanban}
+              disabled={generateKanbanMutation.isPending}
+              data-testid="button-generate-kanban"
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Kanban className="mr-2 h-4 w-4" />
+              {generateKanbanMutation.isPending ? 'Generating...' : 'Generate Kanban Board'}
+            </Button>
             <Button 
               onClick={onFork}
               className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer"
