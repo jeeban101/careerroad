@@ -7,20 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, GripVertical, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, GripVertical, ChevronLeft, ChevronRight, ExternalLink, Clock, Tag, Edit2, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
-
-interface KanbanTask {
-  id: number;
-  boardId: number;
-  title: string;
-  description: string | null;
-  status: string;
-  position: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { KanbanTask } from "@shared/schema";
 
 interface KanbanBoard {
   id: number;
@@ -51,6 +41,13 @@ export default function KanbanBoardPage() {
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState("todo");
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  
+  // Task details modal state
+  const [selectedTask, setSelectedTask] = useState<KanbanTask | null>(null);
+  const [isTaskDetailsOpen, setIsTaskDetailsOpen] = useState(false);
+  const [isEditingTask, setIsEditingTask] = useState(false);
+  const [editTaskTitle, setEditTaskTitle] = useState("");
+  const [editTaskDescription, setEditTaskDescription] = useState("");
 
   // Auto-select board from URL parameter
   useEffect(() => {
@@ -156,6 +153,21 @@ export default function KanbanBoardPage() {
     },
   });
 
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ taskId, title, description }: { taskId: number; title: string; description: string }) => {
+      const res = await apiRequest("PATCH", `/api/kanban/tasks/${taskId}`, { title, description });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/kanban/boards", selectedBoard] });
+      setIsEditingTask(false);
+      toast({
+        title: "Task updated",
+        description: "Task details have been saved successfully.",
+      });
+    },
+  });
+
   const getTasksByStatus = (status: string): KanbanTask[] => {
     if (!currentBoard?.tasks) return [];
     return currentBoard.tasks
@@ -177,6 +189,23 @@ export default function KanbanBoardPage() {
       taskId: task.id,
       status: newStatus,
       position: newPosition
+    });
+  };
+
+  const openTaskDetails = (task: KanbanTask) => {
+    setSelectedTask(task);
+    setEditTaskTitle(task.title);
+    setEditTaskDescription(task.description || "");
+    setIsEditingTask(false);
+    setIsTaskDetailsOpen(true);
+  };
+
+  const handleSaveTask = () => {
+    if (!selectedTask) return;
+    updateTaskMutation.mutate({
+      taskId: selectedTask.id,
+      title: editTaskTitle,
+      description: editTaskDescription
     });
   };
 
@@ -363,7 +392,12 @@ export default function KanbanBoardPage() {
                           const canMoveRight = columnIndex < KANBAN_COLUMNS.length - 1;
                           
                           return (
-                            <Card key={task.id} data-testid={`card-task-${task.id}`} className="hover:shadow-md transition-shadow">
+                            <Card 
+                              key={task.id} 
+                              data-testid={`card-task-${task.id}`} 
+                              className="hover:shadow-md transition-shadow cursor-pointer"
+                              onClick={() => openTaskDetails(task)}
+                            >
                               <CardHeader className="pb-3">
                                 <CardTitle className="text-base flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-2 flex-1">
@@ -373,7 +407,10 @@ export default function KanbanBoardPage() {
                                   <div className="flex items-center gap-1">
                                     <button
                                       data-testid={`button-move-left-${task.id}`}
-                                      onClick={() => moveTask(task, 'left')}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        moveTask(task, 'left');
+                                      }}
                                       disabled={!canMoveLeft || updateTaskStatusMutation.isPending}
                                       className="text-blue-500 hover:text-blue-700 disabled:text-slate-300 disabled:cursor-not-allowed"
                                       title="Move to previous column"
@@ -382,7 +419,10 @@ export default function KanbanBoardPage() {
                                     </button>
                                     <button
                                       data-testid={`button-move-right-${task.id}`}
-                                      onClick={() => moveTask(task, 'right')}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        moveTask(task, 'right');
+                                      }}
                                       disabled={!canMoveRight || updateTaskStatusMutation.isPending}
                                       className="text-blue-500 hover:text-blue-700 disabled:text-slate-300 disabled:cursor-not-allowed"
                                       title="Move to next column"
@@ -391,7 +431,8 @@ export default function KanbanBoardPage() {
                                     </button>
                                     <button
                                       data-testid={`button-delete-task-${task.id}`}
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         if (confirm(`Delete task "${task.title}"?`)) {
                                           deleteTaskMutation.mutate(task.id);
                                         }
@@ -405,7 +446,7 @@ export default function KanbanBoardPage() {
                               </CardHeader>
                               {task.description && (
                                 <CardContent className="pt-0">
-                                  <p className="text-sm text-slate-600 dark:text-slate-400">{task.description}</p>
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{task.description}</p>
                                 </CardContent>
                               )}
                             </Card>
@@ -437,6 +478,168 @@ export default function KanbanBoardPage() {
         )}
       </div>
     </div>
+
+    {/* Task Details Modal */}
+    <Dialog open={isTaskDetailsOpen} onOpenChange={setIsTaskDetailsOpen}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-between">
+            <span>Task Details</span>
+            {!isEditingTask ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditingTask(true)}
+                data-testid="button-edit-task"
+              >
+                <Edit2 className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setIsEditingTask(false);
+                    if (selectedTask) {
+                      setEditTaskTitle(selectedTask.title);
+                      setEditTaskDescription(selectedTask.description || "");
+                    }
+                  }}
+                  data-testid="button-cancel-edit"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleSaveTask}
+                  disabled={updateTaskMutation.isPending}
+                  data-testid="button-save-task"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {updateTaskMutation.isPending ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        
+        {selectedTask && (
+          <div className="space-y-4 pt-4">
+            {/* Title */}
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Title</label>
+              {isEditingTask ? (
+                <Input
+                  value={editTaskTitle}
+                  onChange={(e) => setEditTaskTitle(e.target.value)}
+                  data-testid="input-edit-task-title"
+                  className="mt-1"
+                />
+              ) : (
+                <p className="text-lg font-semibold mt-1">{selectedTask.title}</p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+              {isEditingTask ? (
+                <Textarea
+                  value={editTaskDescription}
+                  onChange={(e) => setEditTaskDescription(e.target.value)}
+                  data-testid="input-edit-task-description"
+                  className="mt-1"
+                  rows={4}
+                  placeholder="Add a description..."
+                />
+              ) : (
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
+                  {selectedTask.description || "No description"}
+                </p>
+              )}
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                Status
+              </label>
+              <div className="mt-1">
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  selectedTask.status === 'done' 
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
+                    : selectedTask.status === 'in_progress'
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                    : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-400'
+                }`}>
+                  {KANBAN_COLUMNS.find(col => col.id === selectedTask.status)?.title || selectedTask.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Category */}
+            {selectedTask.category && (
+              <div>
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  Category
+                </label>
+                <p className="text-slate-600 dark:text-slate-400 mt-1">{selectedTask.category}</p>
+              </div>
+            )}
+
+            {/* Estimated Time */}
+            {selectedTask.estimatedTime && (
+              <div>
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Estimated Time
+                </label>
+                <p className="text-slate-600 dark:text-slate-400 mt-1">{selectedTask.estimatedTime}</p>
+              </div>
+            )}
+
+            {/* Resources */}
+            {selectedTask.resources && selectedTask.resources.length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  Resources
+                </label>
+                <div className="mt-2 space-y-2">
+                  {selectedTask.resources.map((resource, index) => (
+                    <a
+                      key={index}
+                      href={resource}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline"
+                      data-testid={`link-resource-${index}`}
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      <span className="text-sm truncate">{resource}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Metadata */}
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="text-xs text-slate-500 dark:text-slate-500 space-y-1">
+                {selectedTask.createdAt && <p>Created: {new Date(selectedTask.createdAt).toLocaleString()}</p>}
+                {selectedTask.updatedAt && <p>Updated: {new Date(selectedTask.updatedAt).toLocaleString()}</p>}
+              </div>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
     </>
   );
 }
