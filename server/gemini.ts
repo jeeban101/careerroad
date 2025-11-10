@@ -214,20 +214,17 @@ Your goal is to transform roadmap phases and items into concrete, trackable task
 For each task:
 - title: Clear, actionable task name (max 500 chars)
 - description: Brief explanation of what to do and why
-- status: Assign logically ("todo", "in_progress", or "done")
-- position: Sequential number within each column (0, 1, 2...)
+- status: Always set to "todo" (all tasks start in the todo column)
+- position: Sequential number (0, 1, 2, 3...)
 - resources: Array of links or resource names (optional)
 - estimatedTime: Time estimate like "2-3 hours", "1 week" (optional)
 - category: Phase name or skill area (optional)
 
-Distribute tasks sensibly:
-- todo column: 40-50% of tasks (foundational learning, setup)
-- in_progress column: 30-40% of tasks (main skill building)
-- done column: 10-20% of tasks (prerequisites, quick environment setup)
+Important: ALL tasks should have status "todo" and be placed in sequential positions starting from 0.
 
 Output strict JSON matching this schema:
 {
-  "tasks": [{"title": string, "description": string, "status": "todo"|"in_progress"|"done", "position": number, "resources"?: string[], "estimatedTime"?: string, "category"?: string}],
+  "tasks": [{"title": string, "description": string, "status": "todo", "position": number, "resources"?: string[], "estimatedTime"?: string, "category"?: string}],
   "boardSummary": "Brief board purpose" (optional)
 }
 
@@ -239,13 +236,13 @@ No extra commentary. Pure JSON output only.`;
 Roadmap Phases:
 ${JSON.stringify(roadmap.phases, null, 2)}
 
-Convert these phases into 12-20 actionable Kanban tasks distributed across todo, in_progress, and done columns.`
+Convert these phases into 12-20 actionable Kanban tasks. All tasks should have status "todo".`
       : `${roadmapDescription}
 
 Skill Content:
 ${JSON.stringify(roadmap.skillContent, null, 2)}
 
-Convert this skill roadmap into 10-18 actionable Kanban tasks distributed across todo, in_progress, and done columns.`;
+Convert this skill roadmap into 10-18 actionable Kanban tasks. All tasks should have status "todo".`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
