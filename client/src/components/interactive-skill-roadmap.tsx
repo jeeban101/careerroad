@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Target, Clock, Trophy, Star, BookOpen, Youtube, FileText, ExternalLink, Award, Zap, TrendingUp } from "lucide-react";
+import { CheckCircle, Target, Clock, Trophy, Star, BookOpen, Youtube, FileText, ExternalLink, Award, Zap, TrendingUp, Kanban } from "lucide-react";
 import { SkillRoadmapContent } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import confetti from "canvas-confetti";
 import { Badge } from "@/components/ui/badge";
 
@@ -48,6 +51,7 @@ const getResourceIcon = (resource: string) => {
 
 export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSkillRoadmapProps) {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   const [taskProgress, setTaskProgress] = useState<TaskProgress[]>([]);
   const [stageNotes, setStageNotes] = useState<StageNote[]>([]);
   const [expandedStage, setExpandedStage] = useState<number | null>(0);
@@ -164,6 +168,43 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
     return stageNotes.find(n => n.stageIndex === stageIndex)?.note || "";
   };
 
+  // Generate Kanban board from roadmap
+  const generateKanbanMutation = useMutation({
+    mutationFn: async (historyId: number) => {
+      const response = await apiRequest('POST', `/api/roadmaps/${historyId}/generate-kanban`, {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Kanban Board Created!",
+        description: "Your roadmap has been converted into actionable tasks.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/kanban/boards'] });
+      navigate(`/kanban/${data.boardId}`);
+    },
+    onError: (error) => {
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate Kanban board. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Failed to generate Kanban:", error);
+    }
+  });
+
+  const handleGenerateKanban = () => {
+    if (!skillRoadmap.id) {
+      toast({
+        title: "Error",
+        description: "Roadmap ID not found",
+        variant: "destructive",
+      });
+      return;
+    }
+    generateKanbanMutation.mutate(skillRoadmap.id);
+  };
+
   useEffect(() => {
     if (completionPercentage === 100 && totalTasks > 0 && completedTasks === totalTasks) {
       triggerCelebration();
@@ -227,6 +268,19 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
             <span className="font-bold text-purple-400">{completedTasks}/{totalTasks} tasks • {completionPercentage}%</span>
           </div>
           <Progress value={completionPercentage} className="h-3 bg-white/10" />
+        </div>
+
+        {/* Generate Kanban Button */}
+        <div className="mt-4 flex justify-center">
+          <Button 
+            onClick={handleGenerateKanban}
+            disabled={generateKanbanMutation.isPending}
+            data-testid="button-generate-kanban-skill"
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-2.5 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Kanban className="mr-2 h-4 w-4" />
+            {generateKanbanMutation.isPending ? 'Generating...' : 'Generate Kanban Board'}
+          </Button>
         </div>
 
         {motivationalMessage && (

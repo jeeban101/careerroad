@@ -338,15 +338,16 @@ export default function HistoryPage() {
                       <div className="flex items-center gap-2 p-3 bg-blue-600/30 rounded-lg border border-blue-500/30">
                         <Brain className="h-5 w-5 text-blue-300" />
                         <div>
-                          <div className="text-sm font-semibold text-blue-100">{roadmap.phases.length}</div>
-                          <div className="text-xs text-blue-200">Phases</div>
+                          <div className="text-sm font-semibold text-blue-100">{roadmap.phases?.length || roadmap.skillContent?.stages?.length || 0}</div>
+                          <div className="text-xs text-blue-200">{roadmap.roadmapType === 'career' ? 'Phases' : 'Stages'}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-3 bg-emerald-600/30 rounded-lg border border-emerald-500/30">
                         <CheckSquare className="h-5 w-5 text-emerald-300" />
                         <div>
                           <div className="text-sm font-semibold text-emerald-100">
-                            {roadmap.phases.reduce((total, phase) => total + phase.items.length, 0)}
+                            {roadmap.phases?.reduce((total: number, phase: any) => total + (phase.items?.length || 0), 0) || 
+                             roadmap.skillContent?.stages?.reduce((total: number, stage: any) => total + (stage.tasks?.length || 0), 0) || 0}
                           </div>
                           <div className="text-xs text-emerald-200">Tasks</div>
                         </div>
