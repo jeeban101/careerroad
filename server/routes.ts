@@ -3,8 +3,8 @@ import { createServer, type Server } from "http";
 import { createWaitlistEntry, getWaitlistEntries } from "./database";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema, insertUserRoadmapHistorySchema } from "@shared/schema";
-import { generateRoadmap } from "./gemini";
+import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema, insertUserRoadmapHistorySchema, generateSkillRoadmapSchema } from "@shared/schema";
+import { generateRoadmap, generateSkillRoadmap } from "./gemini";
 
 function isAuthenticated(req: any, res: any, next: any) {
   if (!req.isAuthenticated()) {
@@ -130,6 +130,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to generate roadmap:", error);
       res.status(500).json({ message: "Failed to generate roadmap" });
+    }
+  });
+
+  // Generate AI-powered skill roadmap
+  app.post("/api/generate-skill-roadmap", async (req, res) => {
+    try {
+      const validation = generateSkillRoadmapSchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          message: "Invalid skill roadmap data",
+          errors: validation.error.errors 
+        });
+      }
+
+      const skillContent = await generateSkillRoadmap(validation.data);
+      
+      // Return skill roadmap with metadata for frontend
+      const skillRoadmap = {
+        id: Date.now(),
+        roadmapType: "skill",
+        skill: skillContent.skill,
+        proficiencyLevel: skillContent.proficiencyLevel,
+        timeFrame: skillContent.timeFrame,
+        title: `Learn ${skillContent.skill} in ${skillContent.timeFrame}`,
+        skillContent
+      };
+
+      res.json(skillRoadmap);
+    } catch (error) {
+      console.error("Failed to generate skill roadmap:", error);
+      res.status(500).json({ message: "Failed to generate skill roadmap" });
     }
   });
 

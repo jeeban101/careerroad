@@ -99,10 +99,6 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
 
   return (
     <section id="roadmap-builder" className="w-full max-w-4xl mx-auto mb-12">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Choose your goal:</h2>
-      </div>
-      
       <Card className="mb-8 shadow-lg bg-white/5 backdrop-blur-glass border border-purple-500/20">
         <CardContent className="p-8">
           <Form {...form}>

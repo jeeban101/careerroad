@@ -1,0 +1,150 @@
+You are the coding AI developing the CareerRoad app — an AI-powered career roadmap generator that already includes authentication, user dashboard, dark theme UI, roadmap history, and AI roadmap generation using Gemini API.
+
+Now, extend the existing “Choose your goal” section (where users currently select Current course and Desired role to generate a roadmap) by adding a new tab called “Build Skill.”
+
+Here’s exactly what this new feature should do:
+
+🏗️ Feature: “Build Skill” Tab (Skill Roadmap Generator)
+
+Purpose:
+Let users generate a personalized skill learning roadmap for any specific skill they want to develop, based on their current proficiency level and desired completion timeframe.
+
+🖥️ UI & Flow Requirements:
+
+Add a new tab beside the existing inputs (“Current course” and “Desired role”).
+The tab title should be “Build Skill”.
+When selected, show a new form area for skill roadmap generation.
+
+Fields inside the “Build Skill” section:
+
+Choose your skill → dropdown or searchable input (example: React.js, SQL, Machine Learning)
+
+Current level of proficiency → single-choice selection with these options:
+
+I don’t know anything about it
+
+I have heard and know the gist of it
+
+I used to know it but not done it lately
+
+I am an expert and want to learn more
+
+By when do you want to learn this? → dropdown with timeframe options:
+
+24 hr
+
+48 hr
+
+3 days
+
+1 week
+
+2 weeks
+
+4 weeks
+
+3 months
+
+6 months
+
+Action Button:
+Add a gradient button labeled “Generate Skill Roadmap.”
+When clicked:
+
+Validate that all fields are filled
+
+Show a loading state (spinning indicator) while fetching
+
+Call the Gemini API with a structured prompt (see below)
+
+Once data is returned, display the generated skill roadmap below in a card-style layout (similar to existing roadmap design)
+
+Display Results:
+The roadmap shown should have:
+
+Skill name and overview
+
+Stages (Beginner → Intermediate → Advanced) with duration, tasks, and resources
+
+Milestones and expected outcomes
+
+Optional button: “Save to My Roadmaps”
+
+Styling:
+
+Match the current dark theme and button gradients already used in CareerRoad.
+
+Maintain the same card layout, shadow, and font styles.
+
+🧩 Gemini Prompt (to use inside the app):
+
+When the user clicks “Generate Skill Roadmap,” the app should call the Gemini API using this prompt:
+
+You are CareerRoad AI, an expert mentor in career and skill development.
+
+The user wants to build a specific skill. Use the details below to create a personalized, realistic skill-learning roadmap.
+
+User details:
+- Current course: {{currentCourse}}
+- Desired role: {{desiredRole}}
+- Skill: {{selectedSkill}}
+- Current proficiency level: {{proficiencyLevel}}
+  (Options: "I don’t know anything about it", "I have heard and know the gist of it", 
+   "I used to know it but not done it lately", "I am an expert and want to learn more")
+- Target timeframe: {{timeFrame}}
+  (Options: 24 hr, 48 hr, 3 days, 1 week, 2 weeks, 4 weeks, 3 months, 6 months)
+
+Your task:
+Generate a clear, achievable learning roadmap to help the user learn or master this skill within the given timeframe.
+
+Each roadmap should include:
+1. Skill Overview — what the skill is and why it’s relevant to their desired role.
+2. Learning Stages — divided by time (Beginner, Intermediate, Advanced).
+3. Specific Tasks — actionable steps for each stage.
+4. Resources — credible online links or free courses.
+5. Milestones — checkpoints for tracking progress.
+6. Expected Outcome — what the user will be able to do at the end.
+
+Respond **only** with valid JSON in this format:
+{
+  "skill": "string",
+  "proficiencyLevel": "string",
+  "timeFrame": "string",
+  "overview": "string",
+  "stages": [
+    {
+      "stage": "string",
+      "duration": "string",
+      "tasks": ["string"],
+      "resources": ["string"]
+    }
+  ],
+  "milestones": ["string"],
+  "expectedOutcome": "string"
+}
+
+📦 Data Handling:
+
+Store the returned roadmap in Supabase under the logged-in user’s account (like existing roadmaps).
+
+Save the full Gemini response as JSON for reuse in “My Roadmaps.”
+
+Optionally show a toast notification like:
+“Your skill roadmap for [Skill] has been generated successfully!”
+
+✅ Expected Output Behavior:
+
+When a user fills the form and clicks “Generate Skill Roadmap,” they should instantly see a personalized skill plan like this:
+
+Skill: React.js
+Timeframe: 2 weeks
+Overview: React.js is a JavaScript library for building UI...
+Stages:
+
+Beginner (3 days): Learn JSX and basic components
+
+Intermediate (5 days): Hooks, Routing, and API calls
+
+Advanced (6 days): Performance optimization, Deployment
+Milestones: Day 3 – Built first component, Day 8 – API-integrated app, Day 14 – Deployed app
+Expected Outcome: Able to build and deploy a modern React app.

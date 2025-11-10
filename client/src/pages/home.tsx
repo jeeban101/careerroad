@@ -1,12 +1,15 @@
 import { useState } from "react";
 import RoadmapBuilder from "@/components/roadmap-builder";
+import SkillRoadmapBuilder from "@/components/skill-roadmap-builder";
 import RoadmapDisplay from "@/components/roadmap-display";
+import SkillRoadmapDisplay from "@/components/skill-roadmap-display";
 import CustomizationModal from "@/components/customization-modal";
 import EmailModal from "@/components/email-modal";
 import Header from "@/components/header";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { RoadmapTemplate } from "@shared/schema";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RoadmapTemplate, SkillRoadmapContent } from "@shared/schema";
 
 export default function Home() {
   const { user } = useAuth();
@@ -14,11 +17,18 @@ export default function Home() {
   // Debug: Log user state
   console.log('Home - user:', user, 'isLoggedIn:', !!user);
   const [selectedRoadmap, setSelectedRoadmap] = useState<RoadmapTemplate | null>(null);
+  const [selectedSkillRoadmap, setSelectedSkillRoadmap] = useState<any>(null);
   const [showCustomization, setShowCustomization] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
   const handleRoadmapGenerated = (roadmap: RoadmapTemplate) => {
     setSelectedRoadmap(roadmap);
+    setSelectedSkillRoadmap(null);
+  };
+
+  const handleSkillRoadmapGenerated = (skillRoadmap: any) => {
+    setSelectedSkillRoadmap(skillRoadmap);
+    setSelectedRoadmap(null);
   };
 
   const handleForkRoadmap = () => {
@@ -70,17 +80,51 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="grid gap-8">
-              <RoadmapBuilder onRoadmapGenerated={handleRoadmapGenerated} />
-              
-              {selectedRoadmap && (
-                <RoadmapDisplay 
-                  roadmap={selectedRoadmap} 
-                  onFork={handleForkRoadmap}
-                  onShare={handleShareRoadmap}
-                />
-              )}
-            </div>
+            <Tabs defaultValue="career" className="w-full">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-white mb-4">Choose your goal:</h2>
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-white/10 border border-purple-500/30">
+                  <TabsTrigger 
+                    value="career"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
+                    data-testid="tab-career"
+                  >
+                    Career Roadmap
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="skill"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
+                    data-testid="tab-skill"
+                  >
+                    Build Skill
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="career" className="mt-0">
+                <div className="grid gap-8">
+                  <RoadmapBuilder onRoadmapGenerated={handleRoadmapGenerated} />
+                  
+                  {selectedRoadmap && (
+                    <RoadmapDisplay 
+                      roadmap={selectedRoadmap} 
+                      onFork={handleForkRoadmap}
+                      onShare={handleShareRoadmap}
+                    />
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="skill" className="mt-0">
+                <div className="grid gap-8">
+                  <SkillRoadmapBuilder onSkillRoadmapGenerated={handleSkillRoadmapGenerated} />
+                  
+                  {selectedSkillRoadmap && (
+                    <SkillRoadmapDisplay skillRoadmap={selectedSkillRoadmap} />
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
 

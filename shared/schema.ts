@@ -69,10 +69,15 @@ export const customRoadmaps = pgTable("custom_roadmaps", {
 export const userRoadmapHistory = pgTable("user_roadmap_history", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
-  currentCourse: varchar("current_course", { length: 255 }).notNull(),
-  targetRole: varchar("target_role", { length: 255 }).notNull(),
+  roadmapType: varchar("roadmap_type", { length: 50 }).notNull().default("career"),
+  currentCourse: varchar("current_course", { length: 255 }),
+  targetRole: varchar("target_role", { length: 255 }),
+  skill: varchar("skill", { length: 255 }),
+  proficiencyLevel: varchar("proficiency_level", { length: 255 }),
+  timeFrame: varchar("time_frame", { length: 50 }),
   title: varchar("title", { length: 255 }).notNull(),
-  phases: jsonb("phases").notNull().$type<RoadmapPhase[]>(),
+  phases: jsonb("phases").$type<RoadmapPhase[]>(),
+  skillContent: jsonb("skill_content").$type<SkillRoadmapContent>(),
   accessCount: integer("access_count").default(1),
   lastAccessed: timestamp("last_accessed").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -83,8 +88,10 @@ export const userRoadmapProgress = pgTable("user_roadmap_progress", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
   roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
-  phaseIndex: integer("phase_index").notNull(),
-  taskIndex: integer("task_index").notNull(),
+  phaseIndex: integer("phase_index"),
+  taskIndex: integer("task_index"),
+  stepIndex: integer("step_index"),
+  itemIndex: integer("item_index"),
   completed: boolean("completed").default(false),
   notes: text("notes"),
   completedAt: timestamp("completed_at"),
@@ -132,10 +139,15 @@ export const insertCustomRoadmapSchema = createInsertSchema(customRoadmaps).pick
 
 export const insertUserRoadmapHistorySchema = createInsertSchema(userRoadmapHistory).pick({
   userId: true,
+  roadmapType: true,
   currentCourse: true,
   targetRole: true,
+  skill: true,
+  proficiencyLevel: true,
+  timeFrame: true,
   title: true,
   phases: true,
+  skillContent: true,
 });
 
 export const insertUserRoadmapProgressSchema = createInsertSchema(userRoadmapProgress).pick({
@@ -143,6 +155,8 @@ export const insertUserRoadmapProgressSchema = createInsertSchema(userRoadmapPro
   roadmapId: true,
   phaseIndex: true,
   taskIndex: true,
+  stepIndex: true,
+  itemIndex: true,
   completed: true,
   notes: true,
 });
@@ -174,6 +188,53 @@ export interface RoadmapItem {
   link?: string;
   description?: string;
 }
+
+// Skill roadmap types
+export interface SkillRoadmapStage {
+  stage: string;
+  duration: string;
+  tasks: string[];
+  resources: string[];
+}
+
+export interface SkillRoadmapContent {
+  skill: string;
+  proficiencyLevel: string;
+  timeFrame: string;
+  overview: string;
+  stages: SkillRoadmapStage[];
+  milestones: string[];
+  expectedOutcome: string;
+}
+
+// Roadmap type enum
+export const roadmapTypeEnum = z.enum(["career", "skill"]);
+export type RoadmapType = z.infer<typeof roadmapTypeEnum>;
+
+// Skill roadmap generation schemas
+export const generateSkillRoadmapSchema = z.object({
+  skill: z.string().min(1, "Skill is required"),
+  proficiencyLevel: z.enum([
+    "I don't know anything about it",
+    "I have heard and know the gist of it",
+    "I used to know it but not done it lately",
+    "I am an expert and want to learn more"
+  ]),
+  timeFrame: z.enum([
+    "24 hr",
+    "48 hr",
+    "3 days",
+    "1 week",
+    "2 weeks",
+    "4 weeks",
+    "3 months",
+    "6 months"
+  ]),
+  currentCourse: z.string().optional(),
+  desiredRole: z.string().optional(),
+});
+
+export type GenerateSkillRoadmap = z.infer<typeof generateSkillRoadmapSchema>;
 
 // Email schemas
 export const emailRequestSchema = z.object({
