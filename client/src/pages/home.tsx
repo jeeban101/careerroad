@@ -2,7 +2,7 @@ import { useState } from "react";
 import RoadmapBuilder from "@/components/roadmap-builder";
 import SkillRoadmapBuilder from "@/components/skill-roadmap-builder";
 import RoadmapDisplay from "@/components/roadmap-display";
-import SkillRoadmapDisplay from "@/components/skill-roadmap-display";
+import InteractiveSkillRoadmap from "@/components/interactive-skill-roadmap";
 import CustomizationModal from "@/components/customization-modal";
 import EmailModal from "@/components/email-modal";
 import Header from "@/components/header";
@@ -120,7 +120,7 @@ export default function Home() {
                   <SkillRoadmapBuilder onSkillRoadmapGenerated={handleSkillRoadmapGenerated} />
                   
                   {selectedSkillRoadmap && (
-                    <SkillRoadmapDisplay skillRoadmap={selectedSkillRoadmap} />
+                    <InteractiveSkillRoadmap skillRoadmap={selectedSkillRoadmap} />
                   )}
                 </div>
               </TabsContent>
