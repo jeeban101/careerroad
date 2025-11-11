@@ -11,164 +11,189 @@ import { z } from "zod";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
+/**
+ * Robust JSON parsing helper:
+ * - Attempts JSON.parse
+ * - If parse fails, tries to find first "{" and last "}" (or "[" and "]")
+ * - Returns parsed object or throws with debug info
+ */
+function parseJsonSafely(raw: string) {
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    // try to salvage JSON: find first { or [ and last } or ]
+    const firstBrace = Math.min(
+      ...["{", "["]
+        .map((c) => raw.indexOf(c))
+        .filter((i) => i >= 0)
+    );
+    const lastBrace = Math.max(
+      ...["}", "]"]
+        .map((c) => raw.lastIndexOf(c))
+        .filter((i) => i >= 0)
+    );
+
+    if (firstBrace >= 0 && lastBrace > firstBrace) {
+      const candidate = raw.substring(firstBrace, lastBrace + 1);
+      try {
+        return JSON.parse(candidate);
+      } catch (err2) {
+        const snippet = raw.substring(0, 2000);
+        throw new Error(
+          `Failed to parse JSON. Original parse error: ${err}. Salvage attempt failed. Raw start: ${snippet}`
+        );
+      }
+    }
+
+    const snippet = raw.substring(0, 2000);
+    throw new Error(
+      `Failed to parse JSON and no salvageable braces found. Original parse error: ${err}. Raw start: ${snippet}`
+    );
+  }
+}
+
+/**
+ * Retry with exponential backoff + jitter and model fallback.
+ * Handles 429/503/500/404 by retrying. Switches model if flash overload occurs.
+ */
 async function retryWithBackoff<T>(
   fn: (model: string) => Promise<T>,
-  maxRetries: number = 3,
-  initialDelay: number = 1000,
+  maxRetries = 5,
+  initialDelay = 800
 ): Promise<T> {
-  let lastError: Error;
-  let currentModel = "gemini-2.5-flash";
-
-  for (let i = 0; i < maxRetries; i++) {
+  const models = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5"]; // fallback order
+  let attempt = 0;
+  let lastErr: any = null;
+  // cycle across models as needed
+  for (; attempt < maxRetries; attempt++) {
+    const model = models[Math.min(attempt, models.length - 1)];
     try {
-      return await fn(currentModel);
+      return await fn(model);
     } catch (error: any) {
-      lastError = error;
-
-      if ((error?.status === 503 || error?.status === 404) && i < maxRetries - 1) {
-        if (currentModel === "gemini-2.5-flash" && (error?.status === 503 || error?.status === 404)) {
-          console.log(`gemini-2.5-flash failed (${error?.status}), switching to gemini-2.5-pro...`);
-          currentModel = "gemini-2.5-pro";
-          continue;
-        }
-        
-        const delay = initialDelay * Math.pow(2, i);
-        console.log(
-          `API request failed with ${error?.status}, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`,
+      lastErr = error;
+      const status = error?.status || error?.response?.status || null;
+      // If model-specific overload, try next model quickly
+      if ((status === 503 || status === 429) && attempt < maxRetries - 1) {
+        const backoff = Math.round(initialDelay * Math.pow(2, attempt) * (0.8 + Math.random() * 0.4));
+        console.warn(
+          `Model request failed (status=${status}) on model=${model}. Retrying after ${backoff}ms (attempt ${
+            attempt + 1
+          }/${maxRetries}).`
         );
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise((r) => setTimeout(r, backoff));
         continue;
       }
-
+      // For other errors, rethrow
       throw error;
     }
   }
-
-  throw lastError!;
+  throw lastErr;
 }
 
 export async function generateRoadmap(
   currentCourse: string,
-  targetRole: string,
+  targetRole: string
 ): Promise<RoadmapPhase[]> {
   try {
-    const systemPrompt = `You are a career guidance expert. Generate a detailed, structured career roadmap for a student.
+    // Keep prompt concise and explicit about JSON-only output
+    const systemPrompt = `You are CareerRoad AI, an expert career mentor. Output ONLY valid JSON (no explanation).
+Return a JSON array of exactly 3 phases. Each phase object must have: title (string), duration_weeks (integer),
+items (array of 4-6 objects). Each item: { type: "resource"|"tool"|"task"|"community", label:string (<=80 chars),
+description:string (<=150 chars), link: optional http(s) URL or empty string }.
+Focus on practical, India-relevant resources and companies where appropriate.`;
 
-Create a roadmap from "${currentCourse}" to "${targetRole}" with exactly 3 phases:
-1. Foundation Phase (4-6 weeks)
-2. Skill Building Phase (6-8 weeks) 
-3. Career Preparation Phase (4-6 weeks)
-
-For each phase, provide:
-- A clear phase title
-- Duration in weeks
-- 4-6 specific actionable items
-
-Each item should have:
-- type: "resource", "tool", "task", or "community"
-- label: Brief description (max 80 chars)
-- description: Detailed explanation (max 150 chars)
-- link: Optional URL for resources
-
-Focus on practical, actionable steps that are specific to the Indian job market and include real companies, tools, and resources.
-
-Respond with valid JSON in this exact format:
-[
-  {
-    "title": "Phase Title",
-    "duration_weeks": 5,
-    "items": [
-      {
-        "type": "resource",
-        "label": "Read specific book/course",
-        "description": "Why this resource is important",
-        "link": "https://example.com"
-      }
-    ]
-  }
-]`;
+    const userPrompt = `Create a concise 3-phase career roadmap: from "${currentCourse}" to "${targetRole}".
+Phase 1: Foundation (4-6 weeks), Phase 2: Skill Building (6-8 weeks), Phase 3: Career Preparation (4-6 weeks).
+Return ONLY the JSON array described in the system prompt.`;
 
     const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
-        model: model,
+        model,
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
+          // keep temperature low for deterministic output
+          temperature: 0.0,
+          // limit output length so model won't produce huge content
+          maxOutputTokens: 800,
         },
-        contents: `Generate a career roadmap for a ${currentCourse} student to become a ${targetRole}. Include specific resources, tools, and actionable steps relevant to the Indian job market.`,
-      }),
+        contents: userPrompt,
+      })
     );
 
-    const rawJson = response.text;
+    // the SDK may return response.text or other shape, handle both
+    const rawJson = (response as any)?.text ?? (response as any)?.candidates?.[0]?.content?.[0]?.text ?? "";
 
-    if (!rawJson) {
+    if (!rawJson || rawJson.trim().length === 0) {
       throw new Error("Empty response from Gemini");
     }
 
-    const phases: RoadmapPhase[] = JSON.parse(rawJson);
+    // Attempt robust JSON parse
+    const parsed = parseJsonSafely(rawJson);
 
-    // Validate the structure
-    if (!Array.isArray(phases) || phases.length === 0) {
-      throw new Error("Invalid roadmap structure");
+    if (!Array.isArray(parsed) || parsed.length !== 3) {
+      throw new Error("Unexpected roadmap structure: must be an array of three phases");
     }
 
-    return phases;
+    // Optional lightweight validation of each phase shape
+    parsed.forEach((p: any, idx: number) => {
+      if (typeof p.title !== "string" || typeof p.duration_weeks !== "number" || !Array.isArray(p.items)) {
+        throw new Error(`Phase ${idx + 1} missing required fields`);
+      }
+    });
+
+    return parsed as RoadmapPhase[];
   } catch (error) {
     console.error("Failed to generate roadmap:", error);
-    throw new Error(`Failed to generate roadmap: ${error}`);
+    throw new Error(`Failed to generate roadmap: ${String(error)}`);
   }
 }
 
-export async function generateSkillRoadmap(
-  params: GenerateSkillRoadmap,
-): Promise<SkillRoadmapContent> {
+export async function generateSkillRoadmap(params: GenerateSkillRoadmap): Promise<SkillRoadmapContent> {
   try {
-    const { skill, proficiencyLevel, timeFrame, currentCourse, desiredRole } =
-      params;
+    const { skill, proficiencyLevel, timeFrame, currentCourse, desiredRole } = params;
 
     const stageCount = mapTimeframeToStages(timeFrame);
 
-    const systemPrompt = `Generate a skill-learning roadmap with ${stageCount} stages for ${timeFrame}.
-
-JSON structure:
-{
-  "skill": "${skill}",
-  "proficiencyLevel": "${proficiencyLevel}",
-  "timeFrame": "${timeFrame}",
-  "overview": "Brief overview",
+    // concise system prompt: strict JSON-only schema and deterministic settings
+    const systemPrompt = `You are CareerRoad AI. Return ONLY valid JSON that matches the schema exactly. No extra text.
+Schema: {
+  "skill": string,
+  "proficiencyLevel": string,
+  "timeFrame": string,
+  "overview": string,
   "stages": [
-    {
-      "stage": "Stage name",
-      "duration": "Duration",
-      "tasks": ["Task 1", "Task 2"],
-      "resources": ["https://url1.com", "https://url2.com"]
-    }
+    { "stage": string, "duration": string, "tasks": [string], "resources": [string] }
   ],
-  "milestones": ["Milestone 1", "Milestone 2"],
-  "expectedOutcome": "What you'll achieve"
+  "milestones": [string],
+  "expectedOutcome": string
 }
+Provide ${stageCount} stages. Each stage: 3-5 tasks and 2-3 http(s) resource URLs (if possible). If you cannot provide URLs, provide empty strings in the resources array.`;
 
-Resources must be valid http/https URLs. Include 3-4 tasks and 2-3 resources per stage.`;
-
-    const userPrompt = `Create ${stageCount} learning stages for ${skill} at ${proficiencyLevel} level (${timeFrame} total).`;
-
+    const userPrompt = `Create ${stageCount} learning stages for skill "${skill}" for a user with proficiency "${proficiencyLevel}" in timeframe "${timeFrame}".
+Context: current course="${currentCourse}", desired role="${desiredRole}".
+Return ONLY the JSON defined above.`;
 
     const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
-        model: model,
+        model,
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
+          temperature: 0.0,
+          maxOutputTokens: 900,
         },
         contents: userPrompt,
-      }),
+      })
     );
 
-    const rawJson = response.text;
+    const rawJson = (response as any)?.text ?? (response as any)?.candidates?.[0]?.content?.[0]?.text ?? "";
 
-    if (!rawJson) {
+    if (!rawJson || rawJson.trim().length === 0) {
       throw new Error("Empty response from Gemini");
     }
+
+    const parsed = parseJsonSafely(rawJson);
 
     const skillRoadmapSchema = z.object({
       skill: z.string(),
@@ -181,24 +206,25 @@ Resources must be valid http/https URLs. Include 3-4 tasks and 2-3 resources per
           duration: z.string(),
           tasks: z.array(z.string()),
           resources: z.array(z.string()),
-        }),
+        })
       ),
       milestones: z.array(z.string()),
       expectedOutcome: z.string(),
     });
 
-    const parsedData = JSON.parse(rawJson);
-    const validation = skillRoadmapSchema.safeParse(parsedData);
+    const validation = skillRoadmapSchema.safeParse(parsed);
 
     if (!validation.success) {
       console.error("Validation error:", validation.error);
-      throw new Error("Invalid skill roadmap structure from AI");
+      // Provide the raw snippet to help debugging
+      const snippet = rawJson.substring(0, 2000);
+      throw new Error(`Invalid skill roadmap structure from AI. Raw start: ${snippet}`);
     }
 
     return validation.data;
   } catch (error) {
     console.error("Failed to generate skill roadmap:", error);
-    throw new Error(`Failed to generate skill roadmap: ${error}`);
+    throw new Error(`Failed to generate skill roadmap: ${String(error)}`);
   }
 }
 
@@ -221,93 +247,66 @@ function mapTimeframeToStages(timeFrame: string): number {
   }
 }
 
-export async function generateKanbanTasksFromRoadmap(
-  roadmap: UserRoadmapHistory,
-): Promise<KanbanTaskGeneration> {
+export async function generateKanbanTasksFromRoadmap(roadmap: UserRoadmapHistory): Promise<KanbanTaskGeneration> {
   try {
     const isCareerRoadmap = roadmap.roadmapType === "career";
-    
-    // Create simplified roadmap summary instead of full JSON
+
+    // Lightweight summary only — reduces token usage and avoids overload
     let roadmapSummary: string;
     if (isCareerRoadmap && roadmap.phases) {
-      roadmapSummary = roadmap.phases.map((phase, i) => 
-        `Phase ${i + 1}: ${phase.title} (${phase.duration_weeks} weeks)`
-      ).join('\n');
+      roadmapSummary = roadmap.phases
+        .map((phase, i) => `Phase ${i + 1}: ${phase.title} (${phase.duration_weeks} weeks)`)
+        .join("\n");
     } else if (roadmap.skillContent?.stages) {
-      roadmapSummary = roadmap.skillContent.stages.map((stage, i) => 
-        `Stage ${i + 1}: ${stage.stage} (${stage.duration})`
-      ).join('\n');
+      roadmapSummary = roadmap.skillContent.stages
+        .map((stage, i) => `Stage ${i + 1}: ${stage.stage} (${stage.duration})`)
+        .join("\n");
     } else {
       roadmapSummary = `Learning path with multiple stages`;
     }
 
-    const systemPrompt = `Generate 10-15 actionable Kanban tasks for a learning roadmap.
-
-Output JSON format:
-{
-  "tasks": [
-    {
-      "title": "Task name",
-      "description": "Brief explanation",
-      "status": "todo",
-      "position": 0,
-      "estimatedTime": "1 week"
-    }
-  ]
-}
-
-All tasks must have status "todo" and sequential positions (0, 1, 2...).`;
+    const systemPrompt = `You are CareerRoad AI. Output ONLY valid JSON with shape:
+{ "tasks": [ { "title": string, "description": string, "status": "todo", "position": number, "estimatedTime": string } ] }
+Return 8-12 tasks. Keep titles <= 100 chars and descriptions <= 200 chars.`;
 
     const userMessage = isCareerRoadmap
-      ? `Create Kanban tasks for: ${roadmap.currentCourse} → ${roadmap.targetRole}
-
-${roadmapSummary}
-
-Generate 10-15 practical tasks.`
-      : `Create Kanban tasks for learning ${roadmap.skill} (${roadmap.proficiencyLevel} level, ${roadmap.timeFrame})
-
-${roadmapSummary}
-
-Generate 10-15 practical tasks.`;
+      ? `Generate practical Kanban tasks for: ${roadmap.currentCourse} → ${roadmap.targetRole}\n\n${roadmapSummary}\n\nReturn JSON only.`
+      : `Generate practical Kanban tasks for learning ${roadmap.skill} (${roadmap.proficiencyLevel}, ${roadmap.timeFrame})\n\n${roadmapSummary}\n\nReturn JSON only.`;
 
     const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
-        model: model,
+        model,
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
+          temperature: 0.0,
+          maxOutputTokens: 700,
         },
         contents: userMessage,
-      }),
+      })
     );
 
-    const rawJson = response.text;
+    const rawJson = (response as any)?.text ?? (response as any)?.candidates?.[0]?.content?.[0]?.text ?? "";
 
-    if (!rawJson) {
+    if (!rawJson || rawJson.trim().length === 0) {
       throw new Error("Empty response from Gemini");
     }
 
-    // Log raw JSON for debugging malformed responses
     console.log("Kanban raw JSON length:", rawJson.length);
 
-    let parsedData;
-    try {
-      parsedData = JSON.parse(rawJson);
-    } catch (parseError) {
-      console.error("JSON parse error. First 1000 chars:", rawJson.substring(0, 1000));
-      throw parseError;
-    }
+    const parsed = parseJsonSafely(rawJson);
 
-    const validation = kanbanTaskGenerationSchema.safeParse(parsedData);
+    const validation = kanbanTaskGenerationSchema.safeParse(parsed);
 
     if (!validation.success) {
       console.error("Kanban generation validation error:", validation.error);
-      throw new Error("Invalid Kanban task structure from AI");
+      const snippet = rawJson.substring(0, 2000);
+      throw new Error(`Invalid Kanban task structure from AI. Raw start: ${snippet}`);
     }
 
     return validation.data;
   } catch (error) {
     console.error("Failed to generate Kanban tasks:", error);
-    throw new Error(`Failed to generate Kanban tasks: ${error}`);
+    throw new Error(`Failed to generate Kanban tasks: ${String(error)}`);
   }
 }
