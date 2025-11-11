@@ -149,6 +149,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const skillContent = await generateSkillRoadmap(validation.data);
       
+      // Server-side URL filtering: only keep valid http/https URLs in resources
+      const isValidUrl = (str: string): boolean => {
+        return /^https?:\/\/.+/.test(str);
+      };
+      
+      if (skillContent.stages) {
+        skillContent.stages = skillContent.stages.map(stage => ({
+          ...stage,
+          resources: stage.resources.filter(isValidUrl)
+        }));
+      }
+      
       // Return skill roadmap with metadata for frontend
       const skillRoadmap = {
         id: Date.now(),
