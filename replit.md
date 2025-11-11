@@ -29,6 +29,17 @@ Preferred communication style: Simple, everyday language.
 ✓ COMPLETED: Fixed skill roadmap Kanban generation to save roadmap to history before task generation
 ✓ COMPLETED: Fixed history page null phases error for skill roadmaps
 ✓ COMPLETED: Updated AI to place all generated Kanban tasks in "todo" column initially
+✓ COMPLETED: Implemented smart AI model fallback system (November 11, 2025)
+  - Primary model: gemini-2.5-flash (user preference)
+  - Automatic fallback to gemini-2.5-pro on 503 (overloaded) or 404 (not found) errors
+  - Exponential backoff retry logic (1s, 2s, 4s delays) for API failures
+  - Applied to all three AI functions: generateRoadmap, generateSkillRoadmap, generateKanbanTasksFromRoadmap
+✓ COMPLETED: Fixed skill roadmap resource generation issues (November 11, 2025)
+  - Updated AI prompt to generate only valid http/https URLs instead of placeholder text
+  - Added frontend URL validation in ResourceCard component (graceful failure, returns null for invalid URLs)
+  - Implemented server-side URL filtering as defense-in-depth (filters out non-URL strings before sending to frontend)
+  - Fixed ResourceCard crash on invalid URL construction with try-catch validation
+  - Resolved "Invalid URL format" 400 errors from resource-metadata endpoint
 
 ## Previous Changes (July 12, 2025)
 
