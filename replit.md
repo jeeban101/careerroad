@@ -8,7 +8,29 @@ CareerRoad is a full-stack web application that helps students and early graduat
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (July 12, 2025)
+## Recent Changes (November 11, 2025)
+
+✓ COMPLETED: Enhanced resource card system for skill roadmaps with interactive preview capabilities
+✓ COMPLETED: Implemented Open/Preview/Copy buttons for resource links with copy-to-clipboard functionality
+✓ COMPLETED: Added lazy-loading metadata fetching (og:title, og:description) from external URLs
+✓ COMPLETED: Built YouTube and CodePen embed support with responsive modal previews
+✓ COMPLETED: Created comprehensive analytics tracking system for resource interactions
+  - Tracks resource_opened, resource_previewed, and resource_copied events
+  - Includes detailed payload data (roadmapId, stageIndex, resourceUrl, resourceType)
+✓ COMPLETED: Implemented production-grade SSRF protection for resource metadata endpoint
+  - Created `server/resourceSecurity.ts` security module with allowlist approach
+  - Domain allowlist: 30+ approved domains (YouTube, CodePen, GitHub, educational platforms)
+  - DNS resolution with private IP validation (IPv4/IPv6 comprehensive coverage)
+  - Manual redirect handling with per-hop validation (max 5 redirects)
+  - Protocol downgrade blocking (https → http blocked)
+  - Comprehensive private IP blocking: localhost, RFC1918, link-local (169.254.x), CGNAT, IPv6
+  - Structured logging for security monitoring
+  - Defense-in-depth: protocol whitelist + allowlist + DNS/IP validation + redirect validation + timeout + sanitization
+✓ COMPLETED: Fixed skill roadmap Kanban generation to save roadmap to history before task generation
+✓ COMPLETED: Fixed history page null phases error for skill roadmaps
+✓ COMPLETED: Updated AI to place all generated Kanban tasks in "todo" column initially
+
+## Previous Changes (July 12, 2025)
 
 ✓ Redesigned landing page to match minimalist design requirements
 ✓ Implemented AI-powered roadmap generation using Gemini 2.5 Flash
