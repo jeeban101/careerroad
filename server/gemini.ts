@@ -259,49 +259,49 @@ export async function generateKanbanTasksFromRoadmap(
 ): Promise<KanbanTaskGeneration> {
   try {
     const isCareerRoadmap = roadmap.roadmapType === "career";
-    const roadmapDescription = isCareerRoadmap
-      ? `Career roadmap from ${roadmap.currentCourse} to ${roadmap.targetRole}`
-      : `Skill roadmap for ${roadmap.skill} at ${roadmap.proficiencyLevel} proficiency level (${roadmap.timeFrame} timeframe)`;
+    
+    // Create simplified roadmap summary instead of full JSON
+    let roadmapSummary: string;
+    if (isCareerRoadmap && roadmap.phases) {
+      roadmapSummary = roadmap.phases.map((phase, i) => 
+        `Phase ${i + 1}: ${phase.title} (${phase.duration_weeks} weeks)`
+      ).join('\n');
+    } else if (roadmap.skillContent?.stages) {
+      roadmapSummary = roadmap.skillContent.stages.map((stage, i) => 
+        `Stage ${i + 1}: ${stage.stage} (${stage.duration})`
+      ).join('\n');
+    } else {
+      roadmapSummary = `Learning path with multiple stages`;
+    }
 
-    const systemPrompt = `You are a project management expert. Convert a learning roadmap into actionable Kanban board tasks.
+    const systemPrompt = `Generate 10-15 actionable Kanban tasks for a learning roadmap.
 
-Your goal is to transform roadmap phases and items into concrete, trackable tasks organized across three Kanban columns:
-- "todo": Tasks to start with (early foundational items)
-- "in_progress": Current focus tasks (intermediate items)
-- "done": Prerequisites or quick wins that can be marked complete early
-
-For each task:
-- title: Clear, actionable task name (max 500 chars)
-- description: Brief explanation of what to do and why
-- status: Always set to "todo" (all tasks start in the todo column)
-- position: Sequential number (0, 1, 2, 3...)
-- resources: Array of links or resource names (optional)
-- estimatedTime: Time estimate like "2-3 hours", "1 week" (optional)
-- category: Phase name or skill area (optional)
-
-Important: ALL tasks should have status "todo" and be placed in sequential positions starting from 0.
-
-Output strict JSON matching this schema:
+Output JSON format:
 {
-  "tasks": [{"title": string, "description": string, "status": "todo", "position": number, "resources"?: string[], "estimatedTime"?: string, "category"?: string}],
-  "boardSummary": "Brief board purpose" (optional)
+  "tasks": [
+    {
+      "title": "Task name",
+      "description": "Brief explanation",
+      "status": "todo",
+      "position": 0,
+      "estimatedTime": "1 week"
+    }
+  ]
 }
 
-No extra commentary. Pure JSON output only.`;
+All tasks must have status "todo" and sequential positions (0, 1, 2...).`;
 
     const userMessage = isCareerRoadmap
-      ? `${roadmapDescription}
+      ? `Create Kanban tasks for: ${roadmap.currentCourse} → ${roadmap.targetRole}
 
-Roadmap Phases:
-${JSON.stringify(roadmap.phases, null, 2)}
+${roadmapSummary}
 
-Convert these phases into 12-20 actionable Kanban tasks. All tasks should have status "todo".`
-      : `${roadmapDescription}
+Generate 10-15 practical tasks.`
+      : `Create Kanban tasks for learning ${roadmap.skill} (${roadmap.proficiencyLevel} level, ${roadmap.timeFrame})
 
-Skill Content:
-${JSON.stringify(roadmap.skillContent, null, 2)}
+${roadmapSummary}
 
-Convert this skill roadmap into 10-18 actionable Kanban tasks. All tasks should have status "todo".`;
+Generate 10-15 practical tasks.`;
 
     const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
@@ -320,7 +320,17 @@ Convert this skill roadmap into 10-18 actionable Kanban tasks. All tasks should 
       throw new Error("Empty response from Gemini");
     }
 
-    const parsedData = JSON.parse(rawJson);
+    // Log raw JSON for debugging malformed responses
+    console.log("Kanban raw JSON length:", rawJson.length);
+
+    let parsedData;
+    try {
+      parsedData = JSON.parse(rawJson);
+    } catch (parseError) {
+      console.error("JSON parse error. First 1000 chars:", rawJson.substring(0, 1000));
+      throw parseError;
+    }
+
     const validation = kanbanTaskGenerationSchema.safeParse(parsedData);
 
     if (!validation.success) {
