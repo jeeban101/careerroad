@@ -8,50 +8,7 @@ CareerRoad is a full-stack web application that helps students and early graduat
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (November 11, 2025)
-
-✓ COMPLETED: Enhanced resource card system for skill roadmaps with interactive preview capabilities
-✓ COMPLETED: Implemented Open/Preview/Copy buttons for resource links with copy-to-clipboard functionality
-✓ COMPLETED: Added lazy-loading metadata fetching (og:title, og:description) from external URLs
-✓ COMPLETED: Built YouTube and CodePen embed support with responsive modal previews
-✓ COMPLETED: Created comprehensive analytics tracking system for resource interactions
-  - Tracks resource_opened, resource_previewed, and resource_copied events
-  - Includes detailed payload data (roadmapId, stageIndex, resourceUrl, resourceType)
-✓ COMPLETED: Implemented production-grade SSRF protection for resource metadata endpoint
-  - Created `server/resourceSecurity.ts` security module with allowlist approach
-  - Domain allowlist: 30+ approved domains (YouTube, CodePen, GitHub, educational platforms)
-  - DNS resolution with private IP validation (IPv4/IPv6 comprehensive coverage)
-  - Manual redirect handling with per-hop validation (max 5 redirects)
-  - Protocol downgrade blocking (https → http blocked)
-  - Comprehensive private IP blocking: localhost, RFC1918, link-local (169.254.x), CGNAT, IPv6
-  - Structured logging for security monitoring
-  - Defense-in-depth: protocol whitelist + allowlist + DNS/IP validation + redirect validation + timeout + sanitization
-✓ COMPLETED: Fixed skill roadmap Kanban generation to save roadmap to history before task generation
-✓ COMPLETED: Fixed history page null phases error for skill roadmaps
-✓ COMPLETED: Updated AI to place all generated Kanban tasks in "todo" column initially
-✓ COMPLETED: Implemented smart AI model fallback system (November 11, 2025)
-  - Primary model: gemini-2.5-flash (user preference)
-  - Automatic fallback to gemini-2.5-pro on 503 (overloaded) or 404 (not found) errors
-  - Exponential backoff retry logic (1s, 2s, 4s delays) for API failures
-  - Applied to all three AI functions: generateRoadmap, generateSkillRoadmap, generateKanbanTasksFromRoadmap
-✓ COMPLETED: Fixed skill roadmap resource generation issues (November 11, 2025)
-  - Updated AI prompt to generate only valid http/https URLs instead of placeholder text
-  - Added frontend URL validation in ResourceCard component (graceful failure, returns null for invalid URLs)
-  - Implemented server-side URL filtering as defense-in-depth (filters out non-URL strings before sending to frontend)
-  - Fixed ResourceCard crash on invalid URL construction with try-catch validation
-  - Resolved "Invalid URL format" 400 errors from resource-metadata endpoint
-✓ COMPLETED: Optimized AI prompts to eliminate model overload issues (November 11, 2025)
-  - **Skill Roadmap Prompt**: Reduced from 2000+ characters to ~400 characters (80% reduction)
-    - Removed verbose requirements and detailed explanations
-    - Simplified JSON structure example
-    - Matched the efficient style of career roadmap prompt
-  - **Kanban Generation Prompt**: Reduced from embedding full roadmap JSON to simple summaries (90% reduction)
-    - Changed from `JSON.stringify(roadmap.phases)` to simple "Phase 1: Title (4 weeks)" format
-    - Eliminated 1000s of unnecessary tokens per request
-    - Added JSON parse error logging for debugging
-  - **Result**: 3-week skill roadmaps now generate reliably without 503 errors
-
-## Previous Changes (July 12, 2025)
+## Recent Changes (July 12, 2025)
 
 ✓ Redesigned landing page to match minimalist design requirements
 ✓ Implemented AI-powered roadmap generation using Gemini 2.5 Flash
