@@ -1,5 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
-import { RoadmapPhase, SkillRoadmapContent, GenerateSkillRoadmap, kanbanTaskGenerationSchema, KanbanTaskGeneration, UserRoadmapHistory } from "@shared/schema";
+import {
+  RoadmapPhase,
+  SkillRoadmapContent,
+  GenerateSkillRoadmap,
+  kanbanTaskGenerationSchema,
+  KanbanTaskGeneration,
+  UserRoadmapHistory,
+} from "@shared/schema";
 import { z } from "zod";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -7,31 +14,36 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  initialDelay: number = 1000
+  initialDelay: number = 1000,
 ): Promise<T> {
   let lastError: Error;
-  
+
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await fn();
     } catch (error: any) {
       lastError = error;
-      
+
       if (error?.status === 503 && i < maxRetries - 1) {
         const delay = initialDelay * Math.pow(2, i);
-        console.log(`API request failed with 503, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        console.log(
+          `API request failed with 503, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
       }
-      
+
       throw error;
     }
   }
-  
+
   throw lastError!;
 }
 
-export async function generateRoadmap(currentCourse: string, targetRole: string): Promise<RoadmapPhase[]> {
+export async function generateRoadmap(
+  currentCourse: string,
+  targetRole: string,
+): Promise<RoadmapPhase[]> {
   try {
     const systemPrompt = `You are a career guidance expert. Generate a detailed, structured career roadmap for a student.
 
@@ -69,25 +81,25 @@ Respond with valid JSON in this exact format:
   }
 ]`;
 
-    const response = await retryWithBackoff(() => 
+    const response = await retryWithBackoff(() =>
       ai.models.generateContent({
-        model: "gemini-1.5-pro",
+        model: "gemini-2.5-pro",
         config: {
           systemInstruction: systemPrompt,
-          responseMimeType: "application/json"
+          responseMimeType: "application/json",
         },
-        contents: `Generate a career roadmap for a ${currentCourse} student to become a ${targetRole}. Include specific resources, tools, and actionable steps relevant to the Indian job market.`
-      })
+        contents: `Generate a career roadmap for a ${currentCourse} student to become a ${targetRole}. Include specific resources, tools, and actionable steps relevant to the Indian job market.`,
+      }),
     );
 
     const rawJson = response.text;
-    
+
     if (!rawJson) {
       throw new Error("Empty response from Gemini");
     }
 
     const phases: RoadmapPhase[] = JSON.parse(rawJson);
-    
+
     // Validate the structure
     if (!Array.isArray(phases) || phases.length === 0) {
       throw new Error("Invalid roadmap structure");
@@ -100,12 +112,15 @@ Respond with valid JSON in this exact format:
   }
 }
 
-export async function generateSkillRoadmap(params: GenerateSkillRoadmap): Promise<SkillRoadmapContent> {
+export async function generateSkillRoadmap(
+  params: GenerateSkillRoadmap,
+): Promise<SkillRoadmapContent> {
   try {
-    const { skill, proficiencyLevel, timeFrame, currentCourse, desiredRole } = params;
-    
+    const { skill, proficiencyLevel, timeFrame, currentCourse, desiredRole } =
+      params;
+
     const stageCount = mapTimeframeToStages(timeFrame);
-    
+
     const systemPrompt = `You are CareerRoad AI, an expert mentor in career and skill development.
 
 Generate a personalized, realistic skill-learning roadmap for the user based on their current proficiency and desired timeframe.
@@ -114,8 +129,8 @@ User details:
 - Skill: ${skill}
 - Current proficiency level: ${proficiencyLevel}
 - Target timeframe: ${timeFrame}
-${currentCourse ? `- Current course: ${currentCourse}` : ''}
-${desiredRole ? `- Desired role: ${desiredRole}` : ''}
+${currentCourse ? `- Current course: ${currentCourse}` : ""}
+${desiredRole ? `- Desired role: ${desiredRole}` : ""}
 
 Create ${stageCount} learning stages that fit within the ${timeFrame} timeframe.
 
@@ -126,7 +141,7 @@ Stage mapping:
 - Include India-relevant resources (Indian platforms, communities, companies)
 
 Requirements:
-1. Overview: Brief explanation of the skill and its relevance${desiredRole ? ` to ${desiredRole}` : ''}
+1. Overview: Brief explanation of the skill and its relevance${desiredRole ? ` to ${desiredRole}` : ""}
 2. Stages: ${stageCount} progressive stages (Beginner, Intermediate, Advanced, etc.)
    - Each stage has: stage name, duration, specific tasks array, resources array
 3. Milestones: 3-5 checkpoints to track progress
@@ -156,7 +171,7 @@ Respond with valid JSON matching this structure:
   "expectedOutcome": "What the user will be able to do"
 }`;
 
-    const userPrompt = `Generate a ${timeFrame} skill learning roadmap for ${skill}. The learner is at "${proficiencyLevel}" level${currentCourse ? ` and is currently studying ${currentCourse}` : ''}${desiredRole ? ` aiming to become a ${desiredRole}` : ''}.
+    const userPrompt = `Generate a ${timeFrame} skill learning roadmap for ${skill}. The learner is at "${proficiencyLevel}" level${currentCourse ? ` and is currently studying ${currentCourse}` : ""}${desiredRole ? ` aiming to become a ${desiredRole}` : ""}.
 
 Create ${stageCount} stages with practical tasks and resources. Ensure tasks are achievable within ${timeFrame}.
 
@@ -167,14 +182,14 @@ Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array 
         model: "gemini-1.5-pro",
         config: {
           systemInstruction: systemPrompt,
-          responseMimeType: "application/json"
+          responseMimeType: "application/json",
         },
-        contents: userPrompt
-      })
+        contents: userPrompt,
+      }),
     );
 
     const rawJson = response.text;
-    
+
     if (!rawJson) {
       throw new Error("Empty response from Gemini");
     }
@@ -184,19 +199,21 @@ Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array 
       proficiencyLevel: z.string(),
       timeFrame: z.string(),
       overview: z.string(),
-      stages: z.array(z.object({
-        stage: z.string(),
-        duration: z.string(),
-        tasks: z.array(z.string()),
-        resources: z.array(z.string())
-      })),
+      stages: z.array(
+        z.object({
+          stage: z.string(),
+          duration: z.string(),
+          tasks: z.array(z.string()),
+          resources: z.array(z.string()),
+        }),
+      ),
       milestones: z.array(z.string()),
-      expectedOutcome: z.string()
+      expectedOutcome: z.string(),
     });
 
     const parsedData = JSON.parse(rawJson);
     const validation = skillRoadmapSchema.safeParse(parsedData);
-    
+
     if (!validation.success) {
       console.error("Validation error:", validation.error);
       throw new Error("Invalid skill roadmap structure from AI");
@@ -228,7 +245,9 @@ function mapTimeframeToStages(timeFrame: string): number {
   }
 }
 
-export async function generateKanbanTasksFromRoadmap(roadmap: UserRoadmapHistory): Promise<KanbanTaskGeneration> {
+export async function generateKanbanTasksFromRoadmap(
+  roadmap: UserRoadmapHistory,
+): Promise<KanbanTaskGeneration> {
   try {
     const isCareerRoadmap = roadmap.roadmapType === "career";
     const roadmapDescription = isCareerRoadmap
@@ -280,21 +299,21 @@ Convert this skill roadmap into 10-18 actionable Kanban tasks. All tasks should 
         model: "gemini-1.5-pro",
         config: {
           systemInstruction: systemPrompt,
-          responseMimeType: "application/json"
+          responseMimeType: "application/json",
         },
-        contents: userMessage
-      })
+        contents: userMessage,
+      }),
     );
 
     const rawJson = response.text;
-    
+
     if (!rawJson) {
       throw new Error("Empty response from Gemini");
     }
 
     const parsedData = JSON.parse(rawJson);
     const validation = kanbanTaskGenerationSchema.safeParse(parsedData);
-    
+
     if (!validation.success) {
       console.error("Kanban generation validation error:", validation.error);
       throw new Error("Invalid Kanban task structure from AI");
