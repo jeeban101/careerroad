@@ -108,6 +108,22 @@ export default function ResourceCard({ url, roadmapId, stageIndex, onPreview }: 
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  let hostname = "";
+  let isValidUrl = false;
+  
+  try {
+    const parsedUrl = new URL(url);
+    hostname = parsedUrl.hostname;
+    isValidUrl = true;
+  } catch (error) {
+    console.error("Invalid URL in ResourceCard:", url);
+    isValidUrl = false;
+  }
+
+  if (!isValidUrl) {
+    return null;
+  }
+
   if (isLoading) {
     return (
       <Card className="p-4 bg-gray-800/40 border border-gray-700/50 animate-pulse">
@@ -118,7 +134,7 @@ export default function ResourceCard({ url, roadmapId, stageIndex, onPreview }: 
   }
 
   const title = metadata?.title || url;
-  const hostname = metadata?.hostname || new URL(url).hostname;
+  const displayHostname = metadata?.hostname || hostname;
   const type = metadata?.type || "article";
   const canPreview = metadata?.canEmbed || type === "video" || type === "interactive";
 
@@ -144,7 +160,7 @@ export default function ResourceCard({ url, roadmapId, stageIndex, onPreview }: 
           </div>
           
           <p className="text-xs text-gray-400 mb-3 truncate">
-            {hostname}
+            {displayHostname}
           </p>
 
           <div className="flex gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>

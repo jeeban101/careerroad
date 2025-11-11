@@ -171,12 +171,14 @@ Respond with valid JSON matching this structure:
       "stage": "Stage name (e.g., Beginner Fundamentals)",
       "duration": "Specific duration (e.g., 2 days, 1 week)",
       "tasks": ["Task 1", "Task 2", "Task 3"],
-      "resources": ["Resource 1 with URL", "Resource 2"]
+      "resources": ["https://example.com/resource1", "https://youtube.com/watch?v=example"]
     }
   ],
   "milestones": ["Milestone 1", "Milestone 2", "Milestone 3"],
   "expectedOutcome": "What the user will be able to do"
-}`;
+}
+
+IMPORTANT: The "resources" array MUST contain ONLY valid, complete URLs starting with http:// or https://. Do NOT use placeholder text or descriptions - only real, working URLs to actual resources like YouTube videos, documentation sites, tutorials, courses, etc.`;
 
     const userPrompt = `Generate a ${timeFrame} skill learning roadmap for ${skill}. The learner is at "${proficiencyLevel}" level${currentCourse ? ` and is currently studying ${currentCourse}` : ""}${desiredRole ? ` aiming to become a ${desiredRole}` : ""}.
 
