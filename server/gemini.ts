@@ -179,7 +179,7 @@ Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array 
 
     const response = await retryWithBackoff(() =>
       ai.models.generateContent({
-        model: "gemini-1.5-pro",
+        model: "gemini-2.5-pro",
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
@@ -296,7 +296,7 @@ Convert this skill roadmap into 10-18 actionable Kanban tasks. All tasks should 
 
     const response = await retryWithBackoff(() =>
       ai.models.generateContent({
-        model: "gemini-1.5-pro",
+        model: "gemini-2.5-pro",
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
