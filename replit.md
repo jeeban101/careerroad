@@ -40,6 +40,16 @@ Preferred communication style: Simple, everyday language.
   - Implemented server-side URL filtering as defense-in-depth (filters out non-URL strings before sending to frontend)
   - Fixed ResourceCard crash on invalid URL construction with try-catch validation
   - Resolved "Invalid URL format" 400 errors from resource-metadata endpoint
+✓ COMPLETED: Optimized AI prompts to eliminate model overload issues (November 11, 2025)
+  - **Skill Roadmap Prompt**: Reduced from 2000+ characters to ~400 characters (80% reduction)
+    - Removed verbose requirements and detailed explanations
+    - Simplified JSON structure example
+    - Matched the efficient style of career roadmap prompt
+  - **Kanban Generation Prompt**: Reduced from embedding full roadmap JSON to simple summaries (90% reduction)
+    - Changed from `JSON.stringify(roadmap.phases)` to simple "Phase 1: Title (4 weeks)" format
+    - Eliminated 1000s of unnecessary tokens per request
+    - Added JSON parse error logging for debugging
+  - **Result**: 3-week skill roadmaps now generate reliably without 503 errors
 
 ## Previous Changes (July 12, 2025)
 
