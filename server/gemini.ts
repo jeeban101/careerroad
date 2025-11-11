@@ -128,63 +128,30 @@ export async function generateSkillRoadmap(
 
     const stageCount = mapTimeframeToStages(timeFrame);
 
-    const systemPrompt = `You are CareerRoad AI, an expert mentor in career and skill development.
+    const systemPrompt = `Generate a skill-learning roadmap with ${stageCount} stages for ${timeFrame}.
 
-Generate a personalized, realistic skill-learning roadmap for the user based on their current proficiency and desired timeframe.
-
-User details:
-- Skill: ${skill}
-- Current proficiency level: ${proficiencyLevel}
-- Target timeframe: ${timeFrame}
-${currentCourse ? `- Current course: ${currentCourse}` : ""}
-${desiredRole ? `- Desired role: ${desiredRole}` : ""}
-
-Create ${stageCount} learning stages that fit within the ${timeFrame} timeframe.
-
-Stage mapping:
-- ${stageCount} stages total
-- Each stage should be a logical progression from ${proficiencyLevel}
-- Tasks must be realistic and achievable within the allocated time
-- Include India-relevant resources (Indian platforms, communities, companies)
-
-Requirements:
-1. Overview: Brief explanation of the skill and its relevance${desiredRole ? ` to ${desiredRole}` : ""}
-2. Stages: ${stageCount} progressive stages (Beginner, Intermediate, Advanced, etc.)
-   - Each stage has: stage name, duration, specific tasks array, resources array
-3. Milestones: 3-5 checkpoints to track progress
-4. Expected Outcome: What the user will achieve at the end
-
-Focus on:
-- Actionable, specific tasks sized appropriately for each stage duration
-- Real tools, platforms, and resources (prefer free/freemium)
-- Practical projects over theory
-- Indian job market context
-
-Respond with valid JSON matching this structure:
+JSON structure:
 {
   "skill": "${skill}",
   "proficiencyLevel": "${proficiencyLevel}",
   "timeFrame": "${timeFrame}",
-  "overview": "Brief skill overview and relevance",
+  "overview": "Brief overview",
   "stages": [
     {
-      "stage": "Stage name (e.g., Beginner Fundamentals)",
-      "duration": "Specific duration (e.g., 2 days, 1 week)",
-      "tasks": ["Task 1", "Task 2", "Task 3"],
-      "resources": ["https://example.com/resource1", "https://youtube.com/watch?v=example"]
+      "stage": "Stage name",
+      "duration": "Duration",
+      "tasks": ["Task 1", "Task 2"],
+      "resources": ["https://url1.com", "https://url2.com"]
     }
   ],
-  "milestones": ["Milestone 1", "Milestone 2", "Milestone 3"],
-  "expectedOutcome": "What the user will be able to do"
+  "milestones": ["Milestone 1", "Milestone 2"],
+  "expectedOutcome": "What you'll achieve"
 }
 
-IMPORTANT: The "resources" array MUST contain ONLY valid, complete URLs starting with http:// or https://. Do NOT use placeholder text or descriptions - only real, working URLs to actual resources like YouTube videos, documentation sites, tutorials, courses, etc.`;
+Resources must be valid http/https URLs. Include 3-4 tasks and 2-3 resources per stage.`;
 
-    const userPrompt = `Generate a ${timeFrame} skill learning roadmap for ${skill}. The learner is at "${proficiencyLevel}" level${currentCourse ? ` and is currently studying ${currentCourse}` : ""}${desiredRole ? ` aiming to become a ${desiredRole}` : ""}.
+    const userPrompt = `Create ${stageCount} learning stages for ${skill} at ${proficiencyLevel} level (${timeFrame} total).`;
 
-Create ${stageCount} stages with practical tasks and resources. Ensure tasks are achievable within ${timeFrame}.
-
-Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array with stage, duration, tasks array, resources array), milestones (array), expectedOutcome.`;
 
     const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
