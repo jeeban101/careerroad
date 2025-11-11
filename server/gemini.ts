@@ -4,6 +4,33 @@ import { z } from "zod";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  initialDelay: number = 1000
+): Promise<T> {
+  let lastError: Error;
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      
+      if (error?.status === 503 && i < maxRetries - 1) {
+        const delay = initialDelay * Math.pow(2, i);
+        console.log(`API request failed with 503, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      throw error;
+    }
+  }
+  
+  throw lastError!;
+}
+
 export async function generateRoadmap(currentCourse: string, targetRole: string): Promise<RoadmapPhase[]> {
   try {
     const systemPrompt = `You are a career guidance expert. Generate a detailed, structured career roadmap for a student.
@@ -42,14 +69,16 @@ Respond with valid JSON in this exact format:
   }
 ]`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      config: {
-        systemInstruction: systemPrompt,
-        responseMimeType: "application/json"
-      },
-      contents: `Generate a career roadmap for a ${currentCourse} student to become a ${targetRole}. Include specific resources, tools, and actionable steps relevant to the Indian job market.`
-    });
+    const response = await retryWithBackoff(() => 
+      ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        config: {
+          systemInstruction: systemPrompt,
+          responseMimeType: "application/json"
+        },
+        contents: `Generate a career roadmap for a ${currentCourse} student to become a ${targetRole}. Include specific resources, tools, and actionable steps relevant to the Indian job market.`
+      })
+    );
 
     const rawJson = response.text;
     
@@ -133,14 +162,16 @@ Create ${stageCount} stages with practical tasks and resources. Ensure tasks are
 
 Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array with stage, duration, tasks array, resources array), milestones (array), expectedOutcome.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      config: {
-        systemInstruction: systemPrompt,
-        responseMimeType: "application/json"
-      },
-      contents: userPrompt
-    });
+    const response = await retryWithBackoff(() =>
+      ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        config: {
+          systemInstruction: systemPrompt,
+          responseMimeType: "application/json"
+        },
+        contents: userPrompt
+      })
+    );
 
     const rawJson = response.text;
     
@@ -244,14 +275,16 @@ ${JSON.stringify(roadmap.skillContent, null, 2)}
 
 Convert this skill roadmap into 10-18 actionable Kanban tasks. All tasks should have status "todo".`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      config: {
-        systemInstruction: systemPrompt,
-        responseMimeType: "application/json"
-      },
-      contents: userMessage
-    });
+    const response = await retryWithBackoff(() =>
+      ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        config: {
+          systemInstruction: systemPrompt,
+          responseMimeType: "application/json"
+        },
+        contents: userMessage
+      })
+    );
 
     const rawJson = response.text;
     
