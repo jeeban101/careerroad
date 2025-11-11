@@ -12,6 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import confetti from "canvas-confetti";
 import { Badge } from "@/components/ui/badge";
+import ResourceCard from "@/components/resource-card";
+import ResourcePreviewModal from "@/components/resource-preview-modal";
+import type { ResourceMetadata } from "@/hooks/useResourceMetadata";
 
 interface InteractiveSkillRoadmapProps {
   skillRoadmap: any;
@@ -58,6 +61,9 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
   const [xp, setXp] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   const [motivationalMessage, setMotivationalMessage] = useState("");
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewMetadata, setPreviewMetadata] = useState<ResourceMetadata | null>(null);
 
   if (!skillRoadmap || !skillRoadmap.skillContent) {
     return null;
@@ -441,17 +447,17 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: resourceIdx * 0.05 }}
-                                className="p-4 bg-gradient-to-br from-white/5 to-white/10 rounded-lg border border-pink-500/20 hover:border-pink-500/40 transition-all group"
-                                whileHover={{ y: -2 }}
                               >
-                                <div className="flex items-start gap-3">
-                                  <div className="mt-1">
-                                    {getResourceIcon(resource)}
-                                  </div>
-                                  <p className="text-sm text-gray-200 leading-relaxed flex-1 group-hover:text-white transition-colors">
-                                    {resource}
-                                  </p>
-                                </div>
+                                <ResourceCard
+                                  url={resource}
+                                  roadmapId={skillRoadmap.id}
+                                  stageIndex={stageIndex}
+                                  onPreview={(url, metadata) => {
+                                    setPreviewUrl(url);
+                                    setPreviewMetadata(metadata);
+                                    setPreviewModalOpen(true);
+                                  }}
+                                />
                               </motion.div>
                             ))}
                           </div>
@@ -569,6 +575,14 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
           </Card>
         </motion.div>
       )}
+
+      {/* Resource Preview Modal */}
+      <ResourcePreviewModal
+        open={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        url={previewUrl}
+        metadata={previewMetadata}
+      />
     </section>
   );
 }
