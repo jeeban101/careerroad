@@ -31,7 +31,7 @@ async function retryWithBackoff<T>(
           currentModel = "gemini-2.5-pro";
           continue;
         }
-        
+
         const delay = initialDelay * Math.pow(2, i);
         console.log(
           `API request failed with ${error?.status}, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`,
@@ -254,54 +254,72 @@ function mapTimeframeToStages(timeFrame: string): number {
   }
 }
 
+// Helper function to extract key information from roadmap
+function extractRoadmapEssentials(roadmap: UserRoadmapHistory): string {
+  const isCareerRoadmap = roadmap.roadmapType === "career";
+
+  if (isCareerRoadmap && roadmap.phases) {
+    // Extract only titles and durations, limit to 3 phases
+    const phasesSummary = roadmap.phases.slice(0, 3).map((phase, i) => 
+      `${i + 1}. ${phase.title} (${phase.duration_weeks}w)`
+    ).join('\n');
+
+    return `Career Path: ${roadmap.currentCourse} → ${roadmap.targetRole}
+Phases:
+${phasesSummary}`;
+  } else if (roadmap.skillContent?.stages) {
+    // Extract only stage names and durations
+    const stagesSummary = roadmap.skillContent.stages.map((stage, i) => 
+      `${i + 1}. ${stage.stage} (${stage.duration})`
+    ).join('\n');
+
+    return `Skill: ${roadmap.skill}
+Level: ${roadmap.proficiencyLevel}
+Duration: ${roadmap.timeFrame}
+Stages:
+${stagesSummary}`;
+  }
+
+  return `Learning path with multiple stages`;
+}
+
 export async function generateKanbanTasksFromRoadmap(
   roadmap: UserRoadmapHistory,
 ): Promise<KanbanTaskGeneration> {
   try {
     const isCareerRoadmap = roadmap.roadmapType === "career";
-    
-    // Create simplified roadmap summary instead of full JSON
-    let roadmapSummary: string;
-    if (isCareerRoadmap && roadmap.phases) {
-      roadmapSummary = roadmap.phases.map((phase, i) => 
-        `Phase ${i + 1}: ${phase.title} (${phase.duration_weeks} weeks)`
-      ).join('\n');
-    } else if (roadmap.skillContent?.stages) {
-      roadmapSummary = roadmap.skillContent.stages.map((stage, i) => 
-        `Stage ${i + 1}: ${stage.stage} (${stage.duration})`
-      ).join('\n');
-    } else {
-      roadmapSummary = `Learning path with multiple stages`;
-    }
 
-    const systemPrompt = `Generate 10-15 actionable Kanban tasks for a learning roadmap.
+    // Create concise roadmap summary - THIS IS THE KEY FIX
+    const roadmapEssentials = extractRoadmapEssentials(roadmap);
 
-Output JSON format:
+    const systemPrompt = `You are a task planning expert. Generate 10-15 actionable Kanban tasks based on a learning roadmap.
+
+STRICT OUTPUT FORMAT (JSON only):
 {
   "tasks": [
     {
-      "title": "Task name",
-      "description": "Brief explanation",
+      "title": "Clear, actionable task name",
+      "description": "Brief 1-2 sentence explanation",
       "status": "todo",
       "position": 0,
-      "estimatedTime": "1 week"
+      "estimatedTime": "realistic duration (e.g., 2 days, 1 week)"
     }
   ]
 }
 
-All tasks must have status "todo" and sequential positions (0, 1, 2...).`;
+RULES:
+- Generate exactly 10-15 tasks
+- All tasks MUST have status: "todo"
+- Positions MUST be sequential: 0, 1, 2, 3... 
+- Keep descriptions under 200 characters
+- Make tasks specific and actionable
+- Ensure proper JSON formatting`;
 
-    const userMessage = isCareerRoadmap
-      ? `Create Kanban tasks for: ${roadmap.currentCourse} → ${roadmap.targetRole}
+    const userMessage = `Create Kanban tasks for this learning path:
 
-${roadmapSummary}
+${roadmapEssentials}
 
-Generate 10-15 practical tasks.`
-      : `Create Kanban tasks for learning ${roadmap.skill} (${roadmap.proficiencyLevel} level, ${roadmap.timeFrame})
-
-${roadmapSummary}
-
-Generate 10-15 practical tasks.`;
+Generate 10-15 practical, sequential tasks that break down the learning journey into manageable steps.`;
 
     const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
@@ -309,6 +327,7 @@ Generate 10-15 practical tasks.`;
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
+          maxOutputTokens: 2048, // Limit response size
         },
         contents: userMessage,
       }),
@@ -320,25 +339,28 @@ Generate 10-15 practical tasks.`;
       throw new Error("Empty response from Gemini");
     }
 
-    // Log raw JSON for debugging malformed responses
-    console.log("Kanban raw JSON length:", rawJson.length);
+    // Log for debugging
+    console.log("Kanban response length:", rawJson.length);
 
     let parsedData;
     try {
       parsedData = JSON.parse(rawJson);
     } catch (parseError) {
-      console.error("JSON parse error. First 1000 chars:", rawJson.substring(0, 1000));
-      throw parseError;
+      console.error("JSON parse error. First 500 chars:", rawJson.substring(0, 500));
+      throw new Error("Failed to parse Kanban tasks JSON");
     }
 
     const validation = kanbanTaskGenerationSchema.safeParse(parsedData);
 
     if (!validation.success) {
-      console.error("Kanban generation validation error:", validation.error);
+      console.error("Kanban validation error:", validation.error.errors);
       throw new Error("Invalid Kanban task structure from AI");
     }
 
-    return validation.data;
+    // Ensure tasks don't exceed 15
+    const tasks = validation.data.tasks.slice(0, 15);
+
+    return { tasks };
   } catch (error) {
     console.error("Failed to generate Kanban tasks:", error);
     throw new Error(`Failed to generate Kanban tasks: ${error}`);
