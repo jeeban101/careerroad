@@ -12,22 +12,29 @@ import { z } from "zod";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
+  fn: (model: string) => Promise<T>,
   maxRetries: number = 3,
   initialDelay: number = 1000,
 ): Promise<T> {
   let lastError: Error;
+  let currentModel = "gemini-2.5-flash";
 
   for (let i = 0; i < maxRetries; i++) {
     try {
-      return await fn();
+      return await fn(currentModel);
     } catch (error: any) {
       lastError = error;
 
-      if (error?.status === 503 && i < maxRetries - 1) {
+      if ((error?.status === 503 || error?.status === 404) && i < maxRetries - 1) {
+        if (currentModel === "gemini-2.5-flash" && (error?.status === 503 || error?.status === 404)) {
+          console.log(`gemini-2.5-flash failed (${error?.status}), switching to gemini-2.5-pro...`);
+          currentModel = "gemini-2.5-pro";
+          continue;
+        }
+        
         const delay = initialDelay * Math.pow(2, i);
         console.log(
-          `API request failed with 503, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`,
+          `API request failed with ${error?.status}, retrying in ${delay}ms... (attempt ${i + 1}/${maxRetries})`,
         );
         await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
@@ -81,9 +88,9 @@ Respond with valid JSON in this exact format:
   }
 ]`;
 
-    const response = await retryWithBackoff(() =>
+    const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
-        model: "gemini-2.5-pro",
+        model: model,
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
@@ -177,9 +184,9 @@ Create ${stageCount} stages with practical tasks and resources. Ensure tasks are
 
 Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array with stage, duration, tasks array, resources array), milestones (array), expectedOutcome.`;
 
-    const response = await retryWithBackoff(() =>
+    const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
-        model: "gemini-2.5-pro",
+        model: model,
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
@@ -294,9 +301,9 @@ ${JSON.stringify(roadmap.skillContent, null, 2)}
 
 Convert this skill roadmap into 10-18 actionable Kanban tasks. All tasks should have status "todo".`;
 
-    const response = await retryWithBackoff(() =>
+    const response = await retryWithBackoff((model) =>
       ai.models.generateContent({
-        model: "gemini-2.5-pro",
+        model: model,
         config: {
           systemInstruction: systemPrompt,
           responseMimeType: "application/json",
