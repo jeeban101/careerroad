@@ -100,7 +100,7 @@ Requirements:
 1. Overview: Brief explanation of the skill and its relevance${desiredRole ? ` to ${desiredRole}` : ''}
 2. Stages: ${stageCount} progressive stages (Beginner, Intermediate, Advanced, etc.)
    - Each stage has: stage name, duration, specific tasks array, resources array
-3. Milestones: 3-5 checkpoints to track progress
+3. Milestones: 4-6 checkpoints to track progress
 4. Expected Outcome: What the user will achieve at the end
 
 Focus on:
@@ -119,7 +119,7 @@ Respond with valid JSON matching this structure:
     {
       "stage": "Stage name (e.g., Beginner Fundamentals)",
       "duration": "Specific duration (e.g., 2 days, 1 week)",
-      "tasks": ["Task 1", "Task 2", "Task 3"],
+      "tasks": ["Task 1", "Task 2", "Task 3", "Task 4"],
       "resources": ["Resource 1 with URL", "Resource 2"]
     }
   ],
