@@ -17,6 +17,7 @@ interface RoadmapDisplayProps {
   roadmap: RoadmapTemplate;
   onFork: () => void;
   onShare: () => void;
+  historyId?: number;
 }
 
 const getItemIcon = (type: string) => {
@@ -63,23 +64,16 @@ const getPhaseColor = (index: number) => {
   return colors[index % colors.length];
 };
 
-export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisplayProps) {
+export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: RoadmapDisplayProps) {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [roadmapHistoryId, setRoadmapHistoryId] = useState<number | null>(null);
+  const [roadmapHistoryId, setRoadmapHistoryId] = useState<number | null>(historyId || null);
   const { user } = useAuth();
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
   const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
   const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
-
-  // Initialize roadmapHistoryId from roadmap.id if it exists (for pre-saved roadmaps)
-  useEffect(() => {
-    if ((roadmap as any).id && !roadmapHistoryId) {
-      setRoadmapHistoryId((roadmap as any).id);
-    }
-  }, [(roadmap as any).id]);
 
   // Manual save roadmap to history
   const saveToHistoryMutation = useMutation({

@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface InteractiveSkillRoadmapProps {
   skillRoadmap: any;
+  fromHistory?: boolean;
 }
 
 interface TaskProgress {
@@ -50,7 +51,7 @@ const getResourceIcon = (resource: string) => {
   return <ExternalLink className="text-purple-400" size={20} />;
 };
 
-export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSkillRoadmapProps) {
+export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: InteractiveSkillRoadmapProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [, navigate] = useLocation();
@@ -60,7 +61,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
   const [xp, setXp] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   const [motivationalMessage, setMotivationalMessage] = useState("");
-  const [savedId, setSavedId] = useState<number | null>(null);
+  const [savedId, setSavedId] = useState<number | null>(fromHistory ? (skillRoadmap.id || null) : null);
 
   if (!skillRoadmap || !skillRoadmap.skillContent) {
     return null;
@@ -170,13 +171,6 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
   const getStageNote = (stageIndex: number) => {
     return stageNotes.find(n => n.stageIndex === stageIndex)?.note || "";
   };
-
-  // Initialize savedId from skillRoadmap.id if it exists (for pre-saved roadmaps)
-  useEffect(() => {
-    if (skillRoadmap.id && !savedId) {
-      setSavedId(skillRoadmap.id);
-    }
-  }, [skillRoadmap.id]);
 
   // Manual save skill roadmap to history
   const saveToHistoryMutation = useMutation({

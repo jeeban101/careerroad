@@ -166,7 +166,7 @@ export default function HistoryPage() {
             >
               ← Back to History
             </Button>
-            <InteractiveSkillRoadmap skillRoadmap={selectedRoadmap} />
+            <InteractiveSkillRoadmap skillRoadmap={selectedRoadmap} fromHistory={true} />
           </div>
         </div>
       );
