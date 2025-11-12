@@ -74,7 +74,14 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
   const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
   const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
 
-  // Auto-save roadmap to history when user is logged in
+  // Initialize roadmapHistoryId from roadmap.id if it exists (for pre-saved roadmaps)
+  useEffect(() => {
+    if ((roadmap as any).id && !roadmapHistoryId) {
+      setRoadmapHistoryId((roadmap as any).id);
+    }
+  }, [(roadmap as any).id]);
+
+  // Manual save roadmap to history
   const saveToHistoryMutation = useMutation({
     mutationFn: async (roadmapData: any) => {
       const response = await apiRequest('POST', '/api/user-roadmap-history', roadmapData);
@@ -82,23 +89,36 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
     },
     onSuccess: (data) => {
       setRoadmapHistoryId(data.id);
+      queryClient.invalidateQueries({ queryKey: ['/api/user-roadmap-history'] });
+      toast({
+        title: "Roadmap Saved!",
+        description: "Your roadmap has been saved to your history.",
+        variant: "default",
+      });
     },
     onError: (error) => {
       console.error('Failed to save roadmap to history:', error);
+      toast({
+        title: "Save Failed",
+        description: "Failed to save roadmap. Please try again.",
+        variant: "destructive",
+      });
     }
   });
 
-  // Save roadmap to history when component mounts (if user is logged in)
-  useEffect(() => {
-    if (user && roadmap && !roadmapHistoryId) {
-      saveToHistoryMutation.mutate({
-        currentCourse: roadmap.currentCourse,
-        targetRole: roadmap.targetRole,
-        title: roadmap.title,
-        phases: roadmap.phases
-      });
+  const handleSaveToHistory = () => {
+    if (!user) {
+      setShowEmailModal(true);
+      return;
     }
-  }, [user, roadmap, roadmapHistoryId]);
+
+    saveToHistoryMutation.mutate({
+      currentCourse: roadmap.currentCourse,
+      targetRole: roadmap.targetRole,
+      title: roadmap.title,
+      phases: roadmap.phases
+    });
+  };
 
   // Update task progress
   const updateTaskProgressMutation = useMutation({
@@ -154,9 +174,9 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
 
     if (!roadmapHistoryId) {
       toast({
-        title: "Please wait",
-        description: "Roadmap is being saved...",
-        variant: "default",
+        title: "Save Required",
+        description: "Please save the roadmap first before generating Kanban board.",
+        variant: "destructive",
       });
       return;
     }
@@ -215,17 +235,28 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare }: RoadmapDisp
           </div>
           
           <div className="flex justify-center mt-8 space-x-4 animate-in slide-in-from-bottom duration-1000 delay-500">
-            {user && (
+            {user && !roadmapHistoryId && (
+              <Button 
+                onClick={handleSaveToHistory}
+                disabled={saveToHistoryMutation.isPending}
+                data-testid="button-save-roadmap"
+                className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {saveToHistoryMutation.isPending ? 'Saving...' : 'Save to History'}
+              </Button>
+            )}
+            {user && roadmapHistoryId && (
               <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
                 <Bookmark className="h-4 w-4 text-emerald-400" />
                 <span className="text-sm font-medium text-emerald-300">
-                  {saveToHistoryMutation.isPending ? 'Saving...' : 'Saved to History'}
+                  Saved to History
                 </span>
               </div>
             )}
             <Button 
               onClick={handleGenerateKanban}
-              disabled={generateKanbanMutation.isPending}
+              disabled={generateKanbanMutation.isPending || !roadmapHistoryId}
               data-testid="button-generate-kanban"
               className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
             >

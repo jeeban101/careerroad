@@ -12,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { UserRoadmapHistory, UserRoadmapProgress, RoadmapItem } from "@shared/schema";
 import Header from "@/components/header";
 import TaskCard from "@/components/task-card";
+import InteractiveSkillRoadmap from "@/components/interactive-skill-roadmap";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -153,6 +154,25 @@ export default function HistoryPage() {
 
   // Show selected roadmap in full interactive mode
   if (selectedRoadmap) {
+    // If it's a skill roadmap, render it with InteractiveSkillRoadmap
+    if (selectedRoadmap.roadmapType === 'skill') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <Button 
+              variant="ghost" 
+              onClick={() => setSelectedRoadmap(null)}
+              className="mb-6 text-gray-300 hover:text-white"
+            >
+              ← Back to History
+            </Button>
+            <InteractiveSkillRoadmap skillRoadmap={selectedRoadmap} />
+          </div>
+        </div>
+      );
+    }
+
+    // For career roadmaps, show the career roadmap view
     const phases = selectedRoadmap.phases;
     const courseLabel = courseOptions.find(c => c.value === selectedRoadmap.currentCourse)?.label || selectedRoadmap.currentCourse;
     const roleLabel = roleOptions.find(r => r.value === selectedRoadmap.targetRole)?.label || selectedRoadmap.targetRole;

@@ -61,45 +61,14 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
       }
       return response;
     },
-    onSuccess: async (skillRoadmap) => {
-      // Auto-save to history if user is logged in and update roadmap with database ID
-      let updatedRoadmap = skillRoadmap;
+    onSuccess: (skillRoadmap) => {
+      toast({
+        title: "Skill Roadmap Generated!",
+        description: "Your personalized skill roadmap is ready.",
+      });
       
-      if (user && skillRoadmap) {
-        try {
-          const saveResponse = await apiRequest("POST", "/api/user-roadmap-history", {
-            roadmapType: "skill",
-            skill: skillRoadmap.skill,
-            proficiencyLevel: skillRoadmap.proficiencyLevel,
-            timeFrame: skillRoadmap.timeFrame,
-            title: skillRoadmap.title,
-            skillContent: skillRoadmap.skillContent
-          });
-          
-          const savedData = await saveResponse.json();
-          
-          // Update roadmap with database ID
-          updatedRoadmap = {
-            ...skillRoadmap,
-            id: savedData.id
-          };
-          
-          toast({
-            title: "Skill Roadmap Generated!",
-            description: "Your skill roadmap has been automatically saved to your history.",
-          });
-        } catch (error) {
-          console.error("Failed to save skill roadmap to history:", error);
-          toast({
-            title: "Skill Roadmap Generated!",
-            description: "Roadmap generated successfully but couldn't save to history.",
-            variant: "destructive",
-          });
-        }
-      }
-      
-      // Pass the updated roadmap (with database ID) to parent
-      onSkillRoadmapGenerated(updatedRoadmap);
+      // Pass the roadmap to parent component
+      onSkillRoadmapGenerated(skillRoadmap);
       
       setTimeout(() => {
         document.getElementById('skill-roadmap-display')?.scrollIntoView({ behavior: 'smooth' });

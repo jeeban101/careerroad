@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Target, Clock, Trophy, Star, BookOpen, Youtube, FileText, ExternalLink, Award, Zap, TrendingUp, Kanban } from "lucide-react";
+import { CheckCircle, Target, Clock, Trophy, Star, BookOpen, Youtube, FileText, ExternalLink, Award, Zap, TrendingUp, Kanban, Save, Bookmark } from "lucide-react";
 import { SkillRoadmapContent } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import confetti from "canvas-confetti";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +52,7 @@ const getResourceIcon = (resource: string) => {
 
 export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSkillRoadmapProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [, navigate] = useLocation();
   const [taskProgress, setTaskProgress] = useState<TaskProgress[]>([]);
   const [stageNotes, setStageNotes] = useState<StageNote[]>([]);
@@ -58,6 +60,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
   const [xp, setXp] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   const [motivationalMessage, setMotivationalMessage] = useState("");
+  const [savedId, setSavedId] = useState<number | null>(null);
 
   if (!skillRoadmap || !skillRoadmap.skillContent) {
     return null;
@@ -168,6 +171,57 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
     return stageNotes.find(n => n.stageIndex === stageIndex)?.note || "";
   };
 
+  // Initialize savedId from skillRoadmap.id if it exists (for pre-saved roadmaps)
+  useEffect(() => {
+    if (skillRoadmap.id && !savedId) {
+      setSavedId(skillRoadmap.id);
+    }
+  }, [skillRoadmap.id]);
+
+  // Manual save skill roadmap to history
+  const saveToHistoryMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/user-roadmap-history', {
+        roadmapType: "skill",
+        skill: skillRoadmap.skill,
+        proficiencyLevel: skillRoadmap.proficiencyLevel,
+        timeFrame: skillRoadmap.timeFrame,
+        title: skillRoadmap.title,
+        skillContent: skillRoadmap.skillContent
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setSavedId(data.id);
+      queryClient.invalidateQueries({ queryKey: ['/api/user-roadmap-history'] });
+      toast({
+        title: "Skill Roadmap Saved!",
+        description: "Your skill roadmap has been saved to your history.",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      console.error('Failed to save skill roadmap to history:', error);
+      toast({
+        title: "Save Failed",
+        description: "Failed to save skill roadmap. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSaveToHistory = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to save your roadmap.",
+        variant: "destructive",
+      });
+      return;
+    }
+    saveToHistoryMutation.mutate();
+  };
+
   // Generate Kanban board from roadmap
   const generateKanbanMutation = useMutation({
     mutationFn: async (historyId: number) => {
@@ -194,15 +248,25 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
   });
 
   const handleGenerateKanban = () => {
-    if (!skillRoadmap.id) {
+    if (!user) {
       toast({
-        title: "Error",
-        description: "Roadmap ID not found",
+        title: "Login Required",
+        description: "Please log in to generate Kanban board.",
         variant: "destructive",
       });
       return;
     }
-    generateKanbanMutation.mutate(skillRoadmap.id);
+
+    if (!savedId) {
+      toast({
+        title: "Save Required",
+        description: "Please save the roadmap first before generating Kanban board.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    generateKanbanMutation.mutate(savedId);
   };
 
   useEffect(() => {
@@ -270,11 +334,30 @@ export default function InteractiveSkillRoadmap({ skillRoadmap }: InteractiveSki
           <Progress value={completionPercentage} className="h-3 bg-white/10" />
         </div>
 
-        {/* Generate Kanban Button */}
-        <div className="mt-4 flex justify-center">
+        {/* Action Buttons */}
+        <div className="mt-4 flex justify-center gap-4">
+          {user && !savedId && (
+            <Button 
+              onClick={handleSaveToHistory}
+              disabled={saveToHistoryMutation.isPending}
+              data-testid="button-save-skill-roadmap"
+              className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-6 py-2.5 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {saveToHistoryMutation.isPending ? 'Saving...' : 'Save to History'}
+            </Button>
+          )}
+          {user && savedId && (
+            <div className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
+              <Bookmark className="h-4 w-4 text-emerald-400" />
+              <span className="text-sm font-medium text-emerald-300">
+                Saved to History
+              </span>
+            </div>
+          )}
           <Button 
             onClick={handleGenerateKanban}
-            disabled={generateKanbanMutation.isPending}
+            disabled={generateKanbanMutation.isPending || !savedId}
             data-testid="button-generate-kanban-skill"
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-2.5 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
           >
