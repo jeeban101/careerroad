@@ -351,7 +351,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
           )}
           <Button 
             onClick={handleGenerateKanban}
-            disabled={generateKanbanMutation.isPending || !savedId}
+            disabled={generateKanbanMutation.isPending}
             data-testid="button-generate-kanban-skill"
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-2.5 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
           >

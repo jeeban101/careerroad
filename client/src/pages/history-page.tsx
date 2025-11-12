@@ -313,8 +313,17 @@ export default function HistoryPage() {
           {/* Roadmap Grid */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {history.map((roadmap) => {
+            const isSkillRoadmap = roadmap.roadmapType === 'skill';
             const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
             const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
+            
+            // For skill roadmaps, use skill and proficiency/timeframe
+            const displayTitle = isSkillRoadmap 
+              ? `Learn ${roadmap.skill || 'Skill'} in ${roadmap.timeFrame || 'N/A'}`
+              : `${courseLabel} → ${roleLabel}`;
+            const displayBadge = isSkillRoadmap 
+              ? roadmap.skill || 'Skill Learning'
+              : roleLabel;
             
             return (
               <Card 
@@ -340,7 +349,7 @@ export default function HistoryPage() {
                   
                   <div className="flex items-center justify-between pr-8">
                     <Badge variant="outline" className="bg-gradient-to-r from-purple-600/30 to-blue-600/30 text-purple-200 border-purple-400/50 font-semibold">
-                      {roleLabel}
+                      {displayBadge}
                     </Badge>
                     <div className="flex items-center gap-2 text-sm text-gray-300">
                       <Calendar className="h-4 w-4" />
@@ -348,7 +357,7 @@ export default function HistoryPage() {
                     </div>
                   </div>
                   <CardTitle className="text-xl text-white line-clamp-2 font-bold mt-2">
-                    {courseLabel} → {roleLabel}
+                    {displayTitle}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">

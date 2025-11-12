@@ -250,7 +250,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
             )}
             <Button 
               onClick={handleGenerateKanban}
-              disabled={generateKanbanMutation.isPending || !roadmapHistoryId}
+              disabled={generateKanbanMutation.isPending}
               data-testid="button-generate-kanban"
               className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 shimmer disabled:opacity-50 disabled:cursor-not-allowed"
             >

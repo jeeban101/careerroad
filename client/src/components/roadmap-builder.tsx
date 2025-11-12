@@ -53,29 +53,10 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
     onSuccess: async (roadmap) => {
       onRoadmapGenerated(roadmap);
       
-      // Auto-save to history if user is logged in
-      if (user && roadmap) {
-        try {
-          await apiRequest("POST", "/api/user-roadmap-history", {
-            currentCourse: roadmap.currentCourse,
-            targetRole: roadmap.targetRole,
-            title: roadmap.title,
-            phases: roadmap.phases
-          });
-          
-          toast({
-            title: "Roadmap Generated!",
-            description: "Your roadmap has been automatically saved to your history.",
-          });
-        } catch (error) {
-          console.error("Failed to save roadmap to history:", error);
-          toast({
-            title: "Roadmap Generated!",
-            description: "Roadmap generated successfully but couldn't save to history.",
-            variant: "destructive",
-          });
-        }
-      }
+      toast({
+        title: "Roadmap Generated!",
+        description: "Your personalized career roadmap is ready.",
+      });
       
       setTimeout(() => {
         document.getElementById('roadmap-display')?.scrollIntoView({ behavior: 'smooth' });
