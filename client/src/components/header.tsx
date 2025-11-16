@@ -1,4 +1,4 @@
-import { Route, LogOut, History, Kanban } from "lucide-react";
+import { Route, LogOut, History, Kanban, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
 import { useLocation, Link } from "wouter";
@@ -72,6 +72,15 @@ export default function Header() {
                     className={location === "/" ? "bg-purple-600 hover:bg-purple-700 text-white" : "text-gray-300 hover:text-white hover:bg-white/10"}
                   >
                     Home
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button
+                    size="sm"
+                    className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-4 py-2 rounded-lg font-semibold shimmer"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>Dashboard</span>
                   </Button>
                 </Link>
                 <Link href="/history">

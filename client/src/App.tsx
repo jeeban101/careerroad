@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Landing from "@/pages/landing";
+import Dashboard from "@/pages/dashboard";
 import HistoryPage from "@/pages/history-page";
 import KanbanBoardPage from "@/pages/kanban-board";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/" component={user ? Home : Landing} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
+      <Route path="/dashboard" component={user ? Dashboard : Landing} />
       <Route path="/history" component={user ? HistoryPage : Landing} />
       <Route path="/kanban/:id?" component={user ? KanbanBoardPage : Landing} />
       <Route component={NotFound} />

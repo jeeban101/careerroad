@@ -35,6 +35,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getUserStats(userId: number): Promise<{ totalXp: number; currentStreak: number; longestStreak: number; completedTasks: number }>;
   
   createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry>;
   getWaitlistEntries(): Promise<WaitlistEntry[]>;
@@ -255,11 +256,29 @@ export class MemStorage implements IStorage {
       id,
       firstName: insertUser.firstName || null,
       lastName: insertUser.lastName || null,
+      totalXp: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastLoginDate: null,
       createdAt: new Date(), 
       updatedAt: new Date() 
     };
     this.users.set(id, user);
     return user;
+  }
+
+  async getUserStats(userId: number): Promise<{ totalXp: number; currentStreak: number; longestStreak: number; completedTasks: number }> {
+    const user = this.users.get(userId);
+    const completedTasks = Array.from(this.userRoadmapProgresses.values()).filter(
+      p => p.userId === userId && p.completed
+    ).length;
+    
+    return {
+      totalXp: user?.totalXp || 0,
+      currentStreak: user?.currentStreak || 0,
+      longestStreak: user?.longestStreak || 0,
+      completedTasks
+    };
   }
 
   async createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry> {
@@ -458,6 +477,18 @@ export class DatabaseStorage implements IStorage {
       .values(userData)
       .returning();
     return user;
+  }
+
+  async getUserStats(userId: number): Promise<{ totalXp: number; currentStreak: number; longestStreak: number; completedTasks: number }> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const completedTasksCount = await db.select().from(userRoadmapProgress).where(and(eq(userRoadmapProgress.userId, userId), eq(userRoadmapProgress.completed, true)));
+    
+    return {
+      totalXp: user?.totalXp || 0,
+      currentStreak: user?.currentStreak || 0,
+      longestStreak: user?.longestStreak || 0,
+      completedTasks: completedTasksCount.length || 0
+    };
   }
 
   async createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry> {
