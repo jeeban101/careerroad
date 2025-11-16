@@ -32,15 +32,15 @@ export default function Dashboard() {
     return null;
   }
 
-  const totalXp = stats?.totalXp || 0;
-  const currentStreak = stats?.currentStreak || 0;
-  const longestStreak = stats?.longestStreak || 0;
+  const totalXp = (stats as any)?.totalXp || 0;
+  const currentStreak = (stats as any)?.currentStreak || 0;
+  const longestStreak = (stats as any)?.longestStreak || 0;
   const level = Math.floor(totalXp / 100) + 1;
   const xpToNextLevel = 100 - (totalXp % 100);
   const levelProgress = (totalXp % 100);
 
   const totalRoadmaps = recentRoadmaps.length || 0;
-  const completedTasks = stats?.completedTasks || 0;
+  const completedTasks = (stats as any)?.completedTasks || 0;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -224,11 +224,11 @@ export default function Dashboard() {
                           <div className="flex items-center gap-4 text-sm text-gray-400">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              {format(new Date(roadmap.createdAt), 'MMM dd, yyyy')}
+                              {roadmap.createdAt && format(new Date(roadmap.createdAt), 'MMM dd, yyyy')}
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="h-4 w-4" />
-                              Last viewed: {format(new Date(roadmap.lastAccessed), 'MMM dd')}
+                              Last viewed: {roadmap.lastAccessed && format(new Date(roadmap.lastAccessed), 'MMM dd')}
                             </span>
                           </div>
                         </div>
