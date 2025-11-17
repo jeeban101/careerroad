@@ -27,8 +27,40 @@ export const users = pgTable("users", {
   currentStreak: integer("current_streak").default(0),
   longestStreak: integer("longest_streak").default(0),
   lastLoginDate: timestamp("last_login_date"),
+  weeklyTimeSpent: integer("weekly_time_spent").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User activity log for heatmap visualization
+export const userActivityLog = pgTable("user_activity_log", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  activityDate: timestamp("activity_date").notNull(),
+  xpEarned: integer("xp_earned").default(0),
+  tasksCompleted: integer("tasks_completed").default(0),
+  timeSpent: integer("time_spent").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Achievements/Badges system
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  key: varchar("key", { length: 100 }).unique().notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon", { length: 50 }).notNull(),
+  category: varchar("category", { length: 50 }).notNull(),
+  requirement: integer("requirement").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User earned achievements
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  achievementId: integer("achievement_id").references(() => achievements.id, { onDelete: "cascade" }).notNull(),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
 });
 
 // Saved roadmaps for users
@@ -327,3 +359,11 @@ export const resetPasswordSchema = z.object({
 export type EmailRequest = z.infer<typeof emailRequestSchema>;
 export type ResetPasswordRequest = z.infer<typeof resetPasswordRequestSchema>;
 export type ResetPassword = z.infer<typeof resetPasswordSchema>;
+
+// Activity and Achievement types
+export type UserActivityLog = typeof userActivityLog.$inferSelect;
+export type InsertUserActivityLog = typeof userActivityLog.$inferInsert;
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = typeof achievements.$inferInsert;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = typeof userAchievements.$inferInsert;
