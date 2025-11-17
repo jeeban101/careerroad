@@ -111,12 +111,12 @@ export default function Dashboard() {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
             Welcome back, {user.firstName || 'Explorer'}! 👋
           </h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-gray-400 text-base sm:text-lg">
             Here's your progress and recent activity
           </p>
         </motion.div>
@@ -126,7 +126,7 @@ export default function Dashboard() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
         >
           {/* XP & Level Card with Animation */}
           <motion.div variants={cardVariants} whileHover={{ scale: 1.05 }}>
@@ -284,7 +284,7 @@ export default function Dashboard() {
         )}
 
         {/* Activity & Achievements Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           {/* Activity Heatmap */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

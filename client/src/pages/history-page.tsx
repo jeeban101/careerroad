@@ -135,7 +135,7 @@ export default function HistoryPage() {
           <div className="text-center py-12">
             <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
               <Target className="h-16 w-16 text-purple-400 mx-auto mb-6" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Start Your Career Journey</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Start Your Career Journey</h2>
               <p className="text-gray-600 mb-6">
                 No roadmaps yet? Generate your first personalized career roadmap to start tracking your progress and building your future.
               </p>
@@ -194,7 +194,7 @@ export default function HistoryPage() {
           {/* Roadmap Header */}
           <div className="bg-gray-900/80 rounded-2xl shadow-lg p-8 mb-8 border border-purple-500/20 backdrop-blur-glass">
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Your Career Roadmap</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Your Career Roadmap</h1>
               <div className="flex items-center justify-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold text-gray-200">{courseLabel}</span>
@@ -302,16 +302,16 @@ export default function HistoryPage() {
         <Header />
         <div className="container max-w-6xl mx-auto p-6">
           <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               My Career Roadmaps
             </h1>
-            <p className="text-gray-300 text-lg">
+            <p className="text-gray-300 text-base sm:text-lg">
               Track your progress and continue building your career journey
             </p>
           </div>
 
           {/* Roadmap Grid */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
             {history.map((roadmap) => {
             const isSkillRoadmap = roadmap.roadmapType === 'skill';
             const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
@@ -328,7 +328,7 @@ export default function HistoryPage() {
             return (
               <Card 
                 key={roadmap.id} 
-                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400/60 bg-gray-900/80 hover:bg-gray-800/90 backdrop-blur-glass hover:scale-105 transform shadow-lg"
+                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400/60 bg-gray-900/80 hover:bg-gray-800/90 backdrop-blur-glass hover:scale-105 transform shadow-lg min-h-[44px]"
                 onClick={() => setSelectedRoadmap(roadmap)}
               >
                 <CardHeader className="pb-3 relative">
@@ -363,15 +363,15 @@ export default function HistoryPage() {
                 <CardContent className="pt-0">
                   <div className="space-y-4">
                     {/* Stats with icons */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2 p-3 bg-blue-600/30 rounded-lg border border-blue-500/30">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                      <div className="flex items-center gap-2 p-2 sm:p-3 bg-blue-600/30 rounded-lg border border-blue-500/30">
                         <Brain className="h-5 w-5 text-blue-300" />
                         <div>
                           <div className="text-sm font-semibold text-blue-100">{roadmap.phases?.length || roadmap.skillContent?.stages?.length || 0}</div>
                           <div className="text-xs text-blue-200">{roadmap.roadmapType === 'career' ? 'Phases' : 'Stages'}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 p-3 bg-emerald-600/30 rounded-lg border border-emerald-500/30">
+                      <div className="flex items-center gap-2 p-2 sm:p-3 bg-emerald-600/30 rounded-lg border border-emerald-500/30">
                         <CheckSquare className="h-5 w-5 text-emerald-300" />
                         <div>
                           <div className="text-sm font-semibold text-emerald-100">
@@ -384,7 +384,7 @@ export default function HistoryPage() {
                     </div>
                     
                     {/* Last Accessed */}
-                    <div className="flex items-center justify-between text-sm p-3 bg-gray-800/60 rounded-lg border border-gray-700/50">
+                    <div className="flex items-center justify-between text-sm p-2 sm:p-3 bg-gray-800/60 rounded-lg border border-gray-700/50">
                       <span className="text-gray-200 flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         Last viewed
@@ -397,7 +397,7 @@ export default function HistoryPage() {
                     {/* Action Button */}
                     <div className="pt-2">
                       <Button 
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 shimmer"
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 shimmer min-h-[44px]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedRoadmap(roadmap);

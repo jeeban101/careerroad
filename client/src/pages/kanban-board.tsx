@@ -285,12 +285,12 @@ export default function KanbanBoardPage() {
         </div>
 
         <div className="relative z-10 container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold text-white">Kanban Boards</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Kanban Boards</h1>
           
           <Dialog open={isCreateBoardOpen} onOpenChange={setIsCreateBoardOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-create-board" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              <Button data-testid="button-create-board" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 min-h-[44px] w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" /> New Board
               </Button>
             </DialogTrigger>
@@ -340,14 +340,14 @@ export default function KanbanBoardPage() {
           </Card>
         ) : (
           <div className="grid gap-6">
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-4">
               {boards.map((board) => (
                 <Button
                   key={board.id}
                   data-testid={`button-board-${board.id}`}
                   variant={selectedBoard === board.id ? "default" : "outline"}
                   onClick={() => setSelectedBoard(board.id)}
-                  className={`flex items-center gap-2 ${
+                  className={`flex items-center gap-2 min-h-[44px] w-full sm:w-auto ${
                     selectedBoard === board.id
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none'
                       : 'bg-gray-800/50 border-purple-500/30 text-white hover:bg-gray-700/50 hover:border-purple-400/50'
@@ -372,9 +372,9 @@ export default function KanbanBoardPage() {
 
             {selectedBoard && !boardLoading && currentBoard && (
               <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">{currentBoard.name}</h2>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                  <div className="flex-1">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white">{currentBoard.name}</h2>
                     {currentBoard.description && (
                       <p className="text-gray-400 mt-1">{currentBoard.description}</p>
                     )}
@@ -382,7 +382,7 @@ export default function KanbanBoardPage() {
                   
                   <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
                     <DialogTrigger asChild>
-                      <Button data-testid="button-create-task" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                      <Button data-testid="button-create-task" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 min-h-[44px] w-full sm:w-auto">
                         <Plus className="mr-2 h-4 w-4" /> New Task
                       </Button>
                     </DialogTrigger>
@@ -439,7 +439,7 @@ export default function KanbanBoardPage() {
                   </Dialog>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                   {KANBAN_COLUMNS.map((column) => (
                     <div key={column.id} className="rounded-lg p-4 bg-gray-900/50 border border-gray-700/50 backdrop-blur-sm">
                       <h3 className="font-semibold text-lg mb-4 text-white flex items-center justify-between">
