@@ -286,11 +286,11 @@ export default function KanbanBoardPage() {
 
         <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">Kanban Boards</h1>
+          <h1 className="text-4xl font-bold text-white">Kanban Boards</h1>
           
           <Dialog open={isCreateBoardOpen} onOpenChange={setIsCreateBoardOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-create-board" className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600">
+              <Button data-testid="button-create-board" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                 <Plus className="mr-2 h-4 w-4" /> New Board
               </Button>
             </DialogTrigger>
@@ -331,9 +331,9 @@ export default function KanbanBoardPage() {
         </div>
 
         {!boards || boards.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass text-center py-12">
             <CardContent>
-              <p className="text-lg text-slate-600 dark:text-slate-400 mb-4">
+              <p className="text-lg text-gray-400 mb-4">
                 No boards yet. Create your first Kanban board to get started!
               </p>
             </CardContent>
@@ -347,7 +347,11 @@ export default function KanbanBoardPage() {
                   data-testid={`button-board-${board.id}`}
                   variant={selectedBoard === board.id ? "default" : "outline"}
                   onClick={() => setSelectedBoard(board.id)}
-                  className="flex items-center gap-2"
+                  className={`flex items-center gap-2 ${
+                    selectedBoard === board.id
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none'
+                      : 'bg-gray-800/50 border-purple-500/30 text-white hover:bg-gray-700/50 hover:border-purple-400/50'
+                  }`}
                 >
                   {board.name}
                   <button
@@ -358,7 +362,7 @@ export default function KanbanBoardPage() {
                         deleteBoardMutation.mutate(board.id);
                       }
                     }}
-                    className="ml-2 text-red-500 hover:text-red-700"
+                    className="ml-2 text-red-400 hover:text-red-300"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -370,15 +374,15 @@ export default function KanbanBoardPage() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{currentBoard.name}</h2>
+                    <h2 className="text-2xl font-bold text-white">{currentBoard.name}</h2>
                     {currentBoard.description && (
-                      <p className="text-slate-600 dark:text-slate-400 mt-1">{currentBoard.description}</p>
+                      <p className="text-gray-400 mt-1">{currentBoard.description}</p>
                     )}
                   </div>
                   
                   <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
                     <DialogTrigger asChild>
-                      <Button data-testid="button-create-task" variant="outline">
+                      <Button data-testid="button-create-task" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                         <Plus className="mr-2 h-4 w-4" /> New Task
                       </Button>
                     </DialogTrigger>
@@ -437,15 +441,15 @@ export default function KanbanBoardPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {KANBAN_COLUMNS.map((column) => (
-                    <div key={column.id} className={`rounded-lg p-4 ${column.color}`}>
-                      <h3 className="font-semibold text-lg mb-4 text-slate-900 dark:text-white flex items-center justify-between">
+                    <div key={column.id} className="rounded-lg p-4 bg-gray-900/50 border border-gray-700/50 backdrop-blur-sm">
+                      <h3 className="font-semibold text-lg mb-4 text-white flex items-center justify-between">
                         {column.title}
-                        <span className="text-sm font-normal text-slate-600 dark:text-slate-400">
+                        <span className="text-sm font-normal text-gray-400">
                           {getTasksByStatus(column.id).length}
                         </span>
                       </h3>
                       
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {getTasksByStatus(column.id).map((task) => {
                           const columnIndex = KANBAN_COLUMNS.findIndex(col => col.id === task.status);
                           const canMoveLeft = columnIndex > 0;
@@ -455,14 +459,14 @@ export default function KanbanBoardPage() {
                             <Card 
                               key={task.id} 
                               data-testid={`card-task-${task.id}`} 
-                              className="hover:shadow-md transition-shadow cursor-pointer"
+                              className="bg-gray-800/80 border-gray-700/50 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-pointer"
                               onClick={() => openTaskDetails(task)}
                             >
                               <CardHeader className="pb-3">
                                 <CardTitle className="text-base flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-2 flex-1">
-                                    <GripVertical className="h-4 w-4 text-slate-400" />
-                                    <span>{task.title}</span>
+                                    <GripVertical className="h-4 w-4 text-gray-500" />
+                                    <span className="text-white">{task.title}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <button
@@ -472,7 +476,7 @@ export default function KanbanBoardPage() {
                                         moveTask(task, 'left');
                                       }}
                                       disabled={!canMoveLeft || updateTaskStatusMutation.isPending}
-                                      className="text-blue-500 hover:text-blue-700 disabled:text-slate-300 disabled:cursor-not-allowed"
+                                      className="text-purple-400 hover:text-purple-300 disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
                                       title="Move to previous column"
                                     >
                                       <ChevronLeft className="h-4 w-4" />
@@ -484,7 +488,7 @@ export default function KanbanBoardPage() {
                                         moveTask(task, 'right');
                                       }}
                                       disabled={!canMoveRight || updateTaskStatusMutation.isPending}
-                                      className="text-blue-500 hover:text-blue-700 disabled:text-slate-300 disabled:cursor-not-allowed"
+                                      className="text-purple-400 hover:text-purple-300 disabled:text-gray-600 disabled:cursor-not-allowed transition-colors"
                                       title="Move to next column"
                                     >
                                       <ChevronRight className="h-4 w-4" />
@@ -497,7 +501,7 @@ export default function KanbanBoardPage() {
                                           deleteTaskMutation.mutate(task.id);
                                         }
                                       }}
-                                      className="text-red-500 hover:text-red-700"
+                                      className="text-red-400 hover:text-red-300 transition-colors"
                                     >
                                       <Trash2 className="h-4 w-4" />
                                     </button>
@@ -506,7 +510,7 @@ export default function KanbanBoardPage() {
                               </CardHeader>
                               {task.description && (
                                 <CardContent className="pt-0">
-                                  <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{task.description}</p>
+                                  <p className="text-sm text-gray-400 line-clamp-2">{task.description}</p>
                                 </CardContent>
                               )}
                             </Card>
@@ -521,14 +525,14 @@ export default function KanbanBoardPage() {
 
             {selectedBoard && boardLoading && (
               <div className="text-center py-12">
-                <p className="text-lg text-slate-600 dark:text-slate-400">Loading board...</p>
+                <p className="text-lg text-gray-400">Loading board...</p>
               </div>
             )}
 
             {!selectedBoard && (
-              <Card className="text-center py-12">
+              <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass text-center py-12">
                 <CardContent>
-                  <p className="text-lg text-slate-600 dark:text-slate-400">
+                  <p className="text-lg text-gray-400">
                     Select a board to view and manage tasks
                   </p>
                 </CardContent>
