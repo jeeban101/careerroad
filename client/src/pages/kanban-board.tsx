@@ -342,31 +342,33 @@ export default function KanbanBoardPage() {
           <div className="grid gap-6">
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-4">
               {boards.map((board) => (
-                <Button
-                  key={board.id}
-                  data-testid={`button-board-${board.id}`}
-                  variant={selectedBoard === board.id ? "default" : "outline"}
-                  onClick={() => setSelectedBoard(board.id)}
-                  className={`flex items-center gap-2 min-h-[44px] w-full sm:w-auto ${
-                    selectedBoard === board.id
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none'
-                      : 'bg-gray-800/50 border-purple-500/30 text-white hover:bg-gray-700/50 hover:border-purple-400/50'
-                  }`}
-                >
-                  {board.name}
-                  <button
+                <div key={board.id} className="flex items-center gap-2 w-full sm:w-auto">
+                  <Button
+                    data-testid={`button-board-${board.id}`}
+                    variant={selectedBoard === board.id ? "default" : "outline"}
+                    onClick={() => setSelectedBoard(board.id)}
+                    className={`flex-1 min-h-[44px] ${
+                      selectedBoard === board.id
+                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none'
+                        : 'bg-gray-800/50 border-purple-500/30 text-white hover:bg-gray-700/50 hover:border-purple-400/50'
+                    }`}
+                  >
+                    {board.name}
+                  </Button>
+                  <Button
                     data-testid={`button-delete-board-${board.id}`}
+                    variant="ghost"
+                    size="icon"
                     onClick={(e) => {
-                      e.stopPropagation();
                       if (confirm(`Delete board "${board.name}"?`)) {
                         deleteBoardMutation.mutate(board.id);
                       }
                     }}
-                    className="ml-2 text-red-400 hover:text-red-300"
+                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20 min-h-[44px] min-w-[44px]"
                   >
                     <Trash2 className="h-4 w-4" />
-                  </button>
-                </Button>
+                  </Button>
+                </div>
               ))}
             </div>
 
