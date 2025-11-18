@@ -92,46 +92,66 @@ VITE_API_URL=http://localhost:5000
 
 ## 📦 Installation & Setup
 
+> **📖 For detailed Windows setup instructions, see [LOCAL_SETUP.md](./LOCAL_SETUP.md)**
+
 ### Prerequisites
-- Node.js 18+ 
-- PostgreSQL database (Supabase recommended)
-- Google Gemini API key
+- **Node.js 18+** - Download from [nodejs.org](https://nodejs.org/)
+- **PostgreSQL database** - Use [Supabase](https://supabase.com) (free tier available) or install locally
+- **Google Gemini API key** - Get from [Google AI Studio](https://makersuite.google.com/app/apikey)
 
-### 1. Clone the Repository
+### Quick Start
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Set Up Environment Variables**
+   - Copy `.env.example` to `.env` (or create `.env` manually)
+   - Fill in your values:
+     - `DATABASE_URL` - Your PostgreSQL connection string
+     - `GEMINI_API_KEY` - Your Google Gemini API key
+     - `SESSION_SECRET` - A random secure string
+
+3. **Set Up Database**
+   ```bash
+   npm run db:push
+   ```
+
+4. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in Browser**
+   - Navigate to `http://localhost:5000`
+
+### Detailed Setup Instructions
+
+For step-by-step instructions with troubleshooting, see **[LOCAL_SETUP.md](./LOCAL_SETUP.md)**.
+
+### Environment Variables
+
+Create a `.env` file in the root directory with:
+
 ```bash
-git clone <repository-url>
-cd careerroad
-```
-
-### 2. Install Dependencies
-```bash
-npm install
-```
-
-### 3. Database Setup
-1. Create a Supabase project at https://supabase.com
-2. Get your database connection string from the Supabase dashboard
-3. Replace `[YOUR-PASSWORD]` with your actual database password
-
-### 4. Environment Configuration
-Create a `.env` file in the root directory:
-```bash
+# Required: Database connection string
 DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.xxxxx.supabase.co:5432/postgres
-GEMINI_API_KEY=your_gemini_api_key
-SESSION_SECRET=your_secure_random_string
+
+# Required: Google Gemini API key
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Required: Session secret (generate a random string)
+SESSION_SECRET=your_secure_random_string_here
+
+# Optional: Node environment
+NODE_ENV=development
 ```
 
-### 5. Database Migration
-```bash
-npm run db:push
-```
-
-### 6. Start Development Server
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5000`
+**Getting your values:**
+- **DATABASE_URL**: From Supabase project → Settings → Database → Connection string
+- **GEMINI_API_KEY**: From [Google AI Studio](https://makersuite.google.com/app/apikey)
+- **SESSION_SECRET**: Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 
 ## 🏗️ Project Structure
 

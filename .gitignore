@@ -4,3 +4,17 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+.env
+.env.local
+.env.*.local
+
+# Deployment files (optional - you may want to keep these)
+# Uncomment if you don't want to commit deployment configs
+# .ebextensions/
+# deploy.sh
+# ecosystem.config.js
+
+# Local development
+.local/
+*.log
+logs/
