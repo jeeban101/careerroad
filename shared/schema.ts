@@ -35,7 +35,7 @@ export const users = pgTable("users", {
 // User activity log for heatmap visualization
 export const userActivityLog = pgTable("user_activity_log", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   activityDate: timestamp("activity_date").notNull(),
   xpEarned: integer("xp_earned").default(0),
   tasksCompleted: integer("tasks_completed").default(0),
@@ -58,7 +58,7 @@ export const achievements = pgTable("achievements", {
 // User earned achievements
 export const userAchievements = pgTable("user_achievements", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   achievementId: integer("achievement_id").references(() => achievements.id, { onDelete: "cascade" }).notNull(),
   unlockedAt: timestamp("unlocked_at").defaultNow(),
 });
@@ -66,7 +66,7 @@ export const userAchievements = pgTable("user_achievements", {
 // Saved roadmaps for users
 export const savedRoadmaps = pgTable("saved_roadmaps", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: serial("user_id").references(() => users.id).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   currentCourse: varchar("current_course", { length: 255 }).notNull(),
   targetRole: varchar("target_role", { length: 255 }).notNull(),
@@ -94,7 +94,7 @@ export const roadmapTemplates = pgTable("roadmap_templates", {
 
 export const customRoadmaps = pgTable("custom_roadmaps", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id).notNull(),
+  userId: serial("user_id").references(() => users.id).notNull(),
   originalTemplateId: integer("original_template_id").references(() => roadmapTemplates.id),
   title: text("title").notNull(),
   phases: jsonb("phases").notNull(),
@@ -104,7 +104,7 @@ export const customRoadmaps = pgTable("custom_roadmaps", {
 
 export const userRoadmapHistory = pgTable("user_roadmap_history", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }),
   roadmapType: varchar("roadmap_type", { length: 50 }).notNull().default("career"),
   currentCourse: varchar("current_course", { length: 255 }),
   targetRole: varchar("target_role", { length: 255 }),
@@ -122,7 +122,7 @@ export const userRoadmapHistory = pgTable("user_roadmap_history", {
 
 export const userRoadmapProgress = pgTable("user_roadmap_progress", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }),
   roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
   phaseIndex: integer("phase_index"),
   taskIndex: integer("task_index"),
@@ -138,7 +138,7 @@ export const userRoadmapProgress = pgTable("user_roadmap_progress", {
 // Kanban Boards
 export const kanbanBoards = pgTable("kanban_boards", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),

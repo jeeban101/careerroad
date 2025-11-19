@@ -4,3 +4,10 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# ignore replit
+.local
+
+# logs
+logs/
+logs/*.log
