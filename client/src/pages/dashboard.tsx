@@ -14,6 +14,7 @@ import { WeeklyXPChart } from "@/components/weekly-xp-chart";
 import type { UserRoadmapHistory } from "@shared/schema";
 import { format } from "date-fns";
 import { useState } from "react";
+import { ResumeAnalyzer } from "@/components/resume-analyzer";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -400,6 +401,15 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
+        </motion.div>
+
+        {/* Resume Analyzer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.92 }}
+        >
+          <ResumeAnalyzer />
         </motion.div>
 
         {/* Recent Roadmaps with Filters */}

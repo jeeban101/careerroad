@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, createElement } from "react";
+import { createContext, ReactNode, useContext, createElement, useMemo } from "react";
 import { useQuery, useMutation, UseMutationResult } from "@tanstack/react-query";
 import { User, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
@@ -20,12 +20,18 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
-  const { data: user, error, isLoading } = useQuery<User | undefined, Error>({
+  const userQueryFn = useMemo(() => getQueryFn<User | null>({ on401: "returnNull" }), []);
+  const cachedUser = queryClient.getQueryData<User | null>(["/api/user"]);
+  const { data: user, error, isLoading } = useQuery<User | null, Error>({
     queryKey: ["/api/user"],
-    queryFn: getQueryFn({ on401: "returnNull" }),
-    staleTime: 0, // Always fresh
-    refetchOnWindowFocus: true,
-    refetchInterval: 10000, // refetch every 10 seconds
+    queryFn: userQueryFn,
+    initialData: cachedUser,
+    initialDataUpdatedAt: cachedUser !== undefined ? Date.now() : undefined,
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
   });
 
   const loginMutation = useMutation({

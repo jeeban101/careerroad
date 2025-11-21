@@ -122,13 +122,13 @@ export default function TaskCard({
           <ItemIcon className="text-white" size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex flex-col sm:flex-row items-start justify-between mb-2 gap-2">
             <div className="flex-1 min-w-0 pr-4">
-              <h4 className={`text-sm font-semibold text-white group-hover:text-purple-300 transition-colors duration-200 ${isChecked ? 'line-through text-gray-400' : ''}`}>
+              <h4 className={`text-sm font-semibold text-white break-words group-hover:text-purple-300 transition-colors duration-200 ${isChecked ? 'line-through text-gray-400' : ''}`}>
                 {item.label}
               </h4>
             </div>
-            <div className="flex items-center space-x-2 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
               <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm border border-white/20 whitespace-nowrap`}>
                 {item.type}
               </span>
@@ -184,7 +184,7 @@ export default function TaskCard({
             </div>
           </div>
           {item.description && (
-            <p className={`text-sm text-gray-200 leading-relaxed ${isChecked ? 'line-through text-gray-500' : ''}`}>
+            <p className={`text-sm text-gray-200 leading-relaxed break-words ${isChecked ? 'line-through text-gray-500' : ''}`}>
               {item.description}
             </p>
           )}

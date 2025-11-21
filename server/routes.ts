@@ -4,7 +4,11 @@ import { createWaitlistEntry, getWaitlistEntries } from "./database";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema, insertUserRoadmapHistorySchema, generateSkillRoadmapSchema, insertKanbanBoardSchema, insertKanbanTaskSchema } from "@shared/schema";
-import { generateRoadmap, generateSkillRoadmap, generateKanbanTasksFromRoadmap } from "./gemini";
+import { generateRoadmap, generateSkillRoadmap, generateKanbanTasksFromRoadmap, analyzeResume } from "./gemini";
+import multer from "multer";
+import path from "node:path";
+import mammoth from "mammoth";
+import { PDFParse } from 'pdf-parse';
 
 function isAuthenticated(req: any, res: any, next: any) {
   if (!req.isAuthenticated()) {
@@ -16,6 +20,12 @@ function isAuthenticated(req: any, res: any, next: any) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   setupAuth(app);
+
+  // File upload (in-memory) for resume analysis
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  });
 
   // User info route
   app.get('/api/user', isAuthenticated, async (req: any, res) => {
@@ -174,6 +184,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to generate skill roadmap:", error);
       res.status(500).json({ message: "Failed to generate skill roadmap" });
+    }
+  });
+
+  // Resume analysis via AI
+  app.post("/api/resume/analyze", isAuthenticated, upload.single("file"), async (req: any, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file provided" });
+      }
+
+      const { originalname, mimetype, buffer } = req.file as any;
+      const ext = path.extname(originalname || "").toLowerCase();
+
+      let resumeText = "";
+      if (mimetype === "application/pdf" || ext === ".pdf") {
+        const parser = new PDFParse({ data: buffer });
+        
+        const parsedText = await parser.getText();
+
+        if(parsedText.text === ''){
+          return res.status(400).json({ message: "Could not extract text from PDF." });
+        }
+
+        resumeText = parsedText.text;
+
+      } else if (
+        mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+        ext === ".docx"
+      ) {
+        const result = await mammoth.extractRawText({ buffer });
+        resumeText = result.value || "";
+      } else if (mimetype === "text/plain" || ext === ".txt") {
+        resumeText = buffer.toString("utf8");
+      } else {
+        return res.status(400).json({ message: "Unsupported file type. Please upload PDF, DOCX, or TXT." });
+      }
+
+      resumeText = (resumeText || "").replace(/\u0000/g, " ").trim();
+      if (!resumeText || resumeText.length < 50) {
+        return res.status(400).json({ message: "Could not extract text from resume. Try a different format." });
+      }
+
+      const { currentCourse, desiredRole } = (req.body || {}) as { currentCourse?: string; desiredRole?: string };
+
+      const analysis = await analyzeResume(resumeText, {
+        currentCourse,
+        desiredRole,
+      });
+
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing resume:", error);
+      res.status(500).json({ message: "Failed to analyze resume" });
     }
   });
 

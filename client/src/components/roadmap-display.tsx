@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GitBranch, Share2, Brain, Hammer, Rocket, Book, Wrench, CheckSquare, Users, Save, Heart, Bookmark, Star, Kanban } from "lucide-react";
 import TaskCard from "@/components/task-card";
-import { RoadmapTemplate, RoadmapItem, UserRoadmapProgress } from "@shared/schema";
+import { RoadmapTemplate, RoadmapItem, RoadmapPhase, UserRoadmapProgress } from "@shared/schema";
 import { courseOptions, roleOptions } from "@/data/roadmapTemplates";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -74,6 +74,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
 
   const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
   const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
+  const phases: RoadmapPhase[] = Array.isArray((roadmap as any)?.phases) ? (roadmap.phases as RoadmapPhase[]) : [];
 
   // Manual save roadmap to history
   const saveToHistoryMutation = useMutation({
@@ -199,7 +200,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
     }
   };
 
-  const totalWeeks = roadmap.phases?.reduce((sum, phase) => sum + phase.duration_weeks, 0) || 0;
+  const totalWeeks = phases.reduce((sum, phase) => sum + (phase?.duration_weeks ?? 0), 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -228,7 +229,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
             </div>
           </div>
           
-          <div className="flex justify-center mt-8 space-x-4 animate-in slide-in-from-bottom duration-1000 delay-500">
+          <div className="flex flex-col sm:flex-row justify-center mt-8 gap-3 sm:gap-4 animate-in slide-in-from-bottom duration-1000 delay-500">
             {user && !roadmapHistoryId && (
               <Button 
                 onClick={handleSaveToHistory}
@@ -275,19 +276,19 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
         </div>
 
         {/* Enhanced Roadmap Timeline */}
-        <div className="relative">
+        <div className="relative overflow-visible">
           {/* Enhanced Timeline Line */}
-          <div className="absolute left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-400 via-pink-400 to-blue-400 rounded-full opacity-70"></div>
-          <div className="absolute left-10 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full animate-pulse"></div>
+          <div className="hidden sm:block absolute left-10 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-400 via-pink-400 to-blue-400 rounded-full opacity-70"></div>
+          <div className="hidden sm:block absolute left-10 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500 via-pink-500 to-blue-500 rounded-full animate-pulse"></div>
           
-          {!roadmap.phases || roadmap.phases.length === 0 ? (
+          {phases.length === 0 ? (
             <Card className="border border-purple-500/20 animate-in fade-in duration-500 bg-white/5 backdrop-blur-glass">
               <CardContent className="p-8 text-center">
                 <p className="text-gray-300">No roadmap phases available. Please try generating a new roadmap.</p>
               </CardContent>
             </Card>
           ) : (
-            roadmap.phases.map((phase, phaseIndex) => {
+            phases.map((phase, phaseIndex) => {
               const PhaseIcon = getPhaseIcon(phaseIndex);
               const phaseColor = getPhaseColor(phaseIndex);
               
@@ -297,14 +298,14 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
                   className="mb-16 relative animate-in slide-in-from-left duration-700"
                   style={{ animationDelay: `${phaseIndex * 200}ms` }}
                 >
-                  <div className="flex items-start">
-                    <div className={`flex-shrink-0 w-20 h-20 ${phaseColor} rounded-2xl flex items-center justify-center relative z-10 shadow-2xl border-4 border-white/20 transform transition-all duration-300 hover:scale-110 hover:rotate-3`}>
+                    <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-0">
+                    <div className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 ${phaseColor} rounded-2xl flex items-center justify-center relative z-10 shadow-2xl border-4 border-white/20 transform transition-all duration-300 hover:scale-110 hover:rotate-3 mx-auto sm:mx-0`}>
                       <PhaseIcon className="text-white text-2xl" size={28} />
                       <div className="absolute -inset-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl opacity-30 animate-pulse"></div>
                     </div>
-                    <Card className="ml-8 flex-1 border-2 border-purple-500/20 shadow-xl bg-gray-900/70 backdrop-blur-glass hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 rounded-2xl overflow-hidden hover:border-purple-400/40">
+                    <Card className="w-full sm:ml-8 ml-0 flex-1 border-2 border-purple-500/20 shadow-xl bg-gray-900/70 backdrop-blur-glass hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 rounded-2xl overflow-hidden hover:border-purple-400/40">
                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400"></div>
-                      <CardContent className="p-8">
+                      <CardContent className="p-6 sm:p-8">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                           <div>
                             <div className="flex items-center mb-2">
@@ -326,7 +327,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
                           </div>
                         </div>
                         <div className="space-y-3">
-                          {phase.items.map((item, itemIndex) => {
+                          {(Array.isArray(phase.items) ? phase.items : []).map((item, itemIndex) => {
                             const ItemIcon = getItemIcon(item.type);
                             const itemColor = getItemColor(item.type);
                             const itemKey = `${phaseIndex}-${itemIndex}`;

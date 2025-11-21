@@ -367,3 +367,29 @@ export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = typeof achievements.$inferInsert;
 export type UserAchievement = typeof userAchievements.$inferSelect;
 export type InsertUserAchievement = typeof userAchievements.$inferInsert;
+
+// Resume analysis schemas
+export const resumeSkillLevelEnum = z.enum(["Novice", "Beginner", "Intermediate", "Advanced", "Expert"]);
+
+export const resumeSkillSchema = z.object({
+  name: z.string(),
+  level: resumeSkillLevelEnum,
+  confidence: z.number().min(0).max(1).optional(),
+  years: z.number().optional(),
+  keywords: z.array(z.string()).optional(),
+  evidence: z.string().optional(),
+  category: z.string().optional(),
+});
+
+export const resumeAnalysisSchema = z.object({
+  summary: z.string(),
+  totalExperienceYears: z.number().optional(),
+  primaryRole: z.string().optional(),
+  skills: z.array(resumeSkillSchema),
+  strengths: z.array(z.string()).optional(),
+  gaps: z.array(z.string()).optional(),
+  recommendations: z.array(z.string()).optional(),
+});
+
+export type ResumeAnalysis = z.infer<typeof resumeAnalysisSchema>;
+export type ResumeSkill = z.infer<typeof resumeSkillSchema>;

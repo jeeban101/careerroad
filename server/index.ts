@@ -2,6 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { logError } from "./logger";
+import { add } from "date-fns";
+import { AddressInfo } from "node:net";
 
 const app = express();
 app.use(express.json());
@@ -25,7 +27,6 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
 
       log(logLine);
     }
@@ -59,11 +60,32 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = process.env.NODE_PORT || 8005;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+        log(`serving on port http://localhost:${port}`);
+    }
+  );
+
+
+  // Graceful shutdown on Ctrl+C
+  process.on("SIGINT", () => {
+    console.info("SIGINT signal received (Ctrl+C).");
+    console.log("Closing http server.");
+    server.close(() => {
+      console.log("Http server closed.");
+      process.exit(0);
+    });
+    // Fallback: force exit if server doesn't close in time
+    setTimeout(() => {
+      console.warn("Forcing shutdown after 10s timeout.");
+      process.exit(1);
+    }, 10000).unref?.();
+
+    process.exit(0);
   });
 })();

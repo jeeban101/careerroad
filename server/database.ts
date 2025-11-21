@@ -1,23 +1,58 @@
-import { Pool } from 'pg';
-import "dotenv/config.js";
+import { Pool, PoolConfig } from 'pg';
+import 'dotenv/config.js';
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+  throw new Error('DATABASE_URL environment variable is required');
 }
 
-export const pool = new Pool({
+/**
+ * Use a single Pool instance across HMR/serverless invocations.
+ * Keep connections warm and limit new connections with sensible defaults.
+ * Toggle SSL via env if needed:
+ *  - DATABASE_SSL=false -> disable SSL (useful for local Postgres)
+ *  - otherwise defaults to SSL with rejectUnauthorized: false (common on managed providers)
+ */
+const poolConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+  ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false },
 
-// Test connection
-pool.on('connect', () => {
-  console.log('Connected to PostgreSQL database');
-});
+  // Pool tuning
+  max: Number(process.env.PGPOOL_MAX ?? 10), // max concurrent connections in the pool
+  idleTimeoutMillis: Number(process.env.PG_IDLE_TIMEOUT ?? 30_000), // how long a client can remain idle before being closed
+  connectionTimeoutMillis: Number(process.env.PG_CONN_TIMEOUT ?? 5_000), // time to wait before timing out when connecting a new client
 
-pool.on('error', (err) => {
-  console.error('PostgreSQL connection error:', err);
-});
+  // Keep TCP connections alive to reduce churn
+  keepAlive: true,
+  keepAliveInitialDelayMillis: Number(process.env.PG_KEEPALIVE_DELAY ?? 10_000),
+
+  // Keep pool alive (don’t exit when idle)
+  allowExitOnIdle: false
+};
+
+// Persist the Pool across module reloads (dev HMR) and warm serverless invocations.
+const globalForPg = globalThis as unknown as {
+  pgPool?: Pool;
+};
+
+export const pool: Pool = globalForPg.pgPool ?? new Pool(poolConfig);
+
+if (!globalForPg.pgPool) {
+  globalForPg.pgPool = pool;
+
+  // Log errors coming from idle clients in the pool
+  pool.on('error', (err) => {
+    console.error('PostgreSQL pool error:', err);
+  });
+
+  // Optional: one-time connectivity probe to fail fast at startup (won’t create extra pools)
+  if (process.env.NODE_ENV !== 'test') {
+    pool
+      .query('SELECT 1')
+      .catch((err) => {
+        console.error('PostgreSQL initial connectivity check failed:', err);
+      });
+  }
+}
 
 // Database functions
 export async function createUser(email: string, password: string, firstName?: string, lastName?: string) {
@@ -31,13 +66,13 @@ export async function createUser(email: string, password: string, firstName?: st
 }
 
 export async function getUserByEmail(email: string) {
-  const query = `SELECT * FROM users WHERE email = $1`;
+  const query = 'SELECT * FROM users WHERE email = $1';
   const result = await pool.query(query, [email]);
   return result.rows[0];
 }
 
 export async function getUserById(id: number) {
-  const query = `SELECT * FROM users WHERE id = $1`;
+  const query = 'SELECT * FROM users WHERE id = $1';
   const result = await pool.query(query, [id]);
   return result.rows[0];
 }
@@ -53,7 +88,7 @@ export async function createWaitlistEntry(name: string, email: string, college?:
 }
 
 export async function getWaitlistEntries() {
-  const query = `SELECT * FROM waitlist_entries ORDER BY created_at DESC`;
+  const query = 'SELECT * FROM waitlist_entries ORDER BY created_at DESC';
   const result = await pool.query(query);
   return result.rows;
 }
