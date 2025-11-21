@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -51,9 +51,22 @@ export default function TaskCard({
         return null;
       }
     },
-    enabled: !!user && !!roadmapHistoryId,
+    enabled: !!user && !!roadmapHistoryId && showNotes,
+    staleTime: Infinity,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
   });
-
+  
+  // When notes panel opens and query returns, seed local notes
+  useEffect(() => {
+    if (showNotes && taskProgress?.notes) {
+      setNotes(taskProgress.notes);
+      setTempNotes(taskProgress.notes);
+    }
+  }, [showNotes, taskProgress]);
+  
   // Update task progress with notes
   const updateTaskMutation = useMutation({
     mutationFn: async (data: { completed: boolean; notes?: string }) => {
@@ -83,10 +96,6 @@ export default function TaskCard({
 
   const handleNotesToggle = () => {
     setShowNotes(!showNotes);
-    if (!showNotes && taskProgress?.notes) {
-      setNotes(taskProgress.notes);
-      setTempNotes(taskProgress.notes);
-    }
   };
 
   const handleSaveNotes = () => {

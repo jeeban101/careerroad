@@ -441,7 +441,7 @@ export default function KanbanBoardPage() {
                   </Dialog>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                   {KANBAN_COLUMNS.map((column) => (
                     <div key={column.id} className="rounded-lg p-4 bg-gray-900/50 border border-gray-700/50 backdrop-blur-sm">
                       <h3 className="font-semibold text-lg mb-4 text-white flex items-center justify-between">
@@ -461,16 +461,16 @@ export default function KanbanBoardPage() {
                             <Card 
                               key={task.id} 
                               data-testid={`card-task-${task.id}`} 
-                              className="bg-gray-800/80 border-gray-700/50 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-pointer"
+                              className="bg-gray-800/80 border-gray-700/50 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all cursor-pointer overflow-hidden"
                               onClick={() => openTaskDetails(task)}
                             >
                               <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-start justify-between gap-2">
-                                  <div className="flex items-center gap-2 flex-1">
-                                    <GripVertical className="h-4 w-4 text-gray-500" />
-                                    <span className="text-white">{task.title}</span>
+                                <CardTitle className="text-base flex items-center justify-between gap-2 min-w-0">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                    <GripVertical className="h-4 w-4 text-gray-500 shrink-0" />
+                                    <span className="text-white truncate">{task.title}</span>
                                   </div>
-                                  <div className="flex items-center gap-1">
+                                  <div className="flex items-center gap-1 flex-shrink-0 ml-1 whitespace-nowrap">
                                     <button
                                       data-testid={`button-move-left-${task.id}`}
                                       onClick={(e) => {

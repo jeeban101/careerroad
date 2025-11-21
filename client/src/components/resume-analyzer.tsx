@@ -96,16 +96,16 @@ export function ResumeAnalyzer() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="md:col-span-2 flex items-center gap-3">
+          <div className="md:col-span-2 flex flex-wrap items-center gap-3 min-w-0">
             <input
               ref={inputRef}
               type="file"
               accept=".pdf,application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt,text/plain"
               onChange={onFileChange}
-              className="text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+              className="w-full sm:w-auto max-w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
             />
             {file ? (
-              <span className="text-gray-400 flex items-center gap-2">
+              <span className="text-gray-400 flex items-center gap-2 flex-1 truncate">
                 <FileText size={16} /> {file.name}
               </span>
             ) : (
@@ -130,14 +130,14 @@ export function ResumeAnalyzer() {
             placeholder="Current course (optional)"
             value={currentCourse}
             onChange={(e) => setCurrentCourse(e.target.value)}
-            className="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-200 placeholder:text-gray-500"
+            className="w-full max-w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-200 placeholder:text-gray-500"
           />
           <input
             type="text"
             placeholder="Desired role (optional)"
             value={desiredRole}
             onChange={(e) => setDesiredRole(e.target.value)}
-            className="px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-200 placeholder:text-gray-500"
+            className="w-full max-w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-200 placeholder:text-gray-500"
           />
         </div>
 

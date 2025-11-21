@@ -251,3 +251,41 @@
     background-color: var(--brand-amber);
   }
 }
+
+/* Themed scrollbars matching brand colors */
+:root {
+  --scrollbar-track: var(--muted);
+  --scrollbar-thumb: var(--brand-purple);
+  --scrollbar-thumb-2: var(--brand-pink);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* WebKit-based browsers */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--scrollbar-thumb), var(--scrollbar-thumb-2));
+  border-radius: 8px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #7c3aed, #db2777);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
