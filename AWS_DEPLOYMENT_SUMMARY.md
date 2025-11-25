@@ -11,7 +11,7 @@ All deployment files and guides have been created! Here's what you have:
 4. **AWS_DEPLOYMENT_SUMMARY.md** - This file
 
 ### Configuration Files
-1. **ecosystem.config.js** - PM2 configuration for process management
+1. **ecosystem.config.cjs** - PM2 configuration for process management
 2. **deploy.sh** - Automated deployment script for EC2
 3. **.ebextensions/01-environment.config** - EB environment configuration
 4. **.ebextensions/02-nginx.config** - EB Nginx proxy configuration
@@ -132,11 +132,11 @@ chmod +x deploy.sh
 ./deploy.sh
 ```
 
-### For PM2: `ecosystem.config.js`
+### For PM2: `ecosystem.config.cjs`
 
 PM2 configuration for process management:
 ```bash
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 pm2 save
 pm2 startup
 ```

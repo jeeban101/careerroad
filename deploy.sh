@@ -69,8 +69,8 @@ if command -v pm2 &> /dev/null; then
     pm2 delete careerroad 2>/dev/null || true
     
     # Start with ecosystem config
-    if [ -f "ecosystem.config.js" ]; then
-        pm2 start ecosystem.config.js
+    if [ -f "ecosystem.config.cjs" ]; then
+        pm2 start ecosystem.config.cjs
     else
         pm2 start dist/index.js --name careerroad
     fi

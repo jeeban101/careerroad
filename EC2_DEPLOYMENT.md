@@ -159,7 +159,7 @@ ls -la dist/
 
 ```bash
 # Start application with PM2
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 
 # Or manually:
 pm2 start dist/index.js --name careerroad --env production

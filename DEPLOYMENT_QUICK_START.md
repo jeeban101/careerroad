@@ -66,7 +66,7 @@ npm run build
 
 # 7. Create .env file with production variables
 # 8. Start with PM2
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 pm2 save
 pm2 startup
 
