@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
-import { RoadmapPhase, SkillRoadmapContent, GenerateSkillRoadmap, kanbanTaskGenerationSchema, KanbanTaskGeneration, UserRoadmapHistory } from "@shared/schema";
+import { RoadmapPhase, SkillRoadmapContent, GenerateSkillRoadmap, kanbanTaskGenerationSchema, KanbanTaskGeneration, UserRoadmapHistory, resumeAnalysisSchema } from "@shared/schema";
+import type { ResumeAnalysis } from "@shared/schema";
 import { z } from "zod";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
@@ -274,5 +275,66 @@ Convert this skill roadmap into 10-18 actionable Kanban tasks distributed across
   } catch (error) {
     console.error("Failed to generate Kanban tasks:", error);
     throw new Error(`Failed to generate Kanban tasks: ${error}`);
+  }
+}
+
+export async function analyzeResume(
+  resumeText: string,
+  options: { currentCourse?: string; desiredRole?: string } = {}
+): Promise<ResumeAnalysis> {
+  try {
+    const { currentCourse, desiredRole } = options;
+
+    const systemPrompt = `You are a senior career coach and resume analyst. Read the resume text and infer the candidate's skills and levels.
+
+Return strict JSON matching this schema:
+{
+  "summary": string,
+  "totalExperienceYears": number?,
+  "primaryRole": string?,
+  "skills": [
+    { "name": string, "level": "Novice"|"Beginner"|"Intermediate"|"Advanced"|"Expert", "confidence"?: number, "years"?: number, "keywords"?: string[], "evidence"?: string, "category"?: string }
+  ],
+  "strengths": string[]?,
+  "gaps": string[]?,
+  "recommendations": string[]?
+}
+
+Guidance:
+- Calibrate levels conservatively based on evidence in the resume.
+- Map certifications, projects, and quantified experience to skill confidence and years.
+- If ${currentCourse || "N/A"} or ${desiredRole || "N/A"} is provided, tailor recommendations toward that context.
+- Use concise phrasing; no extra commentary.`;
+
+    const userPrompt = `Resume text:
+${resumeText.slice(0, 15000)}
+
+Analyze the above resume. Output JSON only.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      config: {
+        systemInstruction: systemPrompt,
+        responseMimeType: "application/json"
+      },
+      contents: userPrompt
+    });
+
+    const rawJson = response.text;
+    if (!rawJson) {
+      throw new Error("Empty response from Gemini");
+    }
+
+    const parsed = JSON.parse(rawJson);
+    const validated = resumeAnalysisSchema.safeParse(parsed);
+    if (!validated.success) {
+      console.error("Resume analysis validation error:", validated.error);
+      throw new Error("Invalid resume analysis structure from AI");
+    }
+
+    return validated.data;
+  } catch (error) {
+    console.error("Failed to analyze resume:", error);
+    throw new Error(`Failed to analyze resume: ${error}`);
   }
 }
