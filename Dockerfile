@@ -29,10 +29,6 @@ RUN npm ci --omit=dev
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
 
-# Security best practice: run as non-root user
-RUN addgroup -g 1001 -S nodejs && adduser -S node -u 1001
-USER node
-
 # The app listens on 8005 by default (NODE_PORT env can override)
 EXPOSE 8005
 

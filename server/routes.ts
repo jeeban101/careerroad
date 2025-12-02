@@ -1,6 +1,5 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { createWaitlistEntry, getWaitlistEntries } from "./database";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema, insertUserRoadmapHistorySchema, generateSkillRoadmapSchema, insertKanbanBoardSchema, insertKanbanTaskSchema } from "@shared/schema";
@@ -10,11 +9,56 @@ import path from "node:path";
 import mammoth from "mammoth";
 import { PDFParse } from 'pdf-parse';
 
-function isAuthenticated(req: any, res: any, next: any) {
-  if (!req.isAuthenticated()) {
+declare global {
+  namespace Express {
+    interface Locals {
+      user?: {
+        id: number;
+        email: string;
+        firstName?: string | null;
+        lastName?: string | null;
+      };
+    }
+  }
+}
+
+type AuthUser = {
+  id: number;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+};
+
+type AuthenticatedRequest = Request;
+
+function isAuthenticated(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const raw: any = (req as any).user;
+    const user = raw
+      ? {
+          id: raw.id,
+          email: raw.email,
+          firstName: raw.first_name ?? raw.firstName ?? null,
+          lastName: raw.last_name ?? raw.lastName ?? null,
+        }
+      : null;
+
+    if (!user || !user.id || !user.email) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Attach sanitized user for downstream handlers and client usage
+    res.locals.user = user;
+    (req as any).user = user;
+
+    next();
+  } catch {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  next();
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -27,21 +71,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   });
 
-  // User info route
-  app.get('/api/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const user = req.user;
-      res.json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
 
   // User stats route
-  app.get('/api/user/stats', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/stats', isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user!.id;
       const stats = await storage.getUserStats(userId);
       res.json(stats);
     } catch (error) {
@@ -188,7 +222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Resume analysis via AI
-  app.post("/api/resume/analyze", isAuthenticated, upload.single("file"), async (req: any, res) => {
+  app.post("/api/resume/analyze", isAuthenticated, upload.single("file"), async (req: AuthenticatedRequest, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file provided" });
@@ -241,13 +275,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Save roadmap for authenticated user
-  app.post("/api/saved-roadmaps", isAuthenticated, async (req: any, res) => {
+  app.post("/api/saved-roadmaps", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
+      const user = res.locals.user!;
       const validation = insertSavedRoadmapSchema.safeParse({
         ...req.body,
         userId: user.id
@@ -266,13 +296,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user's saved roadmaps
-  app.get("/api/saved-roadmaps", isAuthenticated, async (req: any, res) => {
+  app.get("/api/saved-roadmaps", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
+      const user = res.locals.user!;
       const savedRoadmaps = await storage.getSavedRoadmapsByUser(user.id);
       res.json(savedRoadmaps);
     } catch (error) {
@@ -282,13 +308,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete saved roadmap
-  app.delete("/api/saved-roadmaps/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/saved-roadmaps/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
+      const user = res.locals.user!;
       const roadmapId = parseInt(req.params.id);
       
       await storage.deleteSavedRoadmap(roadmapId, user.id);
@@ -300,13 +322,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User roadmap history routes
-  app.get("/api/user-roadmap-history", isAuthenticated, async (req: any, res) => {
+  app.get("/api/user-roadmap-history", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
+      const user = res.locals.user!;
       const history = await storage.getUserRoadmapHistory(user.id);
       res.json(history);
     } catch (error) {
@@ -315,13 +333,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/user-roadmap-history", isAuthenticated, async (req: any, res) => {
+  app.post("/api/user-roadmap-history", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
+      const user = res.locals.user!;
       const validation = insertUserRoadmapHistorySchema.safeParse({
         ...req.body,
         userId: user.id
@@ -340,13 +354,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete user roadmap history
-  app.delete("/api/user-roadmap-history/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/user-roadmap-history/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
+      const user = res.locals.user!;
       const roadmapId = parseInt(req.params.id);
       await storage.deleteUserRoadmapHistory(roadmapId, user.id);
       res.json({ success: true });
@@ -357,7 +367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate Kanban board from roadmap
-  app.post("/api/roadmaps/:historyId/generate-kanban", isAuthenticated, async (req: any, res) => {
+  app.post("/api/roadmaps/:historyId/generate-kanban", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
       const user = req.user;
       if (!user) {
@@ -449,12 +459,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Task progress routes
-  app.get("/api/roadmap-progress/:roadmapId", isAuthenticated, async (req: any, res) => {
+  app.get("/api/roadmap-progress/:roadmapId", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
+      const userId = res.locals.user!.id;
       
       const roadmapId = parseInt(req.params.roadmapId);
       const phaseIndex = req.query.phaseIndex;
@@ -463,7 +471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If specific task requested, get individual task progress
       if (phaseIndex !== undefined && taskIndex !== undefined) {
         const progress = await storage.getTaskProgress(
-          user.id, 
+          userId, 
           roadmapId, 
           parseInt(phaseIndex as string), 
           parseInt(taskIndex as string)
@@ -471,7 +479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json(progress);
       } else {
         // Get all progress for the roadmap
-        const progress = await storage.getUserRoadmapProgress(user.id, roadmapId);
+        const progress = await storage.getUserRoadmapProgress(userId, roadmapId);
         res.json(progress);
       }
     } catch (error) {
@@ -480,12 +488,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/update-task-progress", isAuthenticated, async (req: any, res) => {
+  app.post("/api/update-task-progress", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
       
       const { roadmapId, phaseIndex, taskIndex, completed, notes } = req.body;
       
@@ -537,12 +542,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Kanban Board Routes
-  app.get("/api/kanban/boards", isAuthenticated, async (req: any, res) => {
+  app.get("/api/kanban/boards", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const boards = await storage.getKanbanBoardsByUser(user.id);
       res.json(boards);
@@ -552,12 +554,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/kanban/boards", isAuthenticated, async (req: any, res) => {
+  app.post("/api/kanban/boards", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const validation = insertKanbanBoardSchema.safeParse({
         ...req.body,
@@ -576,12 +575,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/kanban/boards/generate", isAuthenticated, async (req: any, res) => {
+  app.post("/api/kanban/boards/generate", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const { board, tasks } = req.body;
 
@@ -625,12 +621,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/kanban/boards/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/kanban/boards/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const boardId = parseInt(req.params.id);
       const board = await storage.getKanbanBoard(boardId, user.id);
@@ -647,12 +640,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/kanban/boards/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/kanban/boards/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const boardId = parseInt(req.params.id);
       await storage.deleteKanbanBoard(boardId, user.id);
@@ -664,12 +654,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Kanban Task Routes
-  app.get("/api/kanban/boards/:boardId/tasks", isAuthenticated, async (req: any, res) => {
+  app.get("/api/kanban/boards/:boardId/tasks", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const boardId = parseInt(req.params.boardId);
       const tasks = await storage.getKanbanTasksByBoard(boardId, user.id);
@@ -680,12 +667,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/kanban/boards/:boardId/tasks", isAuthenticated, async (req: any, res) => {
+  app.post("/api/kanban/boards/:boardId/tasks", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const boardId = parseInt(req.params.boardId);
       
@@ -711,12 +695,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/kanban/tasks/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/kanban/tasks/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const taskId = parseInt(req.params.id);
       const updates = req.body;
@@ -729,12 +710,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/kanban/tasks/:id/status", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/kanban/tasks/:id/status", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const taskId = parseInt(req.params.id);
       const { status, position } = req.body;
@@ -751,12 +729,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/kanban/tasks/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/kanban/tasks/:id", isAuthenticated, async (req: AuthenticatedRequest, res) => {
     try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
+      const user = res.locals.user!;
 
       const taskId = parseInt(req.params.id);
       await storage.deleteKanbanTask(taskId, user.id);
