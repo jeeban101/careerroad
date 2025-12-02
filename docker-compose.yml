@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # The app serves both API and static client via Express on 8005
+    ports:
+      - "8005:8005"
+    environment:
+      NODE_ENV: production
+      NODE_PORT: 8005
+    # Provide runtime secrets/config via environment variables.
+    # These values will be injected into the container's environment and used by process.env.
+    env_file:
+      - .env
+    restart: unless-stopped
