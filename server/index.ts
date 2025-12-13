@@ -3,15 +3,19 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { log, logError } from "./logger";
 import path from "path";
-import cors from 'cors'
+import cors from 'cors';
 
 
 const app = express();
 
+const allowedOrigins = [process.env.CLIENT_ORIGIN || "http://localhost:5173"];
+
 app.use(cors({
-  origin: "*",
-  credentials: true 
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

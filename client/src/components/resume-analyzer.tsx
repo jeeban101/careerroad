@@ -24,9 +24,11 @@ export function ResumeAnalyzer() {
       if (currentCourse) form.append("currentCourse", currentCourse);
       if (desiredRole) form.append("desiredRole", desiredRole);
 
-      const res = await fetch("/api/resume/analyze", {
+      const API_BASE = import.meta.env.VITE_APP_BACKEND_URL;
+      const res = await fetch(`${API_BASE}/api/resume/analyze`, {
         method: "POST",
         body: form,
+        credentials: "include",
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
