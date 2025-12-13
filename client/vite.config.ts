@@ -3,6 +3,9 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 console.log('✅ VITE CONFIG LOADED')
+// console.log(`@ -> ${path.resolve(import.meta.dirname, "src")}`)
+// console.log(`@shared -> ${path.resolve(import.meta.dirname, "../shared")}`)
+// console.log(`@assets -> ${path.resolve(import.meta.dirname, "../attached_assets")}`)
 
 export default defineConfig({
   plugins: [
