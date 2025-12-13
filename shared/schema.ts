@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, jsonb, varchar, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb, varchar, timestamp, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -133,7 +133,15 @@ export const userRoadmapProgress = pgTable("user_roadmap_progress", {
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  // Unique constraint to prevent duplicate progress entries for the same task
+  uniqueUserTask: uniqueIndex("unique_user_task_idx").on(
+    table.userId,
+    table.roadmapId,
+    table.phaseIndex,
+    table.taskIndex
+  )
+}));
 
 // Kanban Boards
 export const kanbanBoards = pgTable("kanban_boards", {

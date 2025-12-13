@@ -1,0 +1,17 @@
+{
+    "name": "careerroad-tests",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "test": "playwright test",
+        "test:api": "playwright test tests/integration",
+        "test:e2e": "playwright test tests/e2e",
+        "test:headed": "playwright test --headed",
+        "test:debug": "playwright test --debug",
+        "test:report": "playwright show-report"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.40.0",
+        "@types/node": "^20.10.0"
+    }
+}
