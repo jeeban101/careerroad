@@ -8,7 +8,10 @@ import cors from 'cors';
 
 const app = express();
 
-const allowedOrigins = [process.env.CLIENT_ORIGIN || "http://localhost"];
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN || "http://localhost",
+  process.env.SERVER_URL
+].filter(Boolean) as string[];
 
 app.use(cors({
   origin: allowedOrigins,

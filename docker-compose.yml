@@ -10,6 +10,7 @@ services:
     environment:
       NODE_ENV: production
       NODE_PORT: 8005
+      SERVER_URL: ${SERVER_URL}
     # Provide runtime secrets/config via environment variables.
     # These values will be injected into the container's environment and used by process.env.
     env_file:
@@ -22,6 +23,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    environment:
+      VITE_APP_BACKEND_URL: http://app:8005
     depends_on:
       - app
     restart: unless-stopped
