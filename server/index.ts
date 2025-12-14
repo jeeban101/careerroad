@@ -8,7 +8,7 @@ import cors from 'cors';
 
 const app = express();
 
-const allowedOrigins = [process.env.CLIENT_ORIGIN || "http://localhost:5173"];
+const allowedOrigins = [process.env.CLIENT_ORIGIN || "http://localhost"];
 
 app.use(cors({
   origin: allowedOrigins,

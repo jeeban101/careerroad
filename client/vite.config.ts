@@ -5,7 +5,6 @@ import path from "path";
 console.log('✅ VITE CONFIG LOADED')
 // console.log(`@ -> ${path.resolve(import.meta.dirname, "src")}`)
 // console.log(`@shared -> ${path.resolve(import.meta.dirname, "../shared")}`)
-// console.log(`@assets -> ${path.resolve(import.meta.dirname, "../attached_assets")}`)
 
 export default defineConfig({
   plugins: [
@@ -14,8 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
-      "@shared": path.resolve(import.meta.dirname, "../shared"),
-      "@assets": path.resolve(import.meta.dirname, "../attached_assets"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
     },
   },
   root: path.resolve(import.meta.dirname),

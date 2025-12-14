@@ -2,7 +2,7 @@
 
 # --- Builder stage: install deps and build the app (client + server) ---
 FROM node:20-alpine AS builder
-WORKDIR /app
+WORKDIR /app/client
 
 # Install dependencies (use ci for reproducible builds)
 COPY package*.json ./
@@ -27,7 +27,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Copy built artifacts from builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/client/dist ./dist
 
 # The app listens on 8005 by default (NODE_PORT env can override)
 EXPOSE 8005

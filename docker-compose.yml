@@ -15,3 +15,13 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    restart: unless-stopped
