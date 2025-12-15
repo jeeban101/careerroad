@@ -13,6 +13,7 @@ const allowedOrigins = [
   process.env.SERVER_URL
 ].filter(Boolean) as string[];
 
+console.log("Allowed Origins for CORS:", allowedOrigins);
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
@@ -24,11 +25,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 console.log('✅ EXPRESS SERVER STARTING')
-// add cors
-// const corsOption = {
-//   origin: 'http://localhost:5173',
-// }
-
 
 
 app.use((req, res, next) => {
@@ -76,14 +72,16 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = process.env.NODE_PORT || 8005;
-  server.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
+
+  const serverConfig = {
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  };
+
+  server.listen(serverConfig,
     () => {
-        log(`serving on port http://localhost:${port}`);
+      console.log(`✅ Express SERVER started sucessfully at http://${serverConfig.host}:${serverConfig.port}`);
     }
   );
 
