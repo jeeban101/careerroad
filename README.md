@@ -213,6 +213,21 @@ NODE_ENV=development
 
 ## 🚀 Deployment
 
+1. Copy the `.env.example` file into `.env`
+1. Configure the Database and gemini and replace them in `.env`
+1. Make sure `docker` and `docker-compose-plugin is installed`. To install docker faster you can you
+   ```shell
+   bash scripts/install-docker-ec2.sh
+   ```
+1. Create `client/.env.production` which looks like
+   ```env
+   VITE_APP_BACKEND_URL="http://<ip-addr>:8005"
+   ```
+1. In `docker-compose.yml` update the server URL for CORS
+   ```shell
+      NODE_PORT: 8005
+      SERVER_URL: http://3.238.250.221
+   ```
 ### Build for Production
 ```bash
 npm run build
