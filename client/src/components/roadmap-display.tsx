@@ -187,9 +187,10 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <section id="roadmap-display" className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <Header />
-      <div className="container max-w-6xl mx-auto p-6">
+      <div className="w-full mx-auto p-4 sm:p-5 md:p-6 lg:p-8 overflow-x-auto overflow-y-visible">
+        <div className="max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
         {/* Roadmap Header */}
         <div className="bg-gray-900/80 rounded-2xl shadow-lg p-8 mb-6 border border-purple-500/20 backdrop-blur-glass">
           <div className="text-center mb-6">
@@ -206,7 +207,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
           </div>
 
           {/* Action buttons (kept from original component, styled to fit this UI) */}
-          <div className="flex flex-col sm:flex-row justify-center gap-3">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3">
             {user && !roadmapHistoryId && (
               <Button
                 onClick={handleSaveToHistory}
@@ -313,6 +314,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
             })
           )}
         </div>
+        </div>
       </div>
 
       <EmailModal
@@ -320,6 +322,6 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
         onClose={() => setShowEmailModal(false)}
         roadmap={roadmap}
       />
-    </div>
+    </section>
   );
 }

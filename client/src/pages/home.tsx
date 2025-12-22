@@ -42,7 +42,7 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-visible">
       {/* Dark theme background with animated gradients */}
       <div className="absolute inset-0 bg-background">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(120,53,234,0.3),transparent_50%)] animate-pulse"></div>
