@@ -197,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validation.success) {
         return res.status(400).json({ 
           message: "Invalid skill roadmap data",
-          errors: validation.error.errors 
+          errors: validation.error.issues 
         });
       }
 
@@ -416,7 +416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Board validation error:", boardValidation.error);
         return res.status(400).json({ 
           message: "Invalid board data",
-          errors: boardValidation.error.errors 
+          errors: boardValidation.error.issues 
         });
       }
 
@@ -429,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error(`Task ${i} validation error:`, taskValidation.error);
           return res.status(400).json({ 
             message: `Invalid task data at index ${i}`,
-            errors: taskValidation.error.errors 
+            errors: taskValidation.error.issues 
         });
         }
         validatedTasks.push(taskValidation.data);
@@ -593,7 +593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!boardValidation.success) {
         return res.status(400).json({ 
           message: "Invalid board data",
-          errors: boardValidation.error.errors 
+          errors: boardValidation.error.issues 
         });
       }
 
@@ -603,7 +603,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!taskValidation.success) {
           return res.status(400).json({ 
             message: `Invalid task data at index ${i}`,
-            errors: taskValidation.error.errors 
+            errors: taskValidation.error.issues 
           });
         }
         validatedTasks.push(taskValidation.data);

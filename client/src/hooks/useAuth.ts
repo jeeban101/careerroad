@@ -21,17 +21,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
   const userQueryFn = useMemo(() => getQueryFn<User | null>({ on401: "returnNull" }), []);
-  const cachedUser = queryClient.getQueryData<User | null>(["/api/user"]);
-  const { data: user, error, isLoading } = useQuery<User | null, Error>({
+  
+  const {
+    data: user,
+    error,
+    isLoading,
+  } = useQuery<User | null, Error>({
     queryKey: ["/api/user"],
     queryFn: userQueryFn,
-    initialData: cachedUser,
-    initialDataUpdatedAt: cachedUser !== undefined ? Date.now() : undefined,
     staleTime: 15 * 60 * 1000, // 15 minutes
-    refetchOnMount: false,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchInterval: false,
   });
 
   const loginMutation = useMutation({
