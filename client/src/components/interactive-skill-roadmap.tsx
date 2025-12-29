@@ -281,7 +281,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8 sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-purple-500/20 pb-4"
+        className="mb-8 sticky top-16 z-10 bg-background/95 backdrop-blur-md border-b border-purple-500/20 p-4"
       >
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -511,7 +511,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                             <BookOpen size={16} />
                             Resources ({stage.resources.length})
                           </h5>
-                          <div className="grid md:grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {stage.resources.map((resource, resourceIdx) => (
                               <motion.div
                                 key={resourceIdx}
@@ -521,11 +521,11 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                                 className="p-4 bg-gradient-to-br from-white/5 to-white/10 rounded-lg border border-pink-500/20 hover:border-pink-500/40 transition-all group"
                                 whileHover={{ y: -2 }}
                               >
-                                <div className="flex items-start gap-3">
+                                <div className="flex items-start gap-3 min-w-0">
                                   <div className="mt-1">
                                     {getResourceIcon(resource)}
                                   </div>
-                                  <p className="text-sm text-gray-200 leading-relaxed flex-1 group-hover:text-white transition-colors">
+                                  <p className="text-sm text-gray-200 leading-relaxed flex-1 group-hover:text-white transition-colors break-words min-w-0">
                                     {resource}
                                   </p>
                                 </div>

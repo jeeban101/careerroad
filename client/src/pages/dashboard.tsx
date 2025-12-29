@@ -419,14 +419,14 @@ export default function Dashboard() {
           transition={{ delay: 0.95 }}
         >
           <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass">
-            <CardHeader>
-              <div className="flex items-center justify-between flex-wrap gap-4">
+            <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <CardTitle className="text-white flex items-center gap-2">
                   <BookOpen className="text-purple-400" />
                   Recent Roadmaps
                 </CardTitle>
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <div className="flex gap-1 sm:gap-2">
                     {["all", "career", "skill", "kanban"].map((f) => (
                       <Button
                         key={f}
@@ -440,21 +440,23 @@ export default function Dashboard() {
                       </Button>
                     ))}
                   </div>
-                  <Button 
+                  <Button
+                    aria-label="View all roadmaps"
                     variant="ghost"
-                    className="text-purple-400 hover:text-purple-300"
+                    size="sm"
+                    className="text-purple-400 hover:text-purple-300 px-2 py-1"
                     onClick={() => navigate('/history')}
                     data-testid="button-view-all-roadmaps"
                   >
-                    View All
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <span className="hidden sm:inline">View All</span>
+                    <ArrowRight className="h-4 w-4 ml-0 sm:ml-2" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6">
               {filteredRoadmaps.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-8 sm:py-12">
                   <TrendingUp className="h-16 w-16 text-gray-600 mx-auto mb-4" />
                   <p className="text-gray-400 mb-4">No roadmaps yet! Start your learning journey.</p>
                   <Button 
@@ -466,7 +468,7 @@ export default function Dashboard() {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {filteredRoadmaps.slice(0, 5).map((roadmap) => {
                     const isSkillRoadmap = roadmap.roadmapType === 'skill';
                     const title = isSkillRoadmap 
@@ -477,17 +479,17 @@ export default function Dashboard() {
                       <motion.div
                         key={roadmap.id}
                         whileHover={{ scale: 1.02 }}
-                        className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all"
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all"
                         data-testid={`roadmap-card-${roadmap.id}`}
                       >
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                             <Badge variant="outline" className="bg-purple-600/20 text-purple-300 border-purple-500/30">
                               {isSkillRoadmap ? 'Skill' : 'Career'}
                             </Badge>
                             <h3 className="text-white font-semibold">{title}</h3>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-400">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-400">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
                               {roadmap.createdAt && format(new Date(roadmap.createdAt), 'MMM dd, yyyy')}
@@ -500,7 +502,7 @@ export default function Dashboard() {
                         </div>
                         <Button
                           onClick={() => navigate('/history')}
-                          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transform hover:scale-105 transition-all"
+                          className="w-full sm:w-auto mt-2 sm:mt-0 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transform hover:scale-105 transition-all"
                           data-testid={`button-resume-${roadmap.id}`}
                         >
                           <Play className="h-4 w-4 mr-2" />

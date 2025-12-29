@@ -294,7 +294,7 @@ export default function KanbanBoardPage() {
                 <Plus className="mr-2 h-4 w-4" /> New Board
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create New Board</DialogTitle>
               </DialogHeader>
@@ -388,7 +388,7 @@ export default function KanbanBoardPage() {
                         <Plus className="mr-2 h-4 w-4" /> New Task
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="w-[calc(100%-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Create New Task</DialogTitle>
                       </DialogHeader>
@@ -547,7 +547,7 @@ export default function KanbanBoardPage() {
 
     {/* Task Details Modal */}
     <Dialog open={isTaskDetailsOpen} onOpenChange={setIsTaskDetailsOpen}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-2xl max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Task Details</span>
@@ -746,11 +746,11 @@ export default function KanbanBoardPage() {
                         href={resource}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline"
+                        className="flex items-start gap-2 text-blue-600 dark:text-blue-400 hover:underline max-w-full overflow-hidden"
                         data-testid={`link-resource-${index}`}
                       >
-                        <ExternalLink className="h-3 w-3" />
-                        <span className="text-sm truncate">{resource}</span>
+                        <ExternalLink className="h-4 w-4" />
+                        <span className="text-sm break-all whitespace-normal min-w-0">{resource}</span>
                       </a>
                     ))
                   ) : (

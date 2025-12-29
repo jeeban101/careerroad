@@ -158,15 +158,18 @@ export default function HistoryPage() {
     if (selectedRoadmap.roadmapType === 'skill') {
       return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <Button 
-              variant="ghost" 
+          <Header />
+          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+              <Button 
+                variant="ghost" 
               onClick={() => setSelectedRoadmap(null)}
               className="mb-6 text-gray-300 hover:text-white"
             >
               ← Back to History
             </Button>
             <InteractiveSkillRoadmap skillRoadmap={selectedRoadmap} fromHistory={true} />
+            </div>
           </div>
         </div>
       );

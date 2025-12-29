@@ -11,6 +11,7 @@ import { SkillRoadmapContent } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import InteractiveSkillRoadmap from "@/components/interactive-skill-roadmap";
 
 interface SkillRoadmapBuilderProps {
   onSkillRoadmapGenerated: (roadmap: any) => void;
@@ -43,6 +44,7 @@ const timeFrames = [
 export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRoadmapBuilderProps) {
   const { toast } = useToast();
   const { user } = useAuth();
+  const [generatedRoadmap, setGeneratedRoadmap] = useState<any | null>(null);
   
   const form = useForm<FormData>({
     defaultValues: {
@@ -67,7 +69,8 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
         description: "Your personalized skill roadmap is ready.",
       });
       
-      // Pass the roadmap to parent component
+      // Update local view and pass the roadmap to parent component
+      setGeneratedRoadmap(skillRoadmap);
       onSkillRoadmapGenerated(skillRoadmap);
       
       setTimeout(() => {
@@ -94,7 +97,7 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
       <Card className="mb-8 shadow-lg bg-white/5 backdrop-blur-glass border border-purple-500/20">
         <CardContent className="p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="skill"
@@ -189,40 +192,46 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
         </CardContent>
       </Card>
 
-      {/* Sample Preview */}
-      <Card className="border-2 border-purple-500/20 shadow-lg bg-white/5 backdrop-blur-glass">
-        <CardContent className="p-8">
-          <h3 className="text-2xl font-bold mb-6 text-center text-white">
-            What You'll Get
-          </h3>
-          <div className="space-y-4">
-            <div className="flex items-center p-4 bg-white/10 rounded-lg">
-              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
-                <Target className="text-white" size={20} />
+      {generatedRoadmap ? (
+        <InteractiveSkillRoadmap skillRoadmap={generatedRoadmap} />
+      ) : (
+        <>
+          {/* Sample Preview */}
+          <Card className="border-2 border-purple-500/20 shadow-lg bg-white/5 backdrop-blur-glass">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-bold mb-6 text-center text-white">
+                What You'll Get
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-center p-4 bg-white/10 rounded-lg">
+                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
+                    <Target className="text-white" size={20} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-white">• Progressive Learning Stages</h4>
+                  </div>
+                </div>
+                <div className="flex items-center p-4 bg-white/10 rounded-lg">
+                  <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
+                    <Clock className="text-white" size={20} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-white">• Time-bound Milestones</h4>
+                  </div>
+                </div>
+                <div className="flex items-center p-4 bg-white/10 rounded-lg">
+                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
+                    <Zap className="text-white" size={20} />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-white">• Actionable Tasks & Resources</h4>
+                  </div>
+                </div>
               </div>
-              <div className="flex-1">
-                <h4 className="font-semibold text-white">• Progressive Learning Stages</h4>
-              </div>
-            </div>
-            <div className="flex items-center p-4 bg-white/10 rounded-lg">
-              <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
-                <Clock className="text-white" size={20} />
-              </div>
-              <div className="flex-1">
-                <h4 className="font-semibold text-white">• Time-bound Milestones</h4>
-              </div>
-            </div>
-            <div className="flex items-center p-4 bg-white/10 rounded-lg">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
-                <Zap className="text-white" size={20} />
-              </div>
-              <div className="flex-1">
-                <h4 className="font-semibold text-white">• Actionable Tasks & Resources</h4>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </section>
   );
 }
