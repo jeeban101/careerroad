@@ -59,10 +59,10 @@ export function setupAuth(app: Express) {
     saveUninitialized: false,
     store: sessionStore,
     cookie: {
-      secure: isProduction, // HTTPS only in production
+      secure: false, // HTTPS only in production
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       httpOnly: true,
-      sameSite: isProduction ? 'strict' : 'lax' // Stricter in production
+      sameSite: 'lax' // Stricter in production
     }
   };
 
