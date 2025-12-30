@@ -162,12 +162,13 @@ export default function HistoryPage() {
           <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <Button 
+                onClick={() => setSelectedRoadmap(null)}
                 variant="ghost" 
-              onClick={() => setSelectedRoadmap(null)}
-              className="mb-6 text-gray-300 hover:text-white"
-            >
-              ← Back to History
-            </Button>
+                className="mb-6 flex items-center gap-2 text-gray-300 hover:text-white bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700/50"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to My Roadmaps
+              </Button>
             <InteractiveSkillRoadmap skillRoadmap={selectedRoadmap} fromHistory={true} />
             </div>
           </div>

@@ -276,12 +276,12 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
   }, [completionPercentage]);
 
   return (
-    <section id="skill-roadmap-display" className="w-full max-w-6xl mx-auto mt-8 pb-12">
+    <section id="skill-roadmap-display" className="w-full max-w-6xl mx-auto mt-6 pb-6 overflow-x-hidden">
       {/* XP and Progress Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8 sticky top-16 z-10 bg-background/95 backdrop-blur-md border-b border-purple-500/20 p-4"
+        className="mb-8 bg-background/60 backdrop-blur-md border-b border-purple-500/20 p-4"
       >
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -619,13 +619,15 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
           animate={{ opacity: 1, scale: 1 }}
           className="mt-12 text-center"
         >
-          <Card className="border-4 border-yellow-500/50 shadow-2xl bg-gradient-to-br from-yellow-900/60 to-amber-900/60 backdrop-blur-glass">
-            <CardContent className="p-12">
+          <Card className="border-4 border-yellow-500/50 shadow-2xl bg-gradient-to-br from-yellow-900/60 to-amber-900/60 backdrop-blur-glass overflow-hidden">
+            <CardContent className="p-6 sm:p-8">
               <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
+                className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 overflow-hidden mx-auto mb-6"
+                style={{ willChange: 'transform' }}
+                animate={{ rotate: [0, 6, -6, 0] }}
                 transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
               >
-                <Trophy className="w-24 h-24 text-yellow-400 mx-auto mb-6" />
+                <Trophy className="w-16 h-16 sm:w-20 sm:h-20 text-yellow-400" />
               </motion.div>
               <h2 className="text-4xl font-bold bg-gradient-to-r from-yellow-300 to-amber-300 bg-clip-text text-transparent mb-4">
                 🎉 Congratulations! 🎉

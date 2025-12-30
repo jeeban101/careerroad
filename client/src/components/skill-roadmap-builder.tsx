@@ -179,11 +179,11 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
                 >
                   {generateMutation.isPending ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       Generating your skill roadmap...
                     </>
                   ) : (
-                    "Generate Skill Roadmap"
+                    <>Generate Skill Roadmap</>
                   )}
                 </Button>
               </div>
