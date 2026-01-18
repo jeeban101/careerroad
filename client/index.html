@@ -3,6 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <script>
+      (function() {
+        try {
+          var storageKey = 'careerroad-theme';
+          var stored = localStorage.getItem(storageKey);
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored || 'system';
+          var resolved = theme === 'system' ? (systemDark ? 'dark' : 'light') : theme;
+          var root = document.documentElement;
+          root.classList.remove('light', 'dark');
+          root.classList.add(resolved);
+        } catch (e) {
+          // no-op
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

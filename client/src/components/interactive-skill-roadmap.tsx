@@ -285,10 +285,10 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
               {skillRoadmap.title}
             </h2>
-            <div className="flex items-center gap-4 mt-2 text-sm text-gray-300">
+            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Target size={16} className="text-purple-400" />
                 <span className="font-medium">{content.skill}</span>
@@ -306,7 +306,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                 <Zap className="animate-pulse" />
                 {xp} XP
               </div>
-              <p className="text-xs text-gray-400">Level {Math.floor(xp / 100) + 1}</p>
+              <p className="text-xs text-muted-foreground">Level {Math.floor(xp / 100) + 1}</p>
             </div>
             {completionPercentage === 100 && (
               <motion.div
@@ -322,8 +322,8 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-300">Overall Progress</span>
-            <span className="font-bold text-purple-400">{completedTasks}/{totalTasks} tasks • {completionPercentage}%</span>
+            <span className="text-muted-foreground">Overall Progress</span>
+            <span className="font-bold text-purple-600 dark:text-purple-400">{completedTasks}/{totalTasks} tasks • {completionPercentage}%</span>
           </div>
           <Progress value={completionPercentage} className="h-3 bg-white/10" />
         </div>
@@ -344,7 +344,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
           {user && savedId && (
             <div className="flex items-center space-x-2 px-4 py-2.5 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
               <Bookmark className="h-4 w-4 text-emerald-400" />
-              <span className="text-sm font-medium text-emerald-300">
+              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-300">
                 Saved to History
               </span>
             </div>
@@ -374,22 +374,22 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
 
       {/* Overview Card */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <Card className="mb-8 border-2 border-purple-500/30 shadow-xl bg-gradient-to-br from-purple-900/40 to-pink-900/40 backdrop-blur-glass">
+        <Card className="mb-8 border-2 border-border dark:border-purple-500/30 shadow-xl bg-white dark:bg-gradient-to-br dark:from-purple-900/40 dark:to-pink-900/40 backdrop-blur-glass">
           <CardHeader>
-            <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+            <h3 className="text-xl font-semibold text-foreground dark:text-white flex items-center gap-2">
               <BookOpen className="text-purple-400" />
               Overview
             </h3>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-200 leading-relaxed">{content.overview}</p>
+            <p className="text-muted-foreground dark:text-gray-200 leading-relaxed">{content.overview}</p>
           </CardContent>
         </Card>
       </motion.div>
 
       {/* Learning Stages - Interactive Timeline */}
       <div className="space-y-6">
-        <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+        <h3 className="text-2xl font-bold text-foreground dark:text-white flex items-center gap-2">
           <TrendingUp className="text-purple-400" />
           Your Learning Journey
         </h3>
@@ -408,7 +408,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
               transition={{ delay: stageIndex * 0.1 }}
             >
               <Card 
-                className={`border-2 ${stageColor.border} shadow-lg backdrop-blur-glass hover:shadow-2xl transition-all duration-300 ${isCompleted ? 'ring-2 ring-green-500/50' : ''}`}
+                className={`bg-card border-2 ${stageColor.border} shadow-lg backdrop-blur-glass hover:shadow-2xl transition-all duration-300 ${isCompleted ? 'ring-2 ring-green-500/50' : ''}`}
               >
                 <CardHeader 
                   className="cursor-pointer"
@@ -428,15 +428,15 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                         )}
                       </motion.div>
                       <div>
-                        <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                        <h4 className="text-xl font-bold text-foreground dark:text-white flex items-center gap-2">
                           {stage.stage}
                           {isCompleted && <Award className="text-yellow-400" size={20} />}
                         </h4>
-                        <p className="text-sm text-gray-400">Duration: {stage.duration}</p>
+                        <p className="text-sm text-muted-foreground dark:text-gray-400">Duration: {stage.duration}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-semibold text-purple-300">
+                      <div className="text-sm font-semibold text-purple-500 dark:text-purple-300">
                         {progress.completed}/{progress.total} tasks
                       </div>
                       <Progress value={progress.percentage} className="w-32 h-2 mt-1" />
@@ -455,7 +455,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                       <CardContent className="space-y-6 pt-4">
                         {/* Tasks */}
                         <div>
-                          <h5 className="text-sm font-semibold text-purple-300 mb-4 flex items-center gap-2">
+                          <h5 className="text-sm font-semibold text-purple-600 dark:text-purple-300 mb-4 flex items-center gap-2">
                             <CheckCircle size={16} />
                             Tasks to Complete ({progress.completed}/{progress.total})
                           </h5>
@@ -470,8 +470,8 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                                   transition={{ delay: taskIndex * 0.05 }}
                                   className={`flex items-start gap-3 p-4 rounded-lg cursor-pointer transition-all ${
                                     completed 
-                                      ? 'bg-green-500/20 border-2 border-green-500/40' 
-                                      : 'bg-white/5 hover:bg-white/10 border-2 border-transparent'
+                                      ? 'bg-green-50 border-2 border-green-200 dark:bg-green-500/20 dark:border-green-500/40' 
+                                      : 'bg-secondary hover:bg-secondary/80 border-2 border-border dark:bg-white/5 dark:hover:bg-white/10 dark:border-transparent'
                                   }`}
                                   onClick={() => handleTaskToggle(stageIndex, taskIndex)}
                                   whileHover={{ scale: 1.02 }}
@@ -491,11 +491,11 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                                       <div className="w-6 h-6 border-2 border-purple-400 rounded-full" />
                                     )}
                                   </div>
-                                  <span className={`flex-1 leading-relaxed ${completed ? 'text-gray-300 line-through' : 'text-gray-100'}`}>
+                                  <span className={`flex-1 leading-relaxed ${completed ? 'text-muted-foreground line-through dark:text-gray-300' : 'text-foreground dark:text-gray-100'}`}>
                                     {task}
                                   </span>
                                   {completed && (
-                                    <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/40">
+                                    <Badge className="bg-yellow-500/20 text-yellow-500 dark:text-yellow-300 border-yellow-500/40">
                                       +10 XP
                                     </Badge>
                                   )}
@@ -507,7 +507,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
 
                         {/* Resources */}
                         <div>
-                          <h5 className="text-sm font-semibold text-pink-300 mb-4 flex items-center gap-2">
+                          <h5 className="text-sm font-semibold text-pink-500 dark:text-pink-300 mb-4 flex items-center gap-2">
                             <BookOpen size={16} />
                             Resources ({stage.resources.length})
                           </h5>
@@ -518,14 +518,14 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: resourceIdx * 0.05 }}
-                                className="p-4 bg-gradient-to-br from-white/5 to-white/10 rounded-lg border border-pink-500/20 hover:border-pink-500/40 transition-all group"
+                                className="p-4 rounded-lg border transition-all group bg-secondary border-border hover:bg-secondary/80 dark:bg-gradient-to-br dark:from-white/5 dark:to-white/10 dark:border-pink-500/20 dark:hover:border-pink-500/40"
                                 whileHover={{ y: -2 }}
                               >
                                 <div className="flex items-start gap-3 min-w-0">
                                   <div className="mt-1">
                                     {getResourceIcon(resource)}
                                   </div>
-                                  <p className="text-sm text-gray-200 leading-relaxed flex-1 group-hover:text-white transition-colors break-words min-w-0">
+                                  <p className="text-sm text-foreground dark:text-gray-200 leading-relaxed flex-1 dark:group-hover:text-white transition-colors break-words min-w-0">
                                     {resource}
                                   </p>
                                 </div>
@@ -535,8 +535,8 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                         </div>
 
                         {/* Notes Section */}
-                        <div className={`p-4 rounded-lg ${stageColor.bg} border ${stageColor.border}`}>
-                          <h5 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                        <div className={`p-4 rounded-lg bg-secondary border-border ${stageColor.bg} border ${stageColor.border}`}>
+                          <h5 className="text-sm font-semibold text-foreground dark:text-white mb-3 flex items-center gap-2">
                             <FileText size={16} />
                             Your Notes & Reflections
                           </h5>
@@ -544,10 +544,10 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                             placeholder="Add your notes, questions, or reflections for this stage..."
                             value={getStageNote(stageIndex)}
                             onChange={(e) => updateStageNote(stageIndex, e.target.value)}
-                            className="bg-white/5 border-white/10 text-white min-h-[100px] resize-none"
+                            className="bg-background border-border text-foreground dark:bg-white/5 dark:border-white/10 dark:text-white min-h-[100px] resize-none"
                             data-testid={`notes-${stageIndex}`}
                           />
-                          <p className="text-xs text-gray-400 mt-2">Your notes are saved automatically</p>
+                          <p className="text-xs text-muted-foreground mt-2">Your notes are saved automatically</p>
                         </div>
                       </CardContent>
                     </motion.div>
@@ -565,9 +565,9 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <Card className="mt-8 border-2 border-green-500/30 shadow-xl bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-glass">
+        <Card className="mt-8 border-2 border-border dark:border-green-500/30 shadow-xl bg-white dark:bg-gradient-to-br dark:from-green-900/40 dark:to-emerald-900/40 backdrop-blur-glass">
           <CardHeader>
-            <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-foreground dark:text-white flex items-center gap-2">
               <Trophy className="text-green-400" />
               Milestones
             </h3>
@@ -580,10 +580,10 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3 p-4 bg-white/10 rounded-lg hover:bg-white/15 transition-colors"
+                  className="flex items-start gap-3 p-4 rounded-lg transition-colors bg-secondary hover:bg-secondary/80 dark:bg-white/10 dark:hover:bg-white/15"
                 >
                   <Star size={20} className="text-yellow-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-200 leading-relaxed font-medium">{milestone}</span>
+                  <span className="text-foreground dark:text-gray-200 leading-relaxed font-medium">{milestone}</span>
                 </motion.div>
               ))}
             </div>
@@ -597,15 +597,15 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
       >
-        <Card className="mt-8 border-2 border-blue-500/30 shadow-xl bg-gradient-to-br from-blue-900/40 to-indigo-900/40 backdrop-blur-glass">
+        <Card className="mt-8 border-2 border-border dark:border-blue-500/30 shadow-xl bg-white dark:bg-gradient-to-br dark:from-blue-900/40 dark:to-indigo-900/40 backdrop-blur-glass">
           <CardHeader>
-            <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-foreground dark:text-white flex items-center gap-2">
               <Target className="text-blue-400" />
               Expected Outcome
             </h3>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-200 leading-relaxed text-lg">
+            <p className="text-foreground dark:text-gray-200 leading-relaxed text-lg">
               {content.expectedOutcome}
             </p>
           </CardContent>
@@ -619,7 +619,7 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
           animate={{ opacity: 1, scale: 1 }}
           className="mt-12 text-center"
         >
-          <Card className="border-4 border-yellow-500/50 shadow-2xl bg-gradient-to-br from-yellow-900/60 to-amber-900/60 backdrop-blur-glass overflow-hidden">
+          <Card className="border-4 border-yellow-500/50 shadow-2xl bg-white dark:bg-gradient-to-br dark:from-yellow-900/60 dark:to-amber-900/60 backdrop-blur-glass overflow-hidden">
             <CardContent className="p-6 sm:p-8">
               <motion.div
                 className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 overflow-hidden mx-auto mb-6"
@@ -632,10 +632,10 @@ export default function InteractiveSkillRoadmap({ skillRoadmap, fromHistory }: I
               <h2 className="text-4xl font-bold bg-gradient-to-r from-yellow-300 to-amber-300 bg-clip-text text-transparent mb-4">
                 🎉 Congratulations! 🎉
               </h2>
-              <p className="text-2xl text-white mb-6">
+              <p className="text-2xl text-foreground dark:text-white mb-6">
                 You've mastered {content.skill}!
               </p>
-              <p className="text-gray-300 mb-8">
+              <p className="text-muted-foreground mb-8">
                 Total XP Earned: <span className="text-yellow-400 font-bold text-2xl">{xp}</span>
               </p>
               <Button 

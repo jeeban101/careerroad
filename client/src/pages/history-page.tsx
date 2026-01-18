@@ -80,7 +80,7 @@ export default function HistoryPage() {
     },
   });
 
-  const { data: history, isLoading: historyLoading, error: historyError } = useQuery({
+  const { data: history, isLoading: historyLoading, error: historyError } = useQuery<UserRoadmapHistory[]>({
     queryKey: ["/api/user-roadmap-history"],
     enabled: !!user,
     retry: false,
@@ -116,11 +116,11 @@ export default function HistoryPage() {
 
   if (historyLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="container max-w-4xl mx-auto p-6">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground"></div>
           </div>
         </div>
       </div>
@@ -129,14 +129,14 @@ export default function HistoryPage() {
 
   if (!history || history.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="container max-w-4xl mx-auto p-6">
           <div className="text-center py-12">
-            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
+            <div className="bg-card rounded-2xl shadow-lg p-8 max-w-md mx-auto border border-border">
               <Target className="h-16 w-16 text-purple-400 mx-auto mb-6" />
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Start Your Career Journey</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">Start Your Career Journey</h2>
+              <p className="text-muted-foreground mb-6">
                 No roadmaps yet? Generate your first personalized career roadmap to start tracking your progress and building your future.
               </p>
               <Button 
@@ -157,14 +157,14 @@ export default function HistoryPage() {
     // If it's a skill roadmap, render it with InteractiveSkillRoadmap
     if (selectedRoadmap.roadmapType === 'skill') {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen bg-background">
           <Header />
-          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+          <div className="min-h-screen bg-background">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <Button 
                 onClick={() => setSelectedRoadmap(null)}
                 variant="ghost" 
-                className="mb-6 flex items-center gap-2 text-gray-300 hover:text-white bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700/50"
+                className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-foreground bg-secondary/90 hover:bg-secondary/80 border border-border"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to My Roadmaps
@@ -177,33 +177,33 @@ export default function HistoryPage() {
     }
 
     // For career roadmaps, show the career roadmap view
-    const phases = selectedRoadmap.phases;
+    const phases = selectedRoadmap.phases ?? [];
     const courseLabel = courseOptions.find(c => c.value === selectedRoadmap.currentCourse)?.label || selectedRoadmap.currentCourse;
     const roleLabel = roleOptions.find(r => r.value === selectedRoadmap.targetRole)?.label || selectedRoadmap.targetRole;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen bg-background">
         <Header />
         <div className="container max-w-6xl mx-auto p-6">
           {/* Back Button */}
           <Button 
             onClick={() => setSelectedRoadmap(null)}
             variant="ghost" 
-            className="mb-6 flex items-center gap-2 text-gray-300 hover:text-white bg-gray-800/60 hover:bg-gray-700/60 border border-gray-700/50"
+            className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-foreground bg-secondary hover:bg-secondary/80 border border-border"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to My Roadmaps
           </Button>
 
           {/* Roadmap Header */}
-          <div className="bg-gray-900/80 rounded-2xl shadow-lg p-8 mb-8 border border-purple-500/20 backdrop-blur-glass">
+          <div className="bg-card rounded-2xl shadow-lg p-8 mb-8 border border-border backdrop-blur-glass">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Your Career Roadmap</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">Your Career Roadmap</h1>
               <div className="flex items-center justify-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-semibold text-gray-200">{courseLabel}</span>
+                  <span className="text-lg font-semibold text-muted-foreground">{courseLabel}</span>
                   <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-lg font-semibold text-gray-200">{roleLabel}</span>
+                  <span className="text-lg font-semibold text-muted-foreground">{roleLabel}</span>
                 </div>
               </div>
             </div>
@@ -306,10 +306,10 @@ export default function HistoryPage() {
         <Header />
         <div className="container max-w-6xl mx-auto p-6">
           <div className="mb-8 text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               My Career Roadmaps
             </h1>
-            <p className="text-gray-300 text-base sm:text-lg">
+            <p className="text-muted-foreground text-base sm:text-lg">
               Track your progress and continue building your career journey
             </p>
           </div>
@@ -332,7 +332,7 @@ export default function HistoryPage() {
             return (
               <Card 
                 key={roadmap.id} 
-                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400/60 bg-gray-900/80 hover:bg-gray-800/90 backdrop-blur-glass hover:scale-105 transform shadow-lg min-h-[44px]"
+                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400/60 bg-card hover:bg-secondary/90 backdrop-blur-glass hover:scale-105 transform shadow-lg min-h-[44px]"
                 onClick={() => setSelectedRoadmap(roadmap)}
               >
                 <CardHeader className="pb-3 relative">
@@ -340,7 +340,7 @@ export default function HistoryPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600/20 hover:text-red-400 z-10 text-gray-400"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600/20 hover:text-red-400 z-10 text-muted-foreground"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (confirm('Are you sure you want to delete this roadmap?')) {
@@ -352,15 +352,15 @@ export default function HistoryPage() {
                   </Button>
                   
                   <div className="flex items-center justify-between pr-8">
-                    <Badge variant="outline" className="bg-gradient-to-r from-purple-600/30 to-blue-600/30 text-purple-200 border-purple-400/50 font-semibold">
+                    <Badge variant="outline" className="font-semibold border-purple-300 bg-purple-100 text-purple-800 dark:bg-gradient-to-r dark:from-purple-600/30 dark:to-blue-600/30 dark:text-purple-200 dark:border-purple-400/50">
                       {displayBadge}
                     </Badge>
-                    <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
-                      <span>{format(new Date(roadmap.createdAt), 'MMM dd')}</span>
+                      <span>{roadmap.createdAt ? format(new Date(roadmap.createdAt), 'MMM dd') : ''}</span>
                     </div>
                   </div>
-                  <CardTitle className="text-xl text-white line-clamp-2 font-bold mt-2">
+                  <CardTitle className="text-xl text-foreground line-clamp-2 font-bold mt-2">
                     {displayTitle}
                   </CardTitle>
                 </CardHeader>
@@ -368,33 +368,33 @@ export default function HistoryPage() {
                   <div className="space-y-4">
                     {/* Stats with icons */}
                     <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                      <div className="flex items-center gap-2 p-2 sm:p-3 bg-blue-600/30 rounded-lg border border-blue-500/30">
+                      <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg border bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-600/30 dark:border-blue-500/30 dark:text-blue-100">
                         <Brain className="h-5 w-5 text-blue-300" />
                         <div>
-                          <div className="text-sm font-semibold text-blue-100">{roadmap.phases?.length || roadmap.skillContent?.stages?.length || 0}</div>
-                          <div className="text-xs text-blue-200">{roadmap.roadmapType === 'career' ? 'Phases' : 'Stages'}</div>
+                          <div className="text-sm font-semibold text-blue-700 dark:text-blue-100">{roadmap.phases?.length || roadmap.skillContent?.stages?.length || 0}</div>
+                          <div className="text-xs text-blue-600 dark:text-blue-200">{roadmap.roadmapType === 'career' ? 'Phases' : 'Stages'}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 p-2 sm:p-3 bg-emerald-600/30 rounded-lg border border-emerald-500/30">
+                      <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg border bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-600/30 dark:border-emerald-500/30 dark:text-emerald-100">
                         <CheckSquare className="h-5 w-5 text-emerald-300" />
                         <div>
-                          <div className="text-sm font-semibold text-emerald-100">
+                          <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-100">
                             {roadmap.phases?.reduce((total: number, phase: any) => total + (phase.items?.length || 0), 0) || 
                              roadmap.skillContent?.stages?.reduce((total: number, stage: any) => total + (stage.tasks?.length || 0), 0) || 0}
                           </div>
-                          <div className="text-xs text-emerald-200">Tasks</div>
+                          <div className="text-xs text-emerald-600 dark:text-emerald-200">Tasks</div>
                         </div>
                       </div>
                     </div>
                     
                     {/* Last Accessed */}
-                    <div className="flex items-center justify-between text-sm p-2 sm:p-3 bg-gray-800/60 rounded-lg border border-gray-700/50">
-                      <span className="text-gray-200 flex items-center gap-1">
+                    <div className="flex items-center justify-between text-sm p-2 sm:p-3 bg-secondary rounded-lg border border-border">
+                      <span className="text-muted-foreground flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         Last viewed
                       </span>
-                      <span className="font-semibold text-white">
-                        {format(new Date(roadmap.lastAccessed), 'MMM dd')}
+                      <span className="font-semibold text-foreground">
+                        {roadmap.lastAccessed ? format(new Date(roadmap.lastAccessed), 'MMM dd') : '—'}
                       </span>
                     </div>
                     

@@ -104,7 +104,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-300 via-white to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <Header />
       
       <div className="container max-w-7xl mx-auto p-6 space-y-8">
@@ -114,10 +114,10 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 sm:mb-8"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Welcome back, {user.firstName || 'Explorer'}! 👋
           </h1>
-          <p className="text-gray-400 text-base sm:text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Here's your progress and recent activity
           </p>
         </motion.div>
@@ -131,10 +131,10 @@ export default function Dashboard() {
         >
           {/* XP & Level Card with Animation */}
           <motion.div variants={cardVariants} whileHover={{ scale: 1.05 }}>
-            <Card className="bg-gradient-to-br from-pink-500 to-pink-600 border-pink-400/20 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-pink-500/50">
+            <Card className="bg-card bg-gradient-to-br from-pink-500/25 to-pink-600/25 border-pink-400/30 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-pink-500/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-sm font-medium">
-                  <Zap className="text-yellow-300" size={18} />
+                <CardTitle className="text-foreground flex items-center gap-2 text-sm font-medium">
+                  <Zap className="text-yellow-600 dark:text-yellow-300" size={18} />
                   Level & XP
                 </CardTitle>
               </CardHeader>
@@ -143,32 +143,32 @@ export default function Dashboard() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.2 }}
-                  className="text-5xl font-bold text-white mb-2"
+                  className="text-5xl font-bold text-foreground mb-2"
                 >
                   Level {level}
                 </motion.div>
-                <div className="text-sm text-white/90 mb-3">
+                <div className="text-sm text-foreground/80 mb-3">
                   {totalXp} XP • {xpToNextLevel} XP to next level
                 </div>
-                <Progress value={levelProgress} className="h-2 bg-white/20" />
+                <Progress value={levelProgress} className="h-2 bg-slate-200" />
               </CardContent>
             </Card>
           </motion.div>
 
           {/* Streak Card */}
           <motion.div variants={cardVariants} whileHover={{ scale: 1.05 }}>
-            <Card className="bg-gradient-to-br from-orange-400 to-orange-500 border-orange-300/20 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-orange-500/50">
+            <Card className="bg-card bg-gradient-to-br from-orange-400/25 to-orange-500/25 border-orange-300/30 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-orange-500/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-sm font-medium">
-                  <Flame className="text-orange-100" size={18} />
+                <CardTitle className="text-foreground flex items-center gap-2 text-sm font-medium">
+                  <Flame className="text-orange-600 dark:text-orange-300" size={18} />
                   Current Streak
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-bold text-white mb-2">
+                <div className="text-5xl font-bold text-foreground mb-2">
                   {currentStreak} days
                 </div>
-                <div className="text-sm text-white/90">
+                <div className="text-sm text-foreground/80">
                   Longest: {longestStreak} days 🔥
                 </div>
               </CardContent>
@@ -177,18 +177,18 @@ export default function Dashboard() {
 
           {/* Roadmaps Card */}
           <motion.div variants={cardVariants} whileHover={{ scale: 1.05 }}>
-            <Card className="bg-gradient-to-br from-blue-400 to-blue-500 border-blue-300/20 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-blue-500/50">
+            <Card className="bg-card bg-gradient-to-br from-blue-400/25 to-blue-500/25 border-blue-300/30 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-blue-500/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-sm font-medium">
-                  <Target className="text-blue-100" size={18} />
+                <CardTitle className="text-foreground flex items-center gap-2 text-sm font-medium">
+                  <Target className="text-blue-600 dark:text-blue-300" size={18} />
                   Total Roadmaps
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-bold text-white mb-2">
+                <div className="text-5xl font-bold text-foreground mb-2">
                   {totalRoadmaps}
                 </div>
-                <div className="text-sm text-white/90">
+                <div className="text-sm text-foreground/80">
                   Active learning paths
                 </div>
               </CardContent>
@@ -197,18 +197,18 @@ export default function Dashboard() {
 
           {/* Tasks Completed Card */}
           <motion.div variants={cardVariants} whileHover={{ scale: 1.05 }}>
-            <Card className="bg-gradient-to-br from-emerald-400 to-emerald-500 border-emerald-300/20 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-emerald-500/50">
+            <Card className="bg-card bg-gradient-to-br from-emerald-400/25 to-emerald-500/25 border-emerald-300/30 transition-all duration-300 backdrop-blur-glass hover:shadow-2xl hover:shadow-emerald-500/30">
               <CardHeader className="pb-3">
-                <CardTitle className="text-white flex items-center gap-2 text-sm font-medium">
-                  <Trophy className="text-emerald-100" size={18} />
+                <CardTitle className="text-foreground flex items-center gap-2 text-sm font-medium">
+                  <Trophy className="text-emerald-600 dark:text-emerald-300" size={18} />
                   Tasks Done
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-bold text-white mb-2">
+                <div className="text-5xl font-bold text-foreground mb-2">
                   {completedTasks}
                 </div>
-                <div className="text-sm text-white/90">
+                <div className="text-sm text-foreground/80">
                   Keep up the momentum!
                 </div>
               </CardContent>
@@ -230,8 +230,8 @@ export default function Dashboard() {
                     <Target className="text-purple-400" size={24} />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-400 font-medium">Today's Goal</div>
-                    <div className="text-white font-semibold">{dailyGoal.mission}</div>
+                    <div className="text-sm text-muted-foreground font-medium">Today's Goal</div>
+                    <div className="text-foreground font-semibold">{dailyGoal.mission}</div>
                   </div>
                 </div>
                 <Button
@@ -261,8 +261,8 @@ export default function Dashboard() {
                       <Play className="text-blue-400" size={24} />
                     </div>
                     <div>
-                      <div className="text-sm text-gray-400 font-medium">Continue Where You Left Off</div>
-                      <div className="text-white font-semibold">
+                      <div className="text-sm text-muted-foreground font-medium">Continue Where You Left Off</div>
+                      <div className="text-foreground font-semibold">
                         {continueRoadmap.roadmapType === 'skill' 
                           ? `Learn ${continueRoadmap.skill} in ${continueRoadmap.timeFrame}`
                           : continueRoadmap.title
@@ -292,9 +292,9 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
           >
-            <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass">
+            <Card className="bg-card border border-border backdrop-blur-glass">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-foreground flex items-center gap-2">
                   <Calendar className="text-purple-400" />
                   Activity Overview
                 </CardTitle>
@@ -311,18 +311,18 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75 }}
           >
-            <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass">
+            <Card className="bg-card border border-border backdrop-blur-glass">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-foreground flex items-center gap-2">
                   <Timer className="text-purple-400" />
                   Time Spent Learning
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-white mb-2">
+                <div className="text-4xl font-bold text-foreground mb-2">
                   {Math.floor((stats as any)?.weeklyTimeSpent / 60) || 0}h {((stats as any)?.weeklyTimeSpent % 60) || 0}m
                 </div>
-                <div className="text-sm text-gray-400">This week</div>
+                <div className="text-sm text-muted-foreground">This week</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -334,9 +334,9 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
-          <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass">
+          <Card className="bg-card border border-border backdrop-blur-glass">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <Trophy className="text-yellow-400" />
                 Achievements
               </CardTitle>
@@ -353,9 +353,9 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.85 }}
         >
-          <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass">
+          <Card className="bg-card border border-border backdrop-blur-glass">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <TrendingUp className="text-green-400" />
                 Weekly Performance
               </CardTitle>
@@ -374,7 +374,7 @@ export default function Dashboard() {
         >
           <Card className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border-indigo-500/30 backdrop-blur-glass">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <Brain className="text-indigo-400" />
                 AI Suggests
               </CardTitle>
@@ -382,10 +382,10 @@ export default function Dashboard() {
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white mb-2">
+                  <p className="text-foreground mb-2">
                     Try the "Deploy a sample Node.js app on Kubernetes" project next
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     Based on your learning in DevOps and containerization
                   </p>
                 </div>
@@ -418,10 +418,10 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.95 }}
         >
-          <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass">
+          <Card className="bg-card border border-border backdrop-blur-glass">
             <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-foreground flex items-center gap-2">
                   <BookOpen className="text-purple-400" />
                   Recent Roadmaps
                 </CardTitle>
@@ -433,7 +433,7 @@ export default function Dashboard() {
                         size="sm"
                         variant={filter === f ? "default" : "outline"}
                         onClick={() => setFilter(f as any)}
-                        className={filter === f ? "bg-purple-600 hover:bg-purple-700" : "border-gray-600 text-gray-400 hover:text-white hover:bg-white/10"}
+                        className={filter === f ? "bg-purple-600 hover:bg-purple-700" : "border-border text-muted-foreground hover:text-foreground hover:bg-secondary/80"}
                         data-testid={`filter-${f}`}
                       >
                         {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -444,7 +444,7 @@ export default function Dashboard() {
                     aria-label="View all roadmaps"
                     variant="ghost"
                     size="sm"
-                    className="text-purple-400 hover:text-purple-300 px-2 py-1"
+                    className="text-purple-500 hover:text-purple-500 px-2 py-1"
                     onClick={() => navigate('/history')}
                     data-testid="button-view-all-roadmaps"
                   >
@@ -457,8 +457,8 @@ export default function Dashboard() {
             <CardContent className="p-4 sm:p-6">
               {filteredRoadmaps.length === 0 ? (
                 <div className="text-center py-8 sm:py-12">
-                  <TrendingUp className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-                  <p className="text-gray-400 mb-4">No roadmaps yet! Start your learning journey.</p>
+                  <TrendingUp className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">No roadmaps yet! Start your learning journey.</p>
                   <Button 
                     onClick={() => navigate('/')}
                     className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
@@ -479,17 +479,18 @@ export default function Dashboard() {
                       <motion.div
                         key={roadmap.id}
                         whileHover={{ scale: 1.02 }}
-                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all"
+                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 bg-secondary rounded-lg border border-border hover:border-purple-500/50 transition-all"
                         data-testid={`roadmap-card-${roadmap.id}`}
                       >
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-                            <Badge variant="outline" className="bg-purple-600/20 text-purple-300 border-purple-500/30">
+                            <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300
+    dark:bg-purple-600/20 dark:text-purple-300 dark:border-purple-500/30">
                               {isSkillRoadmap ? 'Skill' : 'Career'}
                             </Badge>
-                            <h3 className="text-white font-semibold">{title}</h3>
+                            <h3 className="text-foreground font-semibold">{title}</h3>
                           </div>
-                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-400">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
                               {roadmap.createdAt && format(new Date(roadmap.createdAt), 'MMM dd, yyyy')}

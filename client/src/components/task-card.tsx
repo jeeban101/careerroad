@@ -118,7 +118,7 @@ export default function TaskCard({
   };
 
   return (
-    <div className="group p-4 rounded-xl bg-gray-800/60 border-2 border-gray-700/50 hover:border-purple-400/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] backdrop-blur-glass shimmer hover:bg-gray-800/80">
+    <div className="group p-4 rounded-xl bg-secondary border border-border hover:border-purple-400/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] backdrop-blur-glass shimmer hover:bg-secondary/80 dark:bg-gray-800/60 dark:border-gray-700/50 dark:hover:bg-gray-800/80">
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
           <Checkbox 
@@ -127,18 +127,18 @@ export default function TaskCard({
             className="mt-1 h-5 w-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 transition-all duration-200 border-gray-400 data-[state=unchecked]:border-gray-400"
           />
         </div>
-        <div className={`flex-shrink-0 w-12 h-12 ${itemColor} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md glow-pulse border border-white/20`}>
+        <div className={`flex-shrink-0 w-12 h-12 ${itemColor} rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-md glow-pulse border border-black/10 dark:border-white/20`}>
           <ItemIcon className="text-white" size={18} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row items-start justify-between mb-2 gap-2">
             <div className="flex-1 min-w-0 pr-4">
-              <h4 className={`text-sm font-semibold text-white break-words group-hover:text-purple-300 transition-colors duration-200 ${isChecked ? 'line-through text-gray-400' : ''}`}>
+              <h4 className={`text-sm font-semibold text-foreground break-words group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors duration-200 ${isChecked ? 'line-through text-muted-foreground' : ''}`}>
                 {item.label}
               </h4>
             </div>
             <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
-              <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm border border-white/20 whitespace-nowrap`}>
+              <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm border border-black/10 dark:border-white/20 whitespace-nowrap`}>
                 {item.type}
               </span>
               
@@ -154,7 +154,7 @@ export default function TaskCard({
                         className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer whitespace-nowrap ${
                           (notes || taskProgress?.notes) 
                             ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg' 
-                            : 'bg-white/10 text-gray-300 border-gray-500 hover:border-purple-400 hover:text-purple-300 hover:bg-purple-500/20'
+                            : 'bg-secondary text-muted-foreground border-border hover:border-purple-400 hover:text-purple-600 hover:bg-secondary/80 dark:bg-white/10 dark:text-gray-300 dark:border-gray-500 dark:hover:text-purple-300 dark:hover:bg-purple-500/20'
                         }`}
                       >
                         <StickyNote size={12} className="mr-1" />
@@ -193,14 +193,14 @@ export default function TaskCard({
             </div>
           </div>
           {item.description && (
-            <p className={`text-sm text-gray-200 leading-relaxed break-words ${isChecked ? 'line-through text-gray-500' : ''}`}>
+            <p className={`text-sm text-muted-foreground leading-relaxed break-words ${isChecked ? 'line-through text-muted-foreground/70' : ''}`}>
               {item.description}
             </p>
           )}
           
           {/* Enhanced Notes Section */}
           {showNotes && (
-            <div className="mt-4 p-4 bg-gray-800/80 border-2 border-purple-400/30 rounded-xl shadow-lg backdrop-blur-glass">
+            <div className="mt-4 p-4 bg-secondary border border-border dark:bg-gray-800/80 dark:border-purple-400/30 rounded-xl shadow-lg backdrop-blur-glass">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -222,7 +222,7 @@ export default function TaskCard({
                       variant="outline"
                       size="sm"
                       onClick={() => setShowNotes(false)}
-                      className="h-8 px-3 text-xs border-gray-500 text-gray-300 hover:text-white hover:bg-white/10"
+                      className="h-8 px-3 text-xs border-border text-muted-foreground hover:text-foreground hover:bg-secondary/80 dark:border-gray-500 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10"
                     >
                       <X size={12} />
                     </Button>
@@ -233,7 +233,7 @@ export default function TaskCard({
                     value={tempNotes}
                     onChange={(e) => setTempNotes(e.target.value)}
                     placeholder="✨ Share your thoughts, progress updates, challenges, or helpful tips here..."
-                    className="text-sm resize-none h-24 bg-gray-900/80 border-2 border-purple-400/30 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 rounded-lg shadow-sm placeholder:text-gray-400 text-white"
+                    className="text-sm resize-none h-24 bg-background border border-border focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 rounded-lg shadow-sm placeholder:text-muted-foreground text-foreground dark:bg-gray-900/80 dark:border-2 dark:border-purple-400/30 dark:placeholder:text-gray-400 dark:text-white"
                   />
                   <div className="absolute bottom-2 right-2 text-xs text-gray-400">
                     {tempNotes.length} characters
@@ -245,12 +245,12 @@ export default function TaskCard({
           
           {/* Enhanced Notes Preview */}
           {!showNotes && (notes || taskProgress?.notes) && (
-            <div className="mt-3 p-3 bg-gray-800/60 rounded-lg border-2 border-emerald-400/30 shadow-sm backdrop-blur-glass">
+            <div className="mt-3 p-3 bg-secondary rounded-lg border border-emerald-500/30 shadow-sm backdrop-blur-glass dark:bg-gray-800/60 dark:border-emerald-400/30">
               <div className="flex items-start space-x-2">
                 <StickyNote className="text-emerald-300 flex-shrink-0 mt-0.5" size={14} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-emerald-200 mb-1">Your Notes:</p>
-                  <p className="text-sm text-emerald-100 line-clamp-3 leading-relaxed">
+                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-200 mb-1">Your Notes:</p>
+                  <p className="text-sm text-emerald-800 dark:text-emerald-100 line-clamp-3 leading-relaxed">
                     {notes || taskProgress?.notes}
                   </p>
                 </div>

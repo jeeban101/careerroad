@@ -187,21 +187,21 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
   };
 
   return (
-    <section id="roadmap-display" className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <section id="roadmap-display" className="min-h-screen bg-background">
       <Header />
       <div className="w-full mx-auto p-4 sm:p-5 md:p-6 lg:p-8 overflow-x-auto overflow-y-visible">
         <div className="max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
         {/* Roadmap Header */}
-        <div className="bg-gray-900/80 rounded-2xl shadow-lg p-8 mb-6 border border-purple-500/20 backdrop-blur-glass">
+        <div className="bg-card rounded-2xl shadow-lg p-8 mb-6 border border-border backdrop-blur-glass dark:bg-gray-900/80 dark:border-purple-500/20">
           <div className="text-center mb-6">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
               Your Career Roadmap
             </h1>
             <div className="flex items-center justify-center gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-gray-200">{courseLabel}</span>
+                <span className="text-lg font-semibold text-muted-foreground">{courseLabel}</span>
                 <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
-                <span className="text-lg font-semibold text-gray-200">{roleLabel}</span>
+                <span className="text-lg font-semibold text-muted-foreground">{roleLabel}</span>
               </div>
             </div>
           </div>
@@ -254,7 +254,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
         {/* Phases Timeline - matches the History Page selected career view UI */}
         <div className="space-y-8">
           {phases.length === 0 ? (
-            <div className="text-center text-gray-300 py-12 bg-gray-900/70 border border-gray-800 rounded-xl">
+            <div className="text-center text-muted-foreground py-12 bg-secondary border border-border rounded-xl dark:bg-gray-900/70 dark:border-gray-800">
               No roadmap phases available. Please try generating a new roadmap.
             </div>
           ) : (

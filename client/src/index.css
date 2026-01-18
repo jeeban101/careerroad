@@ -3,7 +3,61 @@
 @tailwind utilities;
 
 :root {
-  /* Dark mode as default - inspired by Evervault */
+  /* Light theme defaults */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(0, 0%, 7%);
+  --muted: hsl(210, 40%, 96.1%);
+  --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(0, 0%, 7%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(0, 0%, 7%);
+  --border: hsl(214.3, 31.8%, 91.4%);
+  --input: hsl(214.3, 31.8%, 91.4%);
+  --primary: hsl(263, 70%, 50%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(210, 40%, 96.1%);
+  --secondary-foreground: hsl(0, 0%, 7%);
+  --accent: hsl(210, 40%, 96.1%);
+  --accent-foreground: hsl(0, 0%, 7%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(263, 70%, 50%);
+  --radius: 0.75rem;
+
+  /* Brand colors */
+  --brand-purple: hsl(263, 70%, 50%);
+  --brand-blue: hsl(216, 87%, 55%);
+  --brand-cyan: hsl(195, 75%, 60%);
+  --brand-emerald: hsl(160, 84%, 39%);
+  --brand-pink: hsl(314, 100%, 76%);
+  --brand-amber: hsl(43, 96%, 56%);
+
+  /* Charts (used by tailwind theme.extend.colors.chart) */
+  --chart-1: hsl(263, 70%, 50%);
+  --chart-2: hsl(216, 87%, 55%);
+  --chart-3: hsl(195, 75%, 60%);
+  --chart-4: hsl(160, 84%, 39%);
+  --chart-5: hsl(43, 96%, 56%);
+
+  /* Sidebar tokens */
+  --sidebar-background: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--muted-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* Glass morphism effects (light) */
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.06);
+}
+
+.dark {
+  /* Dark theme overrides - inspired by Evervault */
   --background: hsl(225, 25%, 6%);
   --foreground: hsl(0, 0%, 95%);
   --muted: hsl(225, 15%, 12%);
@@ -23,17 +77,18 @@
   --destructive: hsl(0, 62.8%, 50%);
   --destructive-foreground: hsl(0, 0%, 95%);
   --ring: hsl(263, 70%, 50%);
-  --radius: 0.75rem;
-  
-  /* Enhanced brand colors inspired by Evervault */
-  --brand-purple: hsl(263, 70%, 50%);
-  --brand-blue: hsl(216, 87%, 55%);
-  --brand-cyan: hsl(195, 75%, 60%);
-  --brand-emerald: hsl(160, 84%, 39%);
-  --brand-pink: hsl(314, 100%, 76%);
-  --brand-amber: hsl(43, 96%, 56%);
-  
-  /* Glass morphism effects */
+
+  /* Sidebar tokens */
+  --sidebar-background: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--muted-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* Glass morphism effects (dark) */
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: rgba(0, 0, 0, 0.2);
@@ -46,7 +101,6 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    background: hsl(225, 25%, 6%);
     min-height: 100vh;
   }
 }
@@ -172,10 +226,14 @@
 }
 
 .backdrop-blur-glass {
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
   backdrop-filter: blur(20px) saturate(120%);
-  background: var(--glass-bg);
+  background-color: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: 0 8px 32px var(--glass-shadow);
+  isolation: isolate;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .shimmer {

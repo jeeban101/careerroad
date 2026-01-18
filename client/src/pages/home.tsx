@@ -76,24 +76,24 @@ export default function Home() {
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                   Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
                 </h1>
-                <p className="text-gray-300 mt-2 text-sm sm:text-base">Let's continue building your career path</p>
+                <p className="text-muted-foreground mt-2 text-sm sm:text-base">Let's continue building your career path</p>
               </div>
             </div>
             
             <Tabs defaultValue="career" className="w-full">
               <div className="text-center mb-8">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Choose your goal:</h2>
-                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-white/10 border border-purple-500/30 min-h-[44px]">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Choose your goal:</h2>
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-secondary border border-border min-h-[44px] dark:bg-white/10 dark:border-purple-500/30">
                   <TabsTrigger 
                     value="career"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
+                    className="text-muted-foreground data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
                     data-testid="tab-career"
                   >
                     Career Roadmap
                   </TabsTrigger>
                   <TabsTrigger 
                     value="skill"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
+                    className="text-muted-foreground data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
                     data-testid="tab-skill"
                   >
                     Build Skill

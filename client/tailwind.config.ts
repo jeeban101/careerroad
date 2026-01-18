@@ -1,9 +1,28 @@
 import type { Config } from "tailwindcss";
+import defaultTheme from "tailwindcss/defaultTheme";
+
+const SPACING_SCALE = 0.85;
+const scaledSpacing = Object.fromEntries(
+  Object.entries(defaultTheme.spacing).map(([k, v]) => {
+    if (typeof v === "string" && v.endsWith("rem")) {
+      const num = parseFloat(v.replace("rem", ""));
+      const scaled = num * SPACING_SCALE;
+      return [k, `${parseFloat(scaled.toFixed(4))}rem`];
+    }
+    if (typeof v === "string" && v.endsWith("px")) {
+      const num = parseFloat(v.replace("px", ""));
+      const scaled = Math.round(num * SPACING_SCALE);
+      return [k, `${scaled}px`];
+    }
+    return [k, v as any];
+  })
+) as Record<string, string>;
 
 export default {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    spacing: scaledSpacing,
     extend: {
       borderRadius: {
         lg: "var(--radius)",

@@ -24,7 +24,7 @@ export function ResumeAnalyzer() {
       if (currentCourse) form.append("currentCourse", currentCourse);
       if (desiredRole) form.append("desiredRole", desiredRole);
 
-      const API_BASE = import.meta.env.VITE_APP_BACKEND_URL;
+      const API_BASE = import.meta.env.VITE_APP_BACKEND_URL || (typeof window !== "undefined" && window.location.port === "5173" ? "http://localhost:8005" : window.location.origin);
       const res = await fetch(`${API_BASE}/api/resume/analyze`, {
         method: "POST",
         body: form,
@@ -84,14 +84,14 @@ export function ResumeAnalyzer() {
   };
 
   return (
-    <Card className="bg-gray-900/80 border-purple-500/30 backdrop-blur-glass">
+    <Card className="bg-card border border-border backdrop-blur-glass">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-white flex items-center gap-2">
+        <CardTitle className="text-foreground flex items-center gap-2">
           <Upload className="text-purple-400" />
           Upload Resume for Skill Analysis
         </CardTitle>
         {result && (
-          <Button variant="outline" onClick={reset} className="border-gray-600 text-gray-300 hover:bg-white/10">
+          <Button variant="outline" onClick={reset} className="border-border text-foreground/80 hover:bg-secondary/50">
             Reset
           </Button>
         )}
@@ -104,14 +104,14 @@ export function ResumeAnalyzer() {
               type="file"
               accept=".pdf,application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt,text/plain"
               onChange={onFileChange}
-              className="w-full sm:w-auto max-w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
+              className="w-full sm:w-auto max-w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700"
             />
             {file ? (
-              <span className="text-gray-400 flex items-center gap-2 flex-1 truncate">
+              <span className="text-muted-foreground flex items-center gap-2 flex-1 truncate">
                 <FileText size={16} /> {file.name}
               </span>
             ) : (
-              <span className="text-gray-500">PDF, DOCX, or TXT (max 5MB)</span>
+              <span className="text-muted-foreground">PDF, DOCX, or TXT (max 5MB)</span>
             )}
           </div>
           <div className="flex gap-2 justify-end">
@@ -132,19 +132,19 @@ export function ResumeAnalyzer() {
             placeholder="Current course (optional)"
             value={currentCourse}
             onChange={(e) => setCurrentCourse(e.target.value)}
-            className="w-full max-w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-200 placeholder:text-gray-500"
+            className="w-full max-w-full px-3 py-2 rounded bg-secondary border border-border text-foreground placeholder:text-muted-foreground"
           />
           <input
             type="text"
             placeholder="Desired role (optional)"
             value={desiredRole}
             onChange={(e) => setDesiredRole(e.target.value)}
-            className="w-full max-w-full px-3 py-2 rounded bg-gray-800 border border-gray-700 text-gray-200 placeholder:text-gray-500"
+            className="w-full max-w-full px-3 py-2 rounded bg-secondary border border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
 
         {!result && (
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-muted-foreground">
             Upload your resume to extract and assess your skills. We infer your level per skill from projects, experience, and certifications.
           </div>
         )}
@@ -152,33 +152,33 @@ export function ResumeAnalyzer() {
         {result && (
           <div className="space-y-4">
             <div className="space-y-1">
-              <div className="text-white font-semibold">Summary</div>
-              <p className="text-gray-300">{result.summary}</p>
-              <div className="flex flex-wrap gap-2 text-sm text-gray-400">
+              <div className="text-foreground font-semibold">Summary</div>
+              <p className="text-foreground/90">{result.summary}</p>
+              <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
                 {result.primaryRole && <Badge variant="outline" className="border-blue-400/30 text-blue-300 bg-blue-500/10">Role: {result.primaryRole}</Badge>}
                 {typeof result.totalExperienceYears === "number" && <Badge variant="outline" className="border-emerald-400/30 text-emerald-300 bg-emerald-500/10">Exp: {result.totalExperienceYears} yrs</Badge>}
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="text-white font-semibold">Skills</div>
+              <div className="text-foreground font-semibold">Skills</div>
               <div className="space-y-2">
                 {result.skills.map((s, idx) => (
-                  <div key={idx} className="p-3 rounded border border-gray-700 bg-gray-800/60">
+                  <div key={idx} className="p-3 rounded border border-border bg-secondary/60">
                     <div className="flex items-center justify-between">
-                      <div className="text-gray-200 font-medium">{s.name}</div>
+                      <div className="text-foreground font-medium">{s.name}</div>
                       <Badge variant="outline" className={levelColor(s.level)}>{s.level}</Badge>
                     </div>
                     <div className="mt-2">
                       <Progress value={levelToPercent(s.level)} className="h-2 bg-white/10" />
                     </div>
-                    <div className="mt-2 text-xs text-gray-400 flex flex-wrap gap-2">
-                      {typeof s.years === "number" && <span className="px-2 py-0.5 rounded bg-gray-700/60 border border-gray-600">{s.years} yrs</span>}
-                      {typeof s.confidence === "number" && <span className="px-2 py-0.5 rounded bg-gray-700/60 border border-gray-600">conf {Math.round(s.confidence * 100)}%</span>}
-                      {s.category && <span className="px-2 py-0.5 rounded bg-gray-700/60 border border-gray-600">{s.category}</span>}
+                    <div className="mt-2 text-xs text-muted-foreground flex flex-wrap gap-2">
+                      {typeof s.years === "number" && <span className="px-2 py-0.5 rounded bg-secondary/60 border border-border">{s.years} yrs</span>}
+                      {typeof s.confidence === "number" && <span className="px-2 py-0.5 rounded bg-secondary/60 border border-border">conf {Math.round(s.confidence * 100)}%</span>}
+                      {s.category && <span className="px-2 py-0.5 rounded bg-secondary/60 border border-border">{s.category}</span>}
                     </div>
                     {s.evidence && (
-                      <div className="mt-2 text-xs text-gray-400">Evidence: {s.evidence}</div>
+                      <div className="mt-2 text-xs text-muted-foreground">Evidence: {s.evidence}</div>
                     )}
                     {s.keywords && s.keywords.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
@@ -194,24 +194,24 @@ export function ResumeAnalyzer() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="md:col-span-1 space-y-2">
-                <div className="text-white font-semibold">Strengths</div>
-                <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                <div className="text-foreground font-semibold">Strengths</div>
+                <ul className="list-disc list-inside text-foreground/90 text-sm space-y-1">
                   {(result.strengths || ["Clear fundamentals", "Hands-on projects", "Good documentation"]).map((s, i) => (
                     <li key={i}>{s}</li>
                   ))}
                 </ul>
               </div>
               <div className="md:col-span-1 space-y-2">
-                <div className="text-white font-semibold">Gaps</div>
-                <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                <div className="text-foreground font-semibold">Gaps</div>
+                <ul className="list-disc list-inside text-foreground/90 text-sm space-y-1">
                   {(result.gaps || ["Advanced system design", "End-to-end testing", "Cloud deployment"]).map((g, i) => (
                     <li key={i}>{g}</li>
                   ))}
                 </ul>
               </div>
               <div className="md:col-span-1 space-y-2">
-                <div className="text-white font-semibold">Recommendations</div>
-                <ul className="list-disc list-inside text-gray-300 text-sm space-y-1">
+                <div className="text-foreground font-semibold">Recommendations</div>
+                <ul className="list-disc list-inside text-foreground/90 text-sm space-y-1">
                   {(result.recommendations || ["Build a full-stack project with tests", "Learn Docker basics", "Contribute to OSS"]).map((r, i) => (
                     <li key={i}>{r}</li>
                   ))}

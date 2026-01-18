@@ -9,6 +9,7 @@ import cors from 'cors';
 const app = express();
 
 const allowedOrigins = [
+  "http://localhost:5173",
   process.env.CLIENT_ORIGIN || "http://localhost",
   process.env.SERVER_URL
 ].filter(Boolean) as string[];
