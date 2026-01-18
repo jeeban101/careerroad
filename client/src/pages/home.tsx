@@ -51,7 +51,7 @@ export default function Home() {
       </div>
 
       {/* Matrix-like background effect */}
-      <div className="matrix-bg">
+      <div className="matrix-bg hidden dark:block">
         {Array.from({ length: 20 }).map((_, i) => (
           <div
             key={i}
@@ -73,7 +73,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
               <div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground dark:bg-gradient-to-r dark:from-purple-400 dark:to-pink-400 dark:bg-clip-text dark:text-transparent">
                   Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
                 </h1>
                 <p className="text-muted-foreground mt-2 text-sm sm:text-base">Let's continue building your career path</p>

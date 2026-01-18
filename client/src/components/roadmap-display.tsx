@@ -187,14 +187,14 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
   };
 
   return (
-    <section id="roadmap-display" className="min-h-screen bg-background">
-      <Header />
-      <div className="w-full mx-auto p-4 sm:p-5 md:p-6 lg:p-8 overflow-x-auto overflow-y-visible">
+    <section id="roadmap-display" className="min-h-screen">
+      {/* <Header /> */}
+      <div className="w-full mx-auto overflow-x-auto overflow-y-visible">
         <div className="max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
         {/* Roadmap Header */}
         <div className="bg-card rounded-2xl shadow-lg p-8 mb-6 border border-border backdrop-blur-glass dark:bg-gray-900/80 dark:border-purple-500/20">
           <div className="text-center mb-6">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-black dark:text-white">
               Your Career Roadmap
             </h1>
             <div className="flex items-center justify-center gap-4">
@@ -222,7 +222,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
             {user && roadmapHistoryId && (
               <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
                 <Bookmark className="h-4 w-4 text-emerald-400" />
-                <span className="text-sm font-medium text-emerald-300">Saved to History</span>
+                <span className="text-sm font-medium text-emerald-500 dark:text-emerald-300">Saved to History</span>
               </div>
             )}
             <Button

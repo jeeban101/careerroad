@@ -80,7 +80,7 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
 
   return (
     <section id="roadmap-builder" className="w-full max-w-4xl mx-auto mb-12">
-      <Card className="mb-8 shadow-lg bg-white/5 backdrop-blur-glass border border-purple-500/20">
+      <Card className="mb-8 shadow-lg bg-white dark:bg-white/5 backdrop-blur-glass border border-gray-200 dark:border-purple-500/20">
         <CardContent className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -95,7 +95,7 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                         setShowCustomCourse(value === 'custom');
                       }} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="h-14 text-lg bg-white/10 border-2 border-purple-500/30 rounded-lg text-white">
+                          <SelectTrigger className="h-14 text-lg bg-white dark:bg-white/10 border-2 border-purple-500/30 rounded-lg text-gray-900 dark:text-white">
                             <SelectValue placeholder="Current course" />
                           </SelectTrigger>
                         </FormControl>
@@ -117,7 +117,7 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                                 <Input
                                   placeholder="Enter your course name"
                                   {...field}
-                                  className="h-12 text-lg bg-white/10 border-2 border-purple-500/30 rounded-lg text-white placeholder:text-gray-400"
+                                  className="h-12 text-lg bg-white dark:bg-white/10 border-2 border-purple-500/30 rounded-lg text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
                                 />
                               </FormControl>
                             </FormItem>
@@ -137,7 +137,7 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                         setShowCustomRole(value === 'custom');
                       }} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="h-14 text-lg bg-white/10 border-2 border-purple-500/30 rounded-lg text-white">
+                          <SelectTrigger className="h-14 text-lg bg-white dark:bg-white/10 border-2 border-purple-500/30 rounded-lg text-gray-900 dark:text-white">
                             <SelectValue placeholder="Desired role" />
                           </SelectTrigger>
                         </FormControl>
@@ -159,7 +159,7 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
                                 <Input
                                   placeholder="Enter your desired role"
                                   {...field}
-                                  className="h-12 text-lg bg-white/10 border-2 border-purple-500/30 rounded-lg text-white placeholder:text-gray-400"
+                                  className="h-12 text-lg bg-white dark:bg-white/10 border-2 border-purple-500/30 rounded-lg text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
                                 />
                               </FormControl>
                             </FormItem>
@@ -192,39 +192,39 @@ export default function RoadmapBuilder({ onRoadmapGenerated }: RoadmapBuilderPro
       </Card>
 
       {/* Sample Roadmap Preview */}
-      <Card className="border-2 border-purple-500/20 shadow-lg bg-white/5 backdrop-blur-glass">
+      <Card className="border-2 border-gray-200 dark:border-purple-500/20 shadow-lg bg-white dark:bg-white/5 backdrop-blur-glass">
         <CardContent className="p-8">
-          <h3 className="text-2xl font-bold mb-6 text-center text-white">
+          <h3 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">
             Sample Roadmap
           </h3>
           <div className="space-y-4">
-            <div className="flex items-center p-4 bg-white/10 rounded-lg">
+            <div className="flex items-center p-4 bg-gray-50 dark:bg-white/10 rounded-lg">
               <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
                 <List className="text-white" size={20} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-white">• Skill checklists</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">• Skill checklists</h4>
                 </div>
               </div>
             </div>
-            <div className="flex items-center p-4 bg-white/10 rounded-lg">
+            <div className="flex items-center p-4 bg-gray-50 dark:bg-white/10 rounded-lg">
               <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
                 <CheckCircle className="text-white" size={20} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-white">• Milestone timelines</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">• Milestone timelines</h4>
                 </div>
               </div>
             </div>
-            <div className="flex items-center p-4 bg-white/10 rounded-lg">
+            <div className="flex items-center p-4 bg-gray-50 dark:bg-white/10 rounded-lg">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
                 <Wrench className="text-white" size={20} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-white">• Tools & Resources</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">• Tools & Resources</h4>
                 </div>
               </div>
             </div>

@@ -94,7 +94,7 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
 
   return (
     <section id="skill-roadmap-builder" className="w-full max-w-4xl mx-auto mb-12">
-      <Card className="mb-8 shadow-lg bg-white/5 backdrop-blur-glass border border-purple-500/20">
+      <Card className="mb-8 shadow-lg bg-white dark:bg-white/5 backdrop-blur-glass border border-gray-200 dark:border-purple-500/20">
         <CardContent className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -103,12 +103,12 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
                 name="skill"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white text-sm font-medium">Choose your skill</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white text-sm font-medium">Choose your skill</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g., React.js, SQL, Machine Learning"
                         {...field}
-                        className="h-14 text-lg bg-white/10 border-2 border-purple-500/30 rounded-lg text-white placeholder:text-gray-400"
+                        className="h-14 text-lg bg-white dark:bg-white/10 border-2 border-purple-500/30 rounded-lg text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
                         data-testid="input-skill"
                       />
                     </FormControl>
@@ -121,11 +121,11 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
                 name="proficiencyLevel"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white text-sm font-medium">Current level of proficiency</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white text-sm font-medium">Current level of proficiency</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger 
-                          className="h-14 text-lg bg-white/10 border-2 border-purple-500/30 rounded-lg text-white"
+                          className="h-14 text-lg bg-white dark:bg-white/10 border-2 border-purple-500/30 rounded-lg text-gray-900 dark:text-white"
                           data-testid="select-proficiency"
                         >
                           <SelectValue placeholder="Select your current level" />
@@ -148,11 +148,11 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
                 name="timeFrame"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-white text-sm font-medium">By when do you want to learn this?</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-white text-sm font-medium">By when do you want to learn this?</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger 
-                          className="h-14 text-lg bg-white/10 border-2 border-purple-500/30 rounded-lg text-white"
+                          className="h-14 text-lg bg-white dark:bg-white/10 border-2 border-purple-500/30 rounded-lg text-gray-900 dark:text-white"
                           data-testid="select-timeframe"
                         >
                           <SelectValue placeholder="Select your timeline" />
@@ -197,34 +197,34 @@ export default function SkillRoadmapBuilder({ onSkillRoadmapGenerated }: SkillRo
       ) : (
         <>
           {/* Sample Preview */}
-          <Card className="border-2 border-purple-500/20 shadow-lg bg-white/5 backdrop-blur-glass">
+          <Card className="border-2 border-gray-200 dark:border-purple-500/20 shadow-lg bg-white dark:bg-white/5 backdrop-blur-glass">
             <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-6 text-center text-white">
+              <h3 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">
                 What You'll Get
               </h3>
               <div className="space-y-4">
-                <div className="flex items-center p-4 bg-white/10 rounded-lg">
+                <div className="flex items-center p-4 bg-gray-50 dark:bg-white/10 rounded-lg">
                   <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
                     <Target className="text-white" size={20} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-white">• Progressive Learning Stages</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">• Progressive Learning Stages</h4>
                   </div>
                 </div>
-                <div className="flex items-center p-4 bg-white/10 rounded-lg">
+                <div className="flex items-center p-4 bg-gray-50 dark:bg-white/10 rounded-lg">
                   <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
                     <Clock className="text-white" size={20} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-white">• Time-bound Milestones</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">• Time-bound Milestones</h4>
                   </div>
                 </div>
-                <div className="flex items-center p-4 bg-white/10 rounded-lg">
+                <div className="flex items-center p-4 bg-gray-50 dark:bg-white/10 rounded-lg">
                   <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-4 glow-pulse">
                     <Zap className="text-white" size={20} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-white">• Actionable Tasks & Resources</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">• Actionable Tasks & Resources</h4>
                   </div>
                 </div>
               </div>
