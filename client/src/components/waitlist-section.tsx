@@ -27,7 +27,7 @@ export default function WaitlistSection() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: InsertWaitlistEntry) => 
+    mutationFn: (data: InsertWaitlistEntry) =>
       apiRequest("POST", "/api/waitlist", data),
     onSuccess: () => {
       setIsSubmitted(true);
@@ -64,10 +64,10 @@ export default function WaitlistSection() {
           <Rocket className="h-4 w-4 text-purple-300 mr-2" />
           <span className="text-sm font-medium text-purple-200">Join the Future of Career Planning</span>
         </div>
-        <h2 className="text-3xl font-bold text-white mb-2">Get Early Access</h2>
-        <p className="text-gray-300">Be among the first to experience AI-powered career guidance</p>
+        <h2 className="text-3xl font-bold text-foreground mb-2">Get Early Access</h2>
+        <p className="text-muted-foreground">Be among the first to experience AI-powered career guidance</p>
       </div>
-      
+
       <Card className="shadow-lg backdrop-blur-glass border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-pink-500/10">
         <CardContent className="p-8">
           <Form {...form}>
@@ -79,10 +79,10 @@ export default function WaitlistSection() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input 
-                          {...field} 
+                        <Input
+                          {...field}
                           placeholder="Your Name"
-                          className="h-14 text-lg bg-white/10 border-2 border-purple-400/30 rounded-lg text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
+                          className="h-14 text-lg bg-background/50 border-2 border-purple-400/30 rounded-lg text-foreground placeholder:text-muted-foreground focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
                         />
                       </FormControl>
                     </FormItem>
@@ -94,11 +94,11 @@ export default function WaitlistSection() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input 
-                          {...field} 
+                        <Input
+                          {...field}
                           type="email"
                           placeholder="Your Email"
-                          className="h-14 text-lg bg-white/10 border-2 border-purple-400/30 rounded-lg text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
+                          className="h-14 text-lg bg-background/50 border-2 border-purple-400/30 rounded-lg text-foreground placeholder:text-muted-foreground focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
                         />
                       </FormControl>
                     </FormItem>
@@ -106,13 +106,12 @@ export default function WaitlistSection() {
                 />
               </div>
               <div className="pt-4">
-                <Button 
-                  type="submit" 
-                  className={`w-full py-4 px-6 text-lg font-semibold h-14 rounded-lg shimmer transition-all duration-300 transform hover:scale-105 ${
-                    isSubmitted 
-                      ? 'bg-green-600 hover:bg-green-600' 
-                      : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
-                  }`}
+                <Button
+                  type="submit"
+                  className={`w-full py-4 px-6 text-lg font-semibold h-14 rounded-lg dark:shimmer transition-all duration-300 transform hover:scale-105 ${isSubmitted
+                    ? 'bg-green-600 hover:bg-green-600'
+                    : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+                    }`}
                   disabled={mutation.isPending || isSubmitted}
                 >
                   {mutation.isPending ? (
