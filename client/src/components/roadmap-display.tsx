@@ -191,129 +191,129 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
       {/* <Header /> */}
       <div className="w-full mx-auto overflow-x-auto overflow-y-visible">
         <div className="max-w-full sm:max-w-3xl md:max-w-5xl lg:max-w-6xl mx-auto">
-        {/* Roadmap Header */}
-        <div className="bg-card rounded-2xl shadow-lg p-8 mb-6 border border-border backdrop-blur-glass dark:bg-gray-900/80 dark:border-purple-500/20">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-black dark:text-white">
-              Your Career Roadmap
-            </h1>
-            <div className="flex items-center justify-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-muted-foreground">{courseLabel}</span>
-                <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
-                <span className="text-lg font-semibold text-muted-foreground">{roleLabel}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Action buttons (kept from original component, styled to fit this UI) */}
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3">
-            {user && !roadmapHistoryId && (
-              <Button
-                onClick={handleSaveToHistory}
-                disabled={saveToHistoryMutation.isPending}
-                data-testid="button-save-roadmap"
-                className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                {saveToHistoryMutation.isPending ? "Saving..." : "Save to History"}
-              </Button>
-            )}
-            {user && roadmapHistoryId && (
-              <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
-                <Bookmark className="h-4 w-4 text-emerald-400" />
-                <span className="text-sm font-medium text-emerald-500 dark:text-emerald-300">Saved to History</span>
-              </div>
-            )}
-            <Button
-              onClick={handleGenerateKanban}
-              disabled={generateKanbanMutation.isPending}
-              data-testid="button-generate-kanban"
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <Kanban className="mr-2 h-4 w-4" />
-              {generateKanbanMutation.isPending ? "Generating..." : "Generate Kanban Board"}
-            </Button>
-            <Button
-              onClick={onFork}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <GitBranch className="mr-2 h-4 w-4" />
-              Fork & Customize
-            </Button>
-            <Button
-              onClick={onShare}
-              className="bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Share Roadmap
-            </Button>
-          </div>
-        </div>
-
-        {/* Phases Timeline - matches the History Page selected career view UI */}
-        <div className="space-y-8">
-          {phases.length === 0 ? (
-            <div className="text-center text-muted-foreground py-12 bg-secondary border border-border rounded-xl dark:bg-gray-900/70 dark:border-gray-800">
-              No roadmap phases available. Please try generating a new roadmap.
-            </div>
-          ) : (
-            phases.map((phase, phaseIndex) => {
-              const PhaseIcon = getPhaseIcon(phaseIndex);
-              const phaseColor = getPhaseColor(phaseIndex);
-              const isExpanded = expandedPhases.has(phaseIndex);
-
-              return (
-                <div key={phaseIndex} className="relative">
-                  {/* Phase Header */}
-                  <div
-                    className={`${phaseColor} text-white p-6 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg`}
-                    onClick={() => togglePhase(phaseIndex)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <PhaseIcon className="h-8 w-8" />
-                        <div>
-                          <h3 className="text-xl font-bold mb-1">Phase {phaseIndex + 1}</h3>
-                          <h4 className="text-2xl font-semibold">{phase.title}</h4>
-                          <p className="text-sm opacity-90 mt-1">{phase.duration_weeks} weeks</p>
-                        </div>
-                      </div>
-                      {isExpanded ? <ChevronUp className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
-                    </div>
-                  </div>
-
-                  {/* Phase Items */}
-                  {isExpanded && (
-                    <div className="mt-6 space-y-4">
-                      {(Array.isArray(phase.items) ? phase.items : []).map((item, itemIndex) => {
-                        const ItemIcon = getItemIcon(item.type);
-                        const itemColor = getItemColor(item.type);
-                        const itemKey = `${phaseIndex}-${itemIndex}`;
-                        const isChecked = checkedItems.has(itemKey);
-
-                        return (
-                          <TaskCard
-                            key={itemIndex}
-                            item={item}
-                            phaseIndex={phaseIndex}
-                            itemIndex={itemIndex}
-                            isChecked={isChecked}
-                            roadmapHistoryId={roadmapHistoryId}
-                            onTaskCheck={handleTaskCheck}
-                            user={user}
-                            itemColor={itemColor}
-                            ItemIcon={ItemIcon}
-                          />
-                        );
-                      })}
-                    </div>
-                  )}
+          {/* Roadmap Header */}
+          <div className="bg-card rounded-2xl shadow-lg p-8 mb-6 border border-border backdrop-blur-glass dark:bg-gray-900/80 dark:border-purple-500/20">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-black dark:text-transparent">
+                Your Career Roadmap
+              </h1>
+              <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-semibold text-muted-foreground">{courseLabel}</span>
+                  <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
+                  <span className="text-lg font-semibold text-muted-foreground">{roleLabel}</span>
                 </div>
-              );
-            })
-          )}
-        </div>
+              </div>
+            </div>
+
+            {/* Action buttons (kept from original component, styled to fit this UI) */}
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3">
+              {user && !roadmapHistoryId && (
+                <Button
+                  onClick={handleSaveToHistory}
+                  disabled={saveToHistoryMutation.isPending}
+                  data-testid="button-save-roadmap"
+                  className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  {saveToHistoryMutation.isPending ? "Saving..." : "Save to History"}
+                </Button>
+              )}
+              {user && roadmapHistoryId && (
+                <div className="flex items-center space-x-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-xl">
+                  <Bookmark className="h-4 w-4 text-emerald-400" />
+                  <span className="text-sm font-medium text-emerald-500 dark:text-emerald-300">Saved to History</span>
+                </div>
+              )}
+              <Button
+                onClick={handleGenerateKanban}
+                disabled={generateKanbanMutation.isPending}
+                data-testid="button-generate-kanban"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+              >
+                <Kanban className="mr-2 h-4 w-4" />
+                {generateKanbanMutation.isPending ? "Generating..." : "Generate Kanban Board"}
+              </Button>
+              <Button
+                onClick={onFork}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+              >
+                <GitBranch className="mr-2 h-4 w-4" />
+                Fork & Customize
+              </Button>
+              <Button
+                onClick={onShare}
+                className="bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+              >
+                <Share2 className="mr-2 h-4 w-4" />
+                Share Roadmap
+              </Button>
+            </div>
+          </div>
+
+          {/* Phases Timeline - matches the History Page selected career view UI */}
+          <div className="space-y-8">
+            {phases.length === 0 ? (
+              <div className="text-center text-muted-foreground py-12 bg-secondary border border-border rounded-xl dark:bg-gray-900/70 dark:border-gray-800">
+                No roadmap phases available. Please try generating a new roadmap.
+              </div>
+            ) : (
+              phases.map((phase, phaseIndex) => {
+                const PhaseIcon = getPhaseIcon(phaseIndex);
+                const phaseColor = getPhaseColor(phaseIndex);
+                const isExpanded = expandedPhases.has(phaseIndex);
+
+                return (
+                  <div key={phaseIndex} className="relative">
+                    {/* Phase Header */}
+                    <div
+                      className={`${phaseColor} text-white p-6 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg`}
+                      onClick={() => togglePhase(phaseIndex)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <PhaseIcon className="h-8 w-8" />
+                          <div>
+                            <h3 className="text-xl font-bold mb-1">Phase {phaseIndex + 1}</h3>
+                            <h4 className="text-2xl font-semibold">{phase.title}</h4>
+                            <p className="text-sm opacity-90 mt-1">{phase.duration_weeks} weeks</p>
+                          </div>
+                        </div>
+                        {isExpanded ? <ChevronUp className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
+                      </div>
+                    </div>
+
+                    {/* Phase Items */}
+                    {isExpanded && (
+                      <div className="mt-6 space-y-4">
+                        {(Array.isArray(phase.items) ? phase.items : []).map((item, itemIndex) => {
+                          const ItemIcon = getItemIcon(item.type);
+                          const itemColor = getItemColor(item.type);
+                          const itemKey = `${phaseIndex}-${itemIndex}`;
+                          const isChecked = checkedItems.has(itemKey);
+
+                          return (
+                            <TaskCard
+                              key={itemIndex}
+                              item={item}
+                              phaseIndex={phaseIndex}
+                              itemIndex={itemIndex}
+                              isChecked={isChecked}
+                              roadmapHistoryId={roadmapHistoryId}
+                              onTaskCheck={handleTaskCheck}
+                              user={user}
+                              itemColor={itemColor}
+                              ItemIcon={ItemIcon}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
 

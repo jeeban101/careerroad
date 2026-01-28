@@ -11,11 +11,11 @@ export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [registerForm, setRegisterForm] = useState({ 
-    email: "", 
-    password: "", 
-    firstName: "", 
-    lastName: "" 
+  const [registerForm, setRegisterForm] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: ""
   });
 
   // Redirect if already logged in
@@ -63,54 +63,54 @@ export default function AuthPage() {
       <div className="relative z-10 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold text-white">Welcome to CareerRoad</h2>
-            <p className="mt-2 text-sm text-gray-300">
+            <h2 className="mt-6 text-3xl font-bold text-foreground">Welcome to CareerRoad</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
               Sign in to your account or create a new one
             </p>
           </div>
 
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-white/10 border border-purple-500/20 backdrop-blur-glass">
-              <TabsTrigger value="login" className="text-white data-[state=active]:bg-purple-600 data-[state=active]:text-white">Sign In</TabsTrigger>
-              <TabsTrigger value="register" className="text-white data-[state=active]:bg-purple-600 data-[state=active]:text-white">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-background/80 dark:bg-white/10 border border-purple-500/20 backdrop-blur-glass">
+              <TabsTrigger value="login" className="text-foreground data-[state=active]:bg-purple-600 data-[state=active]:text-white">Sign In</TabsTrigger>
+              <TabsTrigger value="register" className="text-foreground data-[state=active]:bg-purple-600 data-[state=active]:text-white">Sign Up</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
-              <Card className="bg-white/5 border border-purple-500/20 backdrop-blur-glass">
+              <Card className="bg-card/80 dark:bg-white/5 border border-purple-500/20 backdrop-blur-glass">
                 <CardHeader>
-                  <CardTitle className="text-white">Sign In</CardTitle>
-                  <CardDescription className="text-gray-300">
+                  <CardTitle className="text-foreground">Sign In</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Enter your email and password to access your account
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleLogin} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="login-email" className="text-gray-200">Email</Label>
+                      <Label htmlFor="login-email" className="text-foreground">Email</Label>
                       <Input
                         id="login-email"
                         type="email"
                         value={loginForm.email}
                         onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                         placeholder="Enter your email"
-                        className="bg-white/10 border-purple-500/30 text-white placeholder:text-gray-400 focus:border-purple-400"
+                        className="bg-background dark:bg-white/10 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="login-password" className="text-gray-200">Password</Label>
+                      <Label htmlFor="login-password" className="text-foreground">Password</Label>
                       <Input
                         id="login-password"
                         type="password"
                         value={loginForm.password}
                         onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                         placeholder="Enter your password"
-                        className="bg-white/10 border-purple-500/30 text-white placeholder:text-gray-400 focus:border-purple-400"
+                        className="bg-background dark:bg-white/10 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                         required
                       />
                     </div>
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shimmer"
                       disabled={loginMutation.isPending}
                     >
@@ -118,7 +118,7 @@ export default function AuthPage() {
                     </Button>
                     <div className="text-center mt-4">
                       <Link href="/reset-password">
-                        <Button variant="link" className="text-gray-400 hover:text-white text-sm">
+                        <Button variant="link" className="text-muted-foreground hover:text-foreground text-sm">
                           Forgot your password?
                         </Button>
                       </Link>
@@ -129,10 +129,10 @@ export default function AuthPage() {
             </TabsContent>
 
             <TabsContent value="register">
-              <Card className="bg-white/5 border border-purple-500/20 backdrop-blur-glass">
+              <Card className="bg-card/80 dark:bg-white/5 border border-purple-500/20 backdrop-blur-glass">
                 <CardHeader>
-                  <CardTitle className="text-white">Create Account</CardTitle>
-                  <CardDescription className="text-gray-300">
+                  <CardTitle className="text-foreground">Create Account</CardTitle>
+                  <CardDescription className="text-muted-foreground">
                     Sign up for a new account to get started
                   </CardDescription>
                 </CardHeader>
@@ -140,52 +140,52 @@ export default function AuthPage() {
                   <form onSubmit={handleRegister} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="register-firstName" className="text-gray-200">First Name</Label>
+                        <Label htmlFor="register-firstName" className="text-foreground">First Name</Label>
                         <Input
                           id="register-firstName"
                           value={registerForm.firstName}
                           onChange={(e) => setRegisterForm({ ...registerForm, firstName: e.target.value })}
                           placeholder="First name"
-                          className="bg-white/10 border-purple-500/30 text-white placeholder:text-gray-400 focus:border-purple-400"
+                          className="bg-background dark:bg-white/10 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="register-lastName" className="text-gray-200">Last Name</Label>
+                        <Label htmlFor="register-lastName" className="text-foreground">Last Name</Label>
                         <Input
                           id="register-lastName"
                           value={registerForm.lastName}
                           onChange={(e) => setRegisterForm({ ...registerForm, lastName: e.target.value })}
                           placeholder="Last name"
-                          className="bg-white/10 border-purple-500/30 text-white placeholder:text-gray-400 focus:border-purple-400"
+                          className="bg-background dark:bg-white/10 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="register-email" className="text-gray-200">Email</Label>
+                      <Label htmlFor="register-email" className="text-foreground">Email</Label>
                       <Input
                         id="register-email"
                         type="email"
                         value={registerForm.email}
                         onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
                         placeholder="Enter your email"
-                        className="bg-white/10 border-purple-500/30 text-white placeholder:text-gray-400 focus:border-purple-400"
+                        className="bg-background dark:bg-white/10 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="register-password" className="text-gray-200">Password</Label>
+                      <Label htmlFor="register-password" className="text-foreground">Password</Label>
                       <Input
                         id="register-password"
                         type="password"
                         value={registerForm.password}
                         onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
                         placeholder="Choose a password"
-                        className="bg-white/10 border-purple-500/30 text-white placeholder:text-gray-400 focus:border-purple-400"
+                        className="bg-background dark:bg-white/10 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                         required
                       />
                     </div>
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shimmer"
                       disabled={registerMutation.isPending}
                     >
@@ -198,10 +198,10 @@ export default function AuthPage() {
           </Tabs>
 
           <div className="text-center">
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               onClick={() => setLocation("/")}
-              className="text-gray-300 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               ← Back to Home
             </Button>

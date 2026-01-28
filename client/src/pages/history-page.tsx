@@ -139,7 +139,7 @@ export default function HistoryPage() {
               <p className="text-muted-foreground mb-6">
                 No roadmaps yet? Generate your first personalized career roadmap to start tracking your progress and building your future.
               </p>
-              <Button 
+              <Button
                 onClick={() => window.location.href = '/'}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
@@ -161,15 +161,15 @@ export default function HistoryPage() {
           <Header />
           <div className="min-h-screen bg-background">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-              <Button 
+              <Button
                 onClick={() => setSelectedRoadmap(null)}
-                variant="ghost" 
+                variant="ghost"
                 className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-foreground bg-secondary/90 hover:bg-secondary/80 border border-border"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to My Roadmaps
               </Button>
-            <InteractiveSkillRoadmap skillRoadmap={selectedRoadmap} fromHistory={true} />
+              <InteractiveSkillRoadmap skillRoadmap={selectedRoadmap} fromHistory={true} />
             </div>
           </div>
         </div>
@@ -186,9 +186,9 @@ export default function HistoryPage() {
         <Header />
         <div className="container max-w-6xl mx-auto p-6">
           {/* Back Button */}
-          <Button 
+          <Button
             onClick={() => setSelectedRoadmap(null)}
-            variant="ghost" 
+            variant="ghost"
             className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-foreground bg-secondary hover:bg-secondary/80 border border-border"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -198,7 +198,7 @@ export default function HistoryPage() {
           {/* Roadmap Header */}
           <div className="bg-card rounded-2xl shadow-lg p-8 mb-8 border border-border backdrop-blur-glass">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">Your Career Roadmap</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-black dark:text-transparent">Your Career Roadmap</h1>
               <div className="flex items-center justify-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold text-muted-foreground">{courseLabel}</span>
@@ -218,7 +218,7 @@ export default function HistoryPage() {
                 return (
                   <div key={phaseIndex} className="relative">
                     {/* Phase Header */}
-                    <div 
+                    <div
                       className={`${phaseColor} text-white p-6 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg`}
                       onClick={() => togglePhase(phaseIndex)}
                     >
@@ -317,105 +317,105 @@ export default function HistoryPage() {
           {/* Roadmap Grid */}
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
             {history.map((roadmap) => {
-            const isSkillRoadmap = roadmap.roadmapType === 'skill';
-            const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
-            const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
-            
-            // For skill roadmaps, use skill and proficiency/timeframe
-            const displayTitle = isSkillRoadmap 
-              ? `Learn ${roadmap.skill || 'Skill'} in ${roadmap.timeFrame || 'N/A'}`
-              : `${courseLabel} → ${roleLabel}`;
-            const displayBadge = isSkillRoadmap 
-              ? roadmap.skill || 'Skill Learning'
-              : roleLabel;
-            
-            return (
-              <Card 
-                key={roadmap.id} 
-                className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400/60 bg-card hover:bg-secondary/90 backdrop-blur-glass hover:scale-105 transform shadow-lg min-h-[44px]"
-                onClick={() => setSelectedRoadmap(roadmap)}
-              >
-                <CardHeader className="pb-3 relative">
-                  {/* Delete Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600/20 hover:text-red-400 z-10 text-muted-foreground"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (confirm('Are you sure you want to delete this roadmap?')) {
-                        deleteRoadmapMutation.mutate(roadmap.id);
-                      }
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  
-                  <div className="flex items-center justify-between pr-8">
-                    <Badge variant="outline" className="font-semibold border-purple-300 bg-purple-100 text-purple-800 dark:bg-gradient-to-r dark:from-purple-600/30 dark:to-blue-600/30 dark:text-purple-200 dark:border-purple-400/50">
-                      {displayBadge}
-                    </Badge>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      <span>{roadmap.createdAt ? format(new Date(roadmap.createdAt), 'MMM dd') : ''}</span>
-                    </div>
-                  </div>
-                  <CardTitle className="text-xl text-foreground line-clamp-2 font-bold mt-2">
-                    {displayTitle}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-4">
-                    {/* Stats with icons */}
-                    <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                      <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg border bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-600/30 dark:border-blue-500/30 dark:text-blue-100">
-                        <Brain className="h-5 w-5 text-blue-300" />
-                        <div>
-                          <div className="text-sm font-semibold text-blue-700 dark:text-blue-100">{roadmap.phases?.length || roadmap.skillContent?.stages?.length || 0}</div>
-                          <div className="text-xs text-blue-600 dark:text-blue-200">{roadmap.roadmapType === 'career' ? 'Phases' : 'Stages'}</div>
-                        </div>
+              const isSkillRoadmap = roadmap.roadmapType === 'skill';
+              const courseLabel = courseOptions.find(c => c.value === roadmap.currentCourse)?.label || roadmap.currentCourse;
+              const roleLabel = roleOptions.find(r => r.value === roadmap.targetRole)?.label || roadmap.targetRole;
+
+              // For skill roadmaps, use skill and proficiency/timeframe
+              const displayTitle = isSkillRoadmap
+                ? `Learn ${roadmap.skill || 'Skill'} in ${roadmap.timeFrame || 'N/A'}`
+                : `${courseLabel} → ${roleLabel}`;
+              const displayBadge = isSkillRoadmap
+                ? roadmap.skill || 'Skill Learning'
+                : roleLabel;
+
+              return (
+                <Card
+                  key={roadmap.id}
+                  className="group cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-purple-500/30 hover:border-purple-400/60 bg-card hover:bg-secondary/90 backdrop-blur-glass hover:scale-105 transform shadow-lg min-h-[44px]"
+                  onClick={() => setSelectedRoadmap(roadmap)}
+                >
+                  <CardHeader className="pb-3 relative">
+                    {/* Delete Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600/20 hover:text-red-400 z-10 text-muted-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Are you sure you want to delete this roadmap?')) {
+                          deleteRoadmapMutation.mutate(roadmap.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+
+                    <div className="flex items-center justify-between pr-8">
+                      <Badge variant="outline" className="font-semibold border-purple-300 bg-purple-100 text-purple-800 dark:bg-gradient-to-r dark:from-purple-600/30 dark:to-blue-600/30 dark:text-purple-200 dark:border-purple-400/50">
+                        {displayBadge}
+                      </Badge>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        <span>{roadmap.createdAt ? format(new Date(roadmap.createdAt), 'MMM dd') : ''}</span>
                       </div>
-                      <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg border bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-600/30 dark:border-emerald-500/30 dark:text-emerald-100">
-                        <CheckSquare className="h-5 w-5 text-emerald-300" />
-                        <div>
-                          <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-100">
-                            {roadmap.phases?.reduce((total: number, phase: any) => total + (phase.items?.length || 0), 0) || 
-                             roadmap.skillContent?.stages?.reduce((total: number, stage: any) => total + (stage.tasks?.length || 0), 0) || 0}
+                    </div>
+                    <CardTitle className="text-xl text-foreground line-clamp-2 font-bold mt-2">
+                      {displayTitle}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-4">
+                      {/* Stats with icons */}
+                      <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                        <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg border bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-600/30 dark:border-blue-500/30 dark:text-blue-100">
+                          <Brain className="h-5 w-5 text-blue-300" />
+                          <div>
+                            <div className="text-sm font-semibold text-blue-700 dark:text-blue-100">{roadmap.phases?.length || roadmap.skillContent?.stages?.length || 0}</div>
+                            <div className="text-xs text-blue-600 dark:text-blue-200">{roadmap.roadmapType === 'career' ? 'Phases' : 'Stages'}</div>
                           </div>
-                          <div className="text-xs text-emerald-600 dark:text-emerald-200">Tasks</div>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg border bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-600/30 dark:border-emerald-500/30 dark:text-emerald-100">
+                          <CheckSquare className="h-5 w-5 text-emerald-300" />
+                          <div>
+                            <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-100">
+                              {roadmap.phases?.reduce((total: number, phase: any) => total + (phase.items?.length || 0), 0) ||
+                                roadmap.skillContent?.stages?.reduce((total: number, stage: any) => total + (stage.tasks?.length || 0), 0) || 0}
+                            </div>
+                            <div className="text-xs text-emerald-600 dark:text-emerald-200">Tasks</div>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Last Accessed */}
+                      <div className="flex items-center justify-between text-sm p-2 sm:p-3 bg-secondary rounded-lg border border-border">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          Last viewed
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          {roadmap.lastAccessed ? format(new Date(roadmap.lastAccessed), 'MMM dd') : '—'}
+                        </span>
+                      </div>
+
+                      {/* Action Button */}
+                      <div className="pt-2">
+                        <Button
+                          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 shimmer min-h-[44px]"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRoadmap(roadmap);
+                          }}
+                        >
+                          <Target className="h-4 w-4 mr-2" />
+                          View & Track Progress
+                        </Button>
+                      </div>
                     </div>
-                    
-                    {/* Last Accessed */}
-                    <div className="flex items-center justify-between text-sm p-2 sm:p-3 bg-secondary rounded-lg border border-border">
-                      <span className="text-muted-foreground flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        Last viewed
-                      </span>
-                      <span className="font-semibold text-foreground">
-                        {roadmap.lastAccessed ? format(new Date(roadmap.lastAccessed), 'MMM dd') : '—'}
-                      </span>
-                    </div>
-                    
-                    {/* Action Button */}
-                    <div className="pt-2">
-                      <Button 
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 shimmer min-h-[44px]"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedRoadmap(roadmap);
-                        }}
-                      >
-                        <Target className="h-4 w-4 mr-2" />
-                        View & Track Progress
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>
