@@ -1,13 +1,17 @@
 import type { Express, Request, Response, NextFunction } from "express";
-import { createServer, type Server } from "http";
+import { createServer as createHttpServer, type Server } from "http";
+import { createServer as createHttpsServer } from "https";
+import * as fs from "fs";
+import * as path from "path";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertWaitlistEntrySchema, insertCustomRoadmapSchema, insertSavedRoadmapSchema, emailRequestSchema, insertUserRoadmapHistorySchema, generateSkillRoadmapSchema, insertKanbanBoardSchema, insertKanbanTaskSchema } from "@shared/schema";
 import { generateRoadmap, generateSkillRoadmap, generateKanbanTasksFromRoadmap, analyzeResume } from "./gemini";
 import multer from "multer";
-import path from "node:path";
+import nodePath from "node:path";
 import mammoth from "mammoth";
 import { PDFParse } from 'pdf-parse';
+
 
 declare global {
   namespace Express {
@@ -742,6 +746,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
+  // Create HTTPS or HTTP server based on environment configuration
+  const sslEnabled = process.env.SSL_ENABLED === 'true';
+  const sslKeyPath = process.env.SSL_KEY_PATH || './certs/key.pem';
+  const sslCertPath = process.env.SSL_CERT_PATH || './certs/cert.pem';
+
+  let httpServer: Server;
+
+  if (sslEnabled) {
+    try {
+      const sslOptions = {
+        key: fs.readFileSync(path.resolve(sslKeyPath)),
+        cert: fs.readFileSync(path.resolve(sslCertPath)),
+      };
+      httpServer = createHttpsServer(sslOptions, app) as unknown as Server;
+      console.log('✅ HTTPS server configured with SSL certificates');
+    } catch (error) {
+      console.warn('⚠️ SSL certificates not found, falling back to HTTP. Error:', (error as Error).message);
+      httpServer = createHttpServer(app);
+    }
+  } else {
+    httpServer = createHttpServer(app);
+  }
+
   return httpServer;
 }

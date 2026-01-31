@@ -10,6 +10,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://localhost:5173",
   process.env.CLIENT_ORIGIN || "http://localhost",
   process.env.SERVER_URL
 ].filter(Boolean) as string[];
@@ -25,7 +26,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-console.log('✅ EXPRESS SERVER STARTING')
+const sslEnabled = process.env.SSL_ENABLED === 'true';
+console.log(`✅ EXPRESS SERVER STARTING (SSL: ${sslEnabled ? 'ENABLED' : 'DISABLED'})`)
 
 
 app.use((req, res, next) => {
@@ -82,7 +84,8 @@ app.use((req, res, next) => {
 
   server.listen(serverConfig,
     () => {
-      console.log(`✅ Express SERVER started sucessfully at http://${serverConfig.host}:${serverConfig.port}`);
+      const protocol = sslEnabled ? 'https' : 'http';
+      console.log(`✅ Express SERVER started successfully at ${protocol}://${serverConfig.host}:${serverConfig.port}`);
     }
   );
 

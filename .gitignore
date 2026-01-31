@@ -26,3 +26,8 @@ vite.config.ts.*
 logs/
 logs/*.log
 
+# SSL certificates (keep private keys out of git!)
+certs/*.pem
+certs/*.key
+certs/*.crt
+!certs/README.md

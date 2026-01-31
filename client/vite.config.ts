@@ -1,15 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import path from "path";
 
 console.log('✅ VITE CONFIG LOADED')
 // console.log(`@ -> ${path.resolve(import.meta.dirname, "src")}`)
 // console.log(`@shared -> ${path.resolve(import.meta.dirname, "../shared")}`)
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
-    react()
-  ],
+    react(),
+    // Enable HTTPS in development with self-signed certificate
+    mode === 'development' ? basicSsl() : null,
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
@@ -30,4 +33,4 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
-});
+}));

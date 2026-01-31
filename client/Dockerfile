@@ -25,6 +25,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy built artifacts to nginx html root
 COPY --from=builder /app/dist/public /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 80 443
 
 # Nginx default CMD is fine
