@@ -198,7 +198,7 @@ export default function HistoryPage() {
           {/* Roadmap Header */}
           <div className="bg-card rounded-2xl shadow-lg p-8 mb-8 border border-border backdrop-blur-glass">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-black dark:text-transparent">Your Career Roadmap</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">Your Career Roadmap</h1>
               <div className="flex items-center justify-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold text-muted-foreground">{courseLabel}</span>
@@ -286,7 +286,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Matrix-like background effect */}
-      <div className="matrix-bg">
+      <div className="matrix-bg hidden dark:block">
         {Array.from({ length: 20 }).map((_, i) => (
           <div
             key={i}
@@ -306,7 +306,7 @@ export default function HistoryPage() {
         <Header />
         <div className="container max-w-6xl mx-auto p-6">
           <div className="mb-8 text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
               My Career Roadmaps
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg">
@@ -352,7 +352,7 @@ export default function HistoryPage() {
                     </Button>
 
                     <div className="flex items-center justify-between pr-8">
-                      <Badge variant="outline" className="font-semibold border-purple-300 bg-purple-100 text-purple-800 dark:bg-gradient-to-r dark:from-purple-600/30 dark:to-blue-600/30 dark:text-purple-200 dark:border-purple-400/50">
+                      <Badge variant="outline" className="font-semibold border border-purple-300 dark:border-purple-500 bg-gradient-to-r from-purple-200 to-blue-200 text-purple-800 dark:from-purple-600/30 dark:to-blue-600/30 dark:text-purple-200">
                         {displayBadge}
                       </Badge>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">

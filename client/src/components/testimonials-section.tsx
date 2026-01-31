@@ -49,8 +49,8 @@ export default function TestimonialsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
           <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 dark:from-yellow-500/20 dark:to-orange-500/20 rounded-full mb-6 backdrop-blur-glass border border-yellow-500/30">
-            <Star className="h-4 w-4 text-yellow-300 mr-2" />
-            <span className="text-sm font-medium text-yellow-500 dark:text-yellow-200">Trusted by 10,000+ Career Changers</span>
+            <Star className="h-4 w-4 text-yellow-600 dark:text-yellow-300 mr-2" />
+            <span className="text-sm font-medium text-yellow-600 dark:text-yellow-200">Trusted by 10,000+ Career Changers</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Success <span className="gradient-text">Stories</span>
@@ -91,8 +91,8 @@ export default function TestimonialsSection() {
                   <h4 className="text-foreground font-semibold">{testimonial.name}</h4>
                   <p className="text-muted-foreground text-sm">{testimonial.role}</p>
                   <div className="flex items-center mt-1">
-                    <GraduationCap className="h-3 w-3 text-muted-foreground/60 mr-1" />
-                    <span className="text-muted-foreground/60 text-xs">{testimonial.education}</span>
+                    <GraduationCap className="h-3 w-3 text-muted-foreground mr-1" />
+                    <span className="text-muted-foreground text-xs">{testimonial.education}</span>
                   </div>
                 </div>
               </div>

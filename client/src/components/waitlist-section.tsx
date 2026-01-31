@@ -61,8 +61,8 @@ export default function WaitlistSection() {
     <section className="w-full max-w-4xl mx-auto mb-12 relative">
       <div className="text-center mb-8">
         <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full mb-6 backdrop-blur-glass border border-purple-500/30">
-          <Rocket className="h-4 w-4 text-purple-300 mr-2" />
-          <span className="text-sm font-medium text-purple-200">Join the Future of Career Planning</span>
+          <Rocket className="h-4 w-4 text-purple-600 dark:text-purple-300 mr-2" />
+          <span className="text-sm font-medium text-purple-600 dark:text-purple-200">Join the Future of Career Planning</span>
         </div>
         <h2 className="text-3xl font-bold text-foreground mb-2">Get Early Access</h2>
         <p className="text-muted-foreground">Be among the first to experience AI-powered career guidance</p>

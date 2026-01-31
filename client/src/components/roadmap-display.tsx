@@ -194,7 +194,7 @@ export default function RoadmapDisplay({ roadmap, onFork, onShare, historyId }: 
           {/* Roadmap Header */}
           <div className="bg-card rounded-2xl shadow-lg p-8 mb-6 border border-border backdrop-blur-glass dark:bg-gray-900/80 dark:border-purple-500/20">
             <div className="text-center mb-6">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-black dark:text-transparent">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-700 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
                 Your Career Roadmap
               </h1>
               <div className="flex items-center justify-center gap-4">

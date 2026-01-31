@@ -58,7 +58,7 @@ export default function TaskCard({
     refetchOnReconnect: false,
     refetchOnMount: false,
   });
-  
+
   // When notes panel opens and query returns, seed local notes
   useEffect(() => {
     if (showNotes && taskProgress?.notes) {
@@ -66,7 +66,7 @@ export default function TaskCard({
       setTempNotes(taskProgress.notes);
     }
   }, [showNotes, taskProgress]);
-  
+
   // Update task progress with notes
   const updateTaskMutation = useMutation({
     mutationFn: async (data: { completed: boolean; notes?: string }) => {
@@ -121,7 +121,7 @@ export default function TaskCard({
     <div className="group p-4 rounded-xl bg-secondary border border-border hover:border-purple-400/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] backdrop-blur-glass shimmer hover:bg-secondary/80 dark:bg-gray-800/60 dark:border-gray-700/50 dark:hover:bg-gray-800/80">
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
-          <Checkbox 
+          <Checkbox
             checked={isChecked}
             onCheckedChange={handleTaskToggle}
             className="mt-1 h-5 w-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 transition-all duration-200 border-gray-400 data-[state=unchecked]:border-gray-400"
@@ -141,7 +141,7 @@ export default function TaskCard({
               <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${itemColor} shadow-sm border border-black/10 dark:border-white/20 whitespace-nowrap`}>
                 {item.type}
               </span>
-              
+
               {/* Enhanced Action Buttons */}
               {user && roadmapHistoryId && (
                 <TooltipProvider>
@@ -151,11 +151,10 @@ export default function TaskCard({
                         variant="outline"
                         size="sm"
                         onClick={handleNotesToggle}
-                        className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer whitespace-nowrap ${
-                          (notes || taskProgress?.notes) 
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg' 
+                        className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer whitespace-nowrap ${(notes || taskProgress?.notes)
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg'
                             : 'bg-secondary text-muted-foreground border-border hover:border-purple-400 hover:text-purple-600 hover:bg-secondary/80 dark:bg-white/10 dark:text-gray-300 dark:border-gray-500 dark:hover:text-purple-300 dark:hover:bg-purple-500/20'
-                        }`}
+                          }`}
                       >
                         <StickyNote size={12} className="mr-1" />
                         {(notes || taskProgress?.notes) ? 'Edit Notes' : 'Add Notes'}
@@ -169,14 +168,14 @@ export default function TaskCard({
                   </Tooltip>
                 </TooltipProvider>
               )}
-              
+
               {item.link && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <a 
-                        href={item.link} 
-                        target="_blank" 
+                      <a
+                        href={item.link}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="px-3 py-1 h-8 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-2 border-blue-500 hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg flex items-center space-x-1 shimmer whitespace-nowrap"
                       >
@@ -197,15 +196,15 @@ export default function TaskCard({
               {item.description}
             </p>
           )}
-          
+
           {/* Enhanced Notes Section */}
           {showNotes && (
             <div className="mt-4 p-4 bg-secondary border border-border dark:bg-gray-800/80 dark:border-purple-400/30 rounded-xl shadow-lg backdrop-blur-glass">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <StickyNote className="text-purple-300" size={16} />
-                    <span className="text-sm font-semibold text-purple-200">Personal Notes & Progress</span>
+                    <StickyNote className="text-purple-600 dark:text-purple-300" size={16} />
+                    <span className="text-sm font-semibold text-purple-700 dark:text-purple-200">Personal Notes & Progress</span>
                   </div>
                   <div className="flex space-x-2">
                     <Button
@@ -242,7 +241,7 @@ export default function TaskCard({
               </div>
             </div>
           )}
-          
+
           {/* Enhanced Notes Preview */}
           {!showNotes && (notes || taskProgress?.notes) && (
             <div className="mt-3 p-3 bg-secondary rounded-lg border border-emerald-500/30 shadow-sm backdrop-blur-glass dark:bg-gray-800/60 dark:border-emerald-400/30">
