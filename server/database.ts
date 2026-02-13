@@ -1,8 +1,8 @@
-import { Pool, PoolConfig } from 'pg';
-import 'dotenv/config.js';
+import { Pool, PoolConfig } from "pg";
+import "dotenv/config.js";
 
 if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is required');
+  throw new Error("DATABASE_URL environment variable is required");
 }
 
 /**
@@ -14,7 +14,10 @@ if (!process.env.DATABASE_URL) {
  */
 const poolConfig: PoolConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false },
+  ssl:
+    process.env.DATABASE_SSL === "false"
+      ? false
+      : { rejectUnauthorized: false },
 
   // Pool tuning
   max: Number(process.env.PGPOOL_MAX ?? 10), // max concurrent connections in the pool
@@ -26,7 +29,7 @@ const poolConfig: PoolConfig = {
   keepAliveInitialDelayMillis: Number(process.env.PG_KEEPALIVE_DELAY ?? 10_000),
 
   // Keep pool alive (don’t exit when idle)
-  allowExitOnIdle: false
+  allowExitOnIdle: false,
 };
 
 // Persist the Pool across module reloads (dev HMR) and warm serverless invocations.
@@ -40,44 +43,58 @@ if (!globalForPg.pgPool) {
   globalForPg.pgPool = pool;
 
   // Log errors coming from idle clients in the pool
-  pool.on('error', (err) => {
-    console.error('PostgreSQL pool error:', err);
+  pool.on("error", (err) => {
+    console.error("PostgreSQL pool error:", err);
   });
 
   // Optional: one-time connectivity probe to fail fast at startup (won’t create extra pools)
-  if (process.env.NODE_ENV !== 'test') {
-    pool
-      .query('SELECT 1')
-      .catch((err) => {
-        console.error('PostgreSQL initial connectivity check failed:', err);
-      });
+  if (process.env.NODE_ENV !== "test") {
+    pool.query("SELECT 1").catch((err) => {
+      console.error("PostgreSQL initial connectivity check failed:", err);
+    });
   }
 }
 
 // Database functions
-export async function createUser(email: string, password: string, firstName?: string, lastName?: string) {
+export async function createUser(
+  email: string,
+  password: string,
+  firstName?: string,
+  lastName?: string,
+) {
   const query = `
     INSERT INTO users (email, username, password, first_name, last_name, created_at, updated_at)
     VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
     RETURNING id, email, username, first_name, last_name, created_at, updated_at
   `;
-  const result = await pool.query(query, [email, email, password, firstName, lastName]);
+  const result = await pool.query(query, [
+    email,
+    email,
+    password,
+    firstName,
+    lastName,
+  ]);
   return result.rows[0];
 }
 
 export async function getUserByEmail(email: string) {
-  const query = 'SELECT * FROM users WHERE email = $1';
+  const query = "SELECT * FROM users WHERE email = $1";
   const result = await pool.query(query, [email]);
   return result.rows[0];
 }
 
 export async function getUserById(id: number) {
-  const query = 'SELECT * FROM users WHERE id = $1';
+  const query = "SELECT * FROM users WHERE id = $1";
   const result = await pool.query(query, [id]);
   return result.rows[0];
 }
 
-export async function createWaitlistEntry(name: string, email: string, college?: string, confusion?: string) {
+export async function createWaitlistEntry(
+  name: string,
+  email: string,
+  college?: string,
+  confusion?: string,
+) {
   const query = `
     INSERT INTO waitlist_entries (name, email, college, confusion, created_at)
     VALUES ($1, $2, $3, $4, NOW())
@@ -88,29 +105,66 @@ export async function createWaitlistEntry(name: string, email: string, college?:
 }
 
 export async function getWaitlistEntries() {
-  const query = 'SELECT * FROM waitlist_entries ORDER BY created_at DESC';
+  const query = "SELECT * FROM waitlist_entries ORDER BY created_at DESC";
   const result = await pool.query(query);
   return result.rows;
 }
 
-export async function createResetToken(email: string, token: string, expiry: Date) {
+export async function createResetToken(
+  email: string,
+  token: string,
+  expiry: Date,
+) {
   await pool.query(
-    'UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3',
-    [token, expiry, email]
+    "UPDATE users SET reset_token = $1, reset_token_expiry = $2 WHERE email = $3",
+    [token, expiry, email],
   );
 }
 
 export async function getUserByResetToken(token: string) {
   const result = await pool.query(
-    'SELECT id, email, username, first_name, last_name FROM users WHERE reset_token = $1 AND reset_token_expiry > NOW()',
-    [token]
+    "SELECT id, email, username, first_name, last_name FROM users WHERE reset_token = $1 AND reset_token_expiry > NOW()",
+    [token],
   );
   return result.rows[0];
 }
 
 export async function updatePassword(userId: number, hashedPassword: string) {
   await pool.query(
-    'UPDATE users SET password = $1, reset_token = NULL, reset_token_expiry = NULL WHERE id = $2',
-    [hashedPassword, userId]
+    "UPDATE users SET password = $1, reset_token = NULL, reset_token_expiry = NULL WHERE id = $2",
+    [hashedPassword, userId],
   );
+}
+
+export async function getUserByGoogleId(googleId: string) {
+  const query = "SELECT * FROM users WHERE google_id = $1";
+  const result = await pool.query(query, [googleId]);
+  return result.rows[0];
+}
+
+export async function createGoogleUser(
+  email: string,
+  googleId: string,
+  firstName?: string,
+  lastName?: string,
+) {
+  const query = `
+    INSERT INTO users (email, username, google_id, first_name, last_name, created_at, updated_at)
+    VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+    RETURNING id, email, username, google_id, first_name, last_name, created_at, updated_at
+  `;
+  const result = await pool.query(query, [
+    email,
+    email,
+    googleId,
+    firstName,
+    lastName,
+  ]);
+  return result.rows[0];
+}
+
+export async function linkGoogleId(userId: number, googleId: string) {
+  const query = "UPDATE users SET google_id = $1 WHERE id = $2 RETURNING *";
+  const result = await pool.query(query, [googleId, userId]);
+  return result.rows[0];
 }

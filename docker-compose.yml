@@ -1,4 +1,3 @@
-
 services:
   app:
     build:
@@ -10,8 +9,9 @@ services:
     environment:
       NODE_ENV: production
       NODE_PORT: 8005
-      SERVER_URL: https://3.238.250.221
-      SSL_ENABLED: "false"  # Backend SSL is handled by nginx, keep false
+      SERVER_URL: https://careeroad.pro
+      CLIENT_ORIGIN: https://careeroad.pro
+      SSL_ENABLED: "false" # Backend SSL is handled by nginx, keep false
     # Provide runtime secrets/config via environment variables.
     # These values will be injected into the container's environment and used by process.env.
     env_file:
@@ -26,11 +26,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      # Mount SSL certificates for nginx
-      # For Let's Encrypt: /etc/letsencrypt/live/yourdomain.com/fullchain.pem -> /etc/nginx/ssl/cert.pem
-      # For Let's Encrypt: /etc/letsencrypt/live/yourdomain.com/privkey.pem -> /etc/nginx/ssl/key.pem
-      - ./certs/cert.pem:/etc/nginx/ssl/cert.pem:ro
-      - ./certs/key.pem:/etc/nginx/ssl/key.pem:ro
+      # Mount Let's Encrypt SSL certificates for nginx
+      - /etc/letsencrypt/live/careeroad.pro/fullchain.pem:/etc/nginx/ssl/cert.pem:ro
+      - /etc/letsencrypt/live/careeroad.pro/privkey.pem:/etc/nginx/ssl/key.pem:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - app
     restart: unless-stopped

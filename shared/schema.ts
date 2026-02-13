@@ -1,4 +1,15 @@
-import { pgTable, text, serial, integer, boolean, jsonb, varchar, timestamp, index, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  jsonb,
+  varchar,
+  timestamp,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -18,7 +29,8 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: varchar("username", { length: 255 }).unique().notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
-  password: varchar("password", { length: 255 }).notNull(),
+  password: varchar("password", { length: 255 }),
+  googleId: varchar("google_id", { length: 255 }).unique(),
   firstName: varchar("first_name", { length: 255 }),
   lastName: varchar("last_name", { length: 255 }),
   resetToken: varchar("reset_token", { length: 255 }),
@@ -35,7 +47,9 @@ export const users = pgTable("users", {
 // User activity log for heatmap visualization
 export const userActivityLog = pgTable("user_activity_log", {
   id: serial("id").primaryKey(),
-  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  userId: serial("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   activityDate: timestamp("activity_date").notNull(),
   xpEarned: integer("xp_earned").default(0),
   tasksCompleted: integer("tasks_completed").default(0),
@@ -58,15 +72,21 @@ export const achievements = pgTable("achievements", {
 // User earned achievements
 export const userAchievements = pgTable("user_achievements", {
   id: serial("id").primaryKey(),
-  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-  achievementId: integer("achievement_id").references(() => achievements.id, { onDelete: "cascade" }).notNull(),
+  userId: serial("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  achievementId: integer("achievement_id")
+    .references(() => achievements.id, { onDelete: "cascade" })
+    .notNull(),
   unlockedAt: timestamp("unlocked_at").defaultNow(),
 });
 
 // Saved roadmaps for users
 export const savedRoadmaps = pgTable("saved_roadmaps", {
   id: serial("id").primaryKey(),
-  userId: serial("user_id").references(() => users.id).notNull(),
+  userId: serial("user_id")
+    .references(() => users.id)
+    .notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   currentCourse: varchar("current_course", { length: 255 }).notNull(),
   targetRole: varchar("target_role", { length: 255 }).notNull(),
@@ -94,8 +114,12 @@ export const roadmapTemplates = pgTable("roadmap_templates", {
 
 export const customRoadmaps = pgTable("custom_roadmaps", {
   id: serial("id").primaryKey(),
-  userId: serial("user_id").references(() => users.id).notNull(),
-  originalTemplateId: integer("original_template_id").references(() => roadmapTemplates.id),
+  userId: serial("user_id")
+    .references(() => users.id)
+    .notNull(),
+  originalTemplateId: integer("original_template_id").references(
+    () => roadmapTemplates.id,
+  ),
   title: text("title").notNull(),
   phases: jsonb("phases").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -105,7 +129,9 @@ export const customRoadmaps = pgTable("custom_roadmaps", {
 export const userRoadmapHistory = pgTable("user_roadmap_history", {
   id: serial("id").primaryKey(),
   userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }),
-  roadmapType: varchar("roadmap_type", { length: 50 }).notNull().default("career"),
+  roadmapType: varchar("roadmap_type", { length: 50 })
+    .notNull()
+    .default("career"),
   currentCourse: varchar("current_course", { length: 255 }),
   targetRole: varchar("target_role", { length: 255 }),
   skill: varchar("skill", { length: 255 }),
@@ -120,34 +146,46 @@ export const userRoadmapHistory = pgTable("user_roadmap_history", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const userRoadmapProgress = pgTable("user_roadmap_progress", {
-  id: serial("id").primaryKey(),
-  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }),
-  roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
-  phaseIndex: integer("phase_index"),
-  taskIndex: integer("task_index"),
-  stepIndex: integer("step_index"),
-  itemIndex: integer("item_index"),
-  completed: boolean("completed").default(false),
-  notes: text("notes"),
-  completedAt: timestamp("completed_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => ({
-  // Unique constraint to prevent duplicate progress entries for the same task
-  uniqueUserTask: uniqueIndex("unique_user_task_idx").on(
-    table.userId,
-    table.roadmapId,
-    table.phaseIndex,
-    table.taskIndex
-  )
-}));
+export const userRoadmapProgress = pgTable(
+  "user_roadmap_progress",
+  {
+    id: serial("id").primaryKey(),
+    userId: serial("user_id").references(() => users.id, {
+      onDelete: "cascade",
+    }),
+    roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, {
+      onDelete: "cascade",
+    }),
+    phaseIndex: integer("phase_index"),
+    taskIndex: integer("task_index"),
+    stepIndex: integer("step_index"),
+    itemIndex: integer("item_index"),
+    completed: boolean("completed").default(false),
+    notes: text("notes"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    // Unique constraint to prevent duplicate progress entries for the same task
+    uniqueUserTask: uniqueIndex("unique_user_task_idx").on(
+      table.userId,
+      table.roadmapId,
+      table.phaseIndex,
+      table.taskIndex,
+    ),
+  }),
+);
 
 // Kanban Boards
 export const kanbanBoards = pgTable("kanban_boards", {
   id: serial("id").primaryKey(),
-  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-  roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, { onDelete: "cascade" }),
+  userId: serial("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  roadmapId: integer("roadmap_id").references(() => userRoadmapHistory.id, {
+    onDelete: "cascade",
+  }),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   roadmapType: varchar("roadmap_type", { length: 50 }),
@@ -158,7 +196,9 @@ export const kanbanBoards = pgTable("kanban_boards", {
 // Kanban Tasks
 export const kanbanTasks = pgTable("kanban_tasks", {
   id: serial("id").primaryKey(),
-  boardId: integer("board_id").references(() => kanbanBoards.id, { onDelete: "cascade" }).notNull(),
+  boardId: integer("board_id")
+    .references(() => kanbanBoards.id, { onDelete: "cascade" })
+    .notNull(),
   title: varchar("title", { length: 500 }).notNull(),
   description: text("description"),
   resources: jsonb("resources").$type<string[]>(),
@@ -186,14 +226,18 @@ export const insertSavedRoadmapSchema = createInsertSchema(savedRoadmaps).pick({
   phases: true,
 });
 
-export const insertWaitlistEntrySchema = createInsertSchema(waitlistEntries).pick({
+export const insertWaitlistEntrySchema = createInsertSchema(
+  waitlistEntries,
+).pick({
   name: true,
   email: true,
   college: true,
   confusion: true,
 });
 
-export const insertRoadmapTemplateSchema = createInsertSchema(roadmapTemplates).pick({
+export const insertRoadmapTemplateSchema = createInsertSchema(
+  roadmapTemplates,
+).pick({
   key: true,
   title: true,
   currentCourse: true,
@@ -201,14 +245,18 @@ export const insertRoadmapTemplateSchema = createInsertSchema(roadmapTemplates).
   phases: true,
 });
 
-export const insertCustomRoadmapSchema = createInsertSchema(customRoadmaps).pick({
+export const insertCustomRoadmapSchema = createInsertSchema(
+  customRoadmaps,
+).pick({
   userId: true,
   originalTemplateId: true,
   title: true,
   phases: true,
 });
 
-export const insertUserRoadmapHistorySchema = createInsertSchema(userRoadmapHistory).pick({
+export const insertUserRoadmapHistorySchema = createInsertSchema(
+  userRoadmapHistory,
+).pick({
   userId: true,
   roadmapType: true,
   currentCourse: true,
@@ -221,7 +269,9 @@ export const insertUserRoadmapHistorySchema = createInsertSchema(userRoadmapHist
   skillContent: true,
 });
 
-export const insertUserRoadmapProgressSchema = createInsertSchema(userRoadmapProgress).pick({
+export const insertUserRoadmapProgressSchema = createInsertSchema(
+  userRoadmapProgress,
+).pick({
   userId: true,
   roadmapId: true,
   phaseIndex: true,
@@ -261,9 +311,13 @@ export type InsertRoadmapTemplate = z.infer<typeof insertRoadmapTemplateSchema>;
 export type RoadmapTemplate = typeof roadmapTemplates.$inferSelect;
 export type InsertCustomRoadmap = z.infer<typeof insertCustomRoadmapSchema>;
 export type CustomRoadmap = typeof customRoadmaps.$inferSelect;
-export type InsertUserRoadmapHistory = z.infer<typeof insertUserRoadmapHistorySchema>;
+export type InsertUserRoadmapHistory = z.infer<
+  typeof insertUserRoadmapHistorySchema
+>;
 export type UserRoadmapHistory = typeof userRoadmapHistory.$inferSelect;
-export type InsertUserRoadmapProgress = z.infer<typeof insertUserRoadmapProgressSchema>;
+export type InsertUserRoadmapProgress = z.infer<
+  typeof insertUserRoadmapProgressSchema
+>;
 export type UserRoadmapProgress = typeof userRoadmapProgress.$inferSelect;
 export type InsertKanbanBoard = z.infer<typeof insertKanbanBoardSchema>;
 export type KanbanBoard = typeof kanbanBoards.$inferSelect;
@@ -272,15 +326,17 @@ export type KanbanTask = typeof kanbanTasks.$inferSelect;
 
 // Kanban generation from roadmap
 export const kanbanTaskGenerationSchema = z.object({
-  tasks: z.array(z.object({
-    title: z.string().max(500),
-    description: z.string().optional(),
-    status: z.enum(["todo", "in_progress", "done"]),
-    position: z.number(),
-    resources: z.array(z.string()).optional(),
-    estimatedTime: z.string().max(100).optional(),
-    category: z.string().max(100).optional(),
-  })),
+  tasks: z.array(
+    z.object({
+      title: z.string().max(500),
+      description: z.string().optional(),
+      status: z.enum(["todo", "in_progress", "done"]),
+      position: z.number(),
+      resources: z.array(z.string()).optional(),
+      estimatedTime: z.string().max(100).optional(),
+      category: z.string().max(100).optional(),
+    }),
+  ),
   boardSummary: z.string().max(500).optional(),
 });
 
@@ -328,7 +384,7 @@ export const generateSkillRoadmapSchema = z.object({
     "I don't know anything about it",
     "I have heard and know the gist of it",
     "I used to know it but not done it lately",
-    "I am an expert and want to learn more"
+    "I am an expert and want to learn more",
   ]),
   timeFrame: z.enum([
     "24 hr",
@@ -338,7 +394,7 @@ export const generateSkillRoadmapSchema = z.object({
     "2 weeks",
     "4 weeks",
     "3 months",
-    "6 months"
+    "6 months",
   ]),
   currentCourse: z.string().optional(),
   desiredRole: z.string().optional(),
@@ -377,7 +433,13 @@ export type UserAchievement = typeof userAchievements.$inferSelect;
 export type InsertUserAchievement = typeof userAchievements.$inferInsert;
 
 // Resume analysis schemas
-export const resumeSkillLevelEnum = z.enum(["Novice", "Beginner", "Intermediate", "Advanced", "Expert"]);
+export const resumeSkillLevelEnum = z.enum([
+  "Novice",
+  "Beginner",
+  "Intermediate",
+  "Advanced",
+  "Expert",
+]);
 
 export const resumeSkillSchema = z.object({
   name: z.string(),
