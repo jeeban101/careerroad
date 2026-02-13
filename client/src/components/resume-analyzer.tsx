@@ -160,37 +160,55 @@ export function ResumeAnalyzer() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="text-foreground font-semibold">Skills</div>
-              <div className="space-y-2">
-                {result.skills.map((s, idx) => (
-                  <div key={idx} className="p-3 rounded border border-border bg-secondary/60">
-                    <div className="flex items-center justify-between">
-                      <div className="text-foreground font-medium">{s.name}</div>
-                      <Badge variant="outline" className={levelColor(s.level)}>{s.level}</Badge>
-                    </div>
-                    <div className="mt-2">
-                      <Progress value={levelToPercent(s.level)} className="h-2 bg-white/10" />
-                    </div>
-                    <div className="mt-2 text-xs text-muted-foreground flex flex-wrap gap-2">
-                      {typeof s.years === "number" && <span className="px-2 py-0.5 rounded bg-secondary/60 border border-border">{s.years} yrs</span>}
-                      {typeof s.confidence === "number" && <span className="px-2 py-0.5 rounded bg-secondary/60 border border-border">conf {Math.round(s.confidence * 100)}%</span>}
-                      {s.category && <span className="px-2 py-0.5 rounded bg-secondary/60 border border-border">{s.category}</span>}
-                    </div>
-                    {s.evidence && (
-                      <div className="mt-2 text-xs text-muted-foreground">Evidence: {s.evidence}</div>
-                    )}
-                    {s.keywords && s.keywords.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {s.keywords.slice(0, 8).map((k, i) => (
-                          <span key={i} className="text-[10px] px-2 py-0.5 rounded bg-purple-600/10 text-purple-300 border border-purple-500/20">{k}</span>
-                        ))}
-                      </div>
-                    )}
+            {/* Advanced & Expert Skills Only */}
+            {(() => {
+              const advancedSkills = result.skills.filter(s => s.level === "Advanced" || s.level === "Expert");
+              const groupedByCategory = advancedSkills.reduce((acc, skill) => {
+                const cat = skill.category || "Other";
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(skill);
+                return acc;
+              }, {} as Record<string, typeof advancedSkills>);
+
+              return advancedSkills.length > 0 ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-foreground font-semibold">Top Skills</div>
+                    <span className="text-xs text-muted-foreground">
+                      {advancedSkills.length} advanced/expert skills
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div className="space-y-3">
+                    {Object.entries(groupedByCategory).map(([category, skills]) => (
+                      <div key={category} className="p-3 rounded border border-border bg-secondary/40">
+                        <div className="text-xs font-medium text-muted-foreground mb-2">{category}</div>
+                        <div className="flex flex-wrap gap-2">
+                          {skills.map((s, idx) => (
+                            <div
+                              key={idx}
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${levelColor(s.level)}`}
+                              title={s.evidence || `${s.years ? s.years + ' years' : ''}`}
+                            >
+                              <span className="font-medium text-sm">{s.name}</span>
+                              {s.level === "Expert" && (
+                                <Sparkles className="h-3 w-3 text-indigo-400" />
+                              )}
+                              {typeof s.years === "number" && (
+                                <span className="text-xs opacity-70">{s.years}y</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground p-3 rounded border border-border bg-secondary/30">
+                  No advanced or expert skills detected. Continue building experience to unlock your top skills.
+                </div>
+              );
+            })()}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="md:col-span-1 space-y-2">

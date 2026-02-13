@@ -8,7 +8,7 @@ This directory should contain SSL certificate files for HTTPS in development.
 Run the following command from the project root:
 
 ```bash
-mkdir -p certs && openssl req -x509 -newkey rsa:2048 -keyout certs/key.pem -out certs/cert.pem -days 365 -nodes -subj "/CN=localhost"
+mkdir -p certs && openssl req -x509 -newkey rsa:2048 -keyout certs/key.pem -out certs/cert.pem -days 365 -nodes -subj "/CN=3.238.250.221"
 ```
 
 ### Windows (PowerShell)
