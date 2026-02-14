@@ -8,7 +8,7 @@ import { ExternalLink, StickyNote, Save, X, Link2, FileText } from "lucide-react
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { RoadmapItem } from "@shared/schema";
+import type { RoadmapItem, UserRoadmapProgress } from "@shared/schema";
 
 interface TaskCardProps {
   item: RoadmapItem;
@@ -20,6 +20,7 @@ interface TaskCardProps {
   user: any;
   itemColor: string;
   ItemIcon: any;
+  initialProgress?: UserRoadmapProgress;
 }
 
 export default function TaskCard({
@@ -31,14 +32,15 @@ export default function TaskCard({
   onTaskCheck,
   user,
   itemColor,
-  ItemIcon
+  ItemIcon,
+  initialProgress
 }: TaskCardProps) {
   const [showNotes, setShowNotes] = useState(false);
   const [notes, setNotes] = useState("");
   const [tempNotes, setTempNotes] = useState("");
   const { toast } = useToast();
 
-  // Fetch existing task progress and notes
+  // Fetch existing task progress and notes (only when no initialProgress and notes panel is open)
   const { data: taskProgress } = useQuery({
     queryKey: ["/api/task-progress", roadmapHistoryId, phaseIndex, itemIndex],
     queryFn: async () => {
@@ -51,7 +53,7 @@ export default function TaskCard({
         return null;
       }
     },
-    enabled: !!user && !!roadmapHistoryId && showNotes,
+    enabled: !!user && !!roadmapHistoryId && !initialProgress && showNotes,
     staleTime: Infinity,
     gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -59,13 +61,23 @@ export default function TaskCard({
     refetchOnMount: false,
   });
 
+  // Use batch-fetched progress if available, fall back to per-task query
+  const effectiveProgress = initialProgress || taskProgress;
+
   // When notes panel opens and query returns, seed local notes
   useEffect(() => {
-    if (showNotes && taskProgress?.notes) {
-      setNotes(taskProgress.notes);
-      setTempNotes(taskProgress.notes);
+    if (showNotes && effectiveProgress?.notes) {
+      setNotes(effectiveProgress.notes);
+      setTempNotes(effectiveProgress.notes);
     }
-  }, [showNotes, taskProgress]);
+  }, [showNotes, effectiveProgress]);
+
+  // Sync parent checked state from initialProgress on mount
+  useEffect(() => {
+    if (initialProgress?.completed && !isChecked) {
+      onTaskCheck(phaseIndex, itemIndex, true);
+    }
+  }, [initialProgress]);
 
   // Update task progress with notes
   const updateTaskMutation = useMutation({
@@ -112,7 +124,7 @@ export default function TaskCard({
     if (user && roadmapHistoryId) {
       updateTaskMutation.mutate({
         completed: checked,
-        notes: notes || taskProgress?.notes
+        notes: notes || effectiveProgress?.notes
       });
     }
   };
@@ -151,18 +163,18 @@ export default function TaskCard({
                         variant="outline"
                         size="sm"
                         onClick={handleNotesToggle}
-                        className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer whitespace-nowrap ${(notes || taskProgress?.notes)
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg'
-                            : 'bg-secondary text-muted-foreground border-border hover:border-purple-400 hover:text-purple-600 hover:bg-secondary/80 dark:bg-white/10 dark:text-gray-300 dark:border-gray-500 dark:hover:text-purple-300 dark:hover:bg-purple-500/20'
+                        className={`px-3 py-1 h-8 rounded-full text-xs font-medium transition-all duration-300 border-2 shimmer whitespace-nowrap ${(notes || effectiveProgress?.notes)
+                          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 hover:from-purple-600 hover:to-pink-600 shadow-lg'
+                          : 'bg-secondary text-muted-foreground border-border hover:border-purple-400 hover:text-purple-600 hover:bg-secondary/80 dark:bg-white/10 dark:text-gray-300 dark:border-gray-500 dark:hover:text-purple-300 dark:hover:bg-purple-500/20'
                           }`}
                       >
                         <StickyNote size={12} className="mr-1" />
-                        {(notes || taskProgress?.notes) ? 'Edit Notes' : 'Add Notes'}
+                        {(notes || effectiveProgress?.notes) ? 'Edit Notes' : 'Add Notes'}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-sm">
-                        {(notes || taskProgress?.notes) ? 'Click to edit your personal notes' : 'Click to add personal notes and track your progress'}
+                        {(notes || effectiveProgress?.notes) ? 'Click to edit your personal notes' : 'Click to add personal notes and track your progress'}
                       </p>
                     </TooltipContent>
                   </Tooltip>
@@ -243,14 +255,14 @@ export default function TaskCard({
           )}
 
           {/* Enhanced Notes Preview */}
-          {!showNotes && (notes || taskProgress?.notes) && (
+          {!showNotes && (notes || effectiveProgress?.notes) && (
             <div className="mt-3 p-3 bg-secondary rounded-lg border border-emerald-500/30 shadow-sm backdrop-blur-glass dark:bg-gray-800/60 dark:border-emerald-400/30">
               <div className="flex items-start space-x-2">
                 <StickyNote className="text-emerald-300 flex-shrink-0 mt-0.5" size={14} />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-emerald-700 dark:text-emerald-200 mb-1">Your Notes:</p>
                   <p className="text-sm text-emerald-800 dark:text-emerald-100 line-clamp-3 leading-relaxed">
-                    {notes || taskProgress?.notes}
+                    {notes || effectiveProgress?.notes}
                   </p>
                 </div>
               </div>

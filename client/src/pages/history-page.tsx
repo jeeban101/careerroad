@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
@@ -54,6 +54,26 @@ export default function HistoryPage() {
   const [selectedRoadmap, setSelectedRoadmap] = useState<UserRoadmapHistory | null>(null);
   const [expandedPhases, setExpandedPhases] = useState<Set<number>>(new Set([0]));
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+
+  // Eagerly fetch ALL task progress for the selected roadmap in one request
+  const { data: allProgress } = useQuery<UserRoadmapProgress[]>({
+    queryKey: ["/api/roadmap-progress", selectedRoadmap?.id, "all"],
+    queryFn: async () => {
+      const res = await fetch(`/api/roadmap-progress/${selectedRoadmap!.id}`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: !!user && !!selectedRoadmap,
+  });
+
+  // Build a lookup map: "phaseIndex-taskIndex" -> progress record
+  const progressMap = useMemo(() => {
+    const map = new Map<string, UserRoadmapProgress>();
+    (allProgress || []).forEach(p => {
+      map.set(`${p.phaseIndex}-${p.taskIndex}`, p);
+    });
+    return map;
+  }, [allProgress]);
 
   // Delete roadmap mutation
   const deleteRoadmapMutation = useMutation({
@@ -260,6 +280,7 @@ export default function HistoryPage() {
                               user={user}
                               itemColor={itemColor}
                               ItemIcon={ItemIcon}
+                              initialProgress={progressMap.get(`${phaseIndex}-${itemIndex}`)}
                             />
                           );
                         })}

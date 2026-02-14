@@ -5,6 +5,7 @@ server/public
 vite.config.ts.*
 *.tar.gz
 
+**/test-results
 
 # Deployment files (optional - you may want to keep these)
 # Uncomment if you don't want to commit deployment configs
