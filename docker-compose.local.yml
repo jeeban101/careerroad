@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # The app serves both API and static client via Express on 8005
+    ports:
+      - "8005:8005"
+    environment:
+      NODE_ENV: production
+      NODE_PORT: 8005
+      SERVER_URL: https://localhost
+      CLIENT_ORIGIN: https://localhost
+      SSL_ENABLED: "false" # Backend SSL is handled by nginx, keep false
+    # Provide runtime secrets/config via environment variables.
+    # These values will be injected into the container's environment and used by process.env.
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Mount Let's Encrypt SSL certificates for nginx
+      - ./certs/cert.pem:/etc/nginx/ssl/cert.pem:ro
+      - ./certs/key.pem:/etc/nginx/ssl/key.pem:ro
+    depends_on:
+      - app
+    restart: unless-stopped

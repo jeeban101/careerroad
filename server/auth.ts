@@ -192,36 +192,30 @@ export function setupAuth(app: Express) {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res
-          .status(201)
-          .json({
-            id: user.id,
-            email: user.email,
-            firstName: user.first_name,
-            lastName: user.last_name,
-          });
+        res.status(201).json({
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+        });
       });
     } catch (error) {
       console.error("Registration error:", error);
-      res
-        .status(500)
-        .json({
-          message: "Registration failed",
-          error: (error as Error).message,
-        });
+      res.status(500).json({
+        message: "Registration failed",
+        error: (error as Error).message,
+      });
     }
   });
 
   app.post("/api/login", passport.authenticate("local"), (req, res) => {
     const user = req.user!;
-    res
-      .status(200)
-      .json({
-        id: user.id,
-        email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
-      });
+    res.status(200).json({
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name,
+    });
   });
 
   app.post("/api/logout", (req, res, next) => {
@@ -254,9 +248,9 @@ export function setupAuth(app: Express) {
       failureRedirect: "/auth?error=google_failed",
     }),
     (req, res) => {
-      // Successful authentication – redirect to the frontend
+      // Redirect to the self-closing popup success page
       const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-      res.redirect(clientOrigin);
+      res.redirect(`${clientOrigin}/auth/success`);
     },
   );
 
