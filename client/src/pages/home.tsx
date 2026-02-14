@@ -13,7 +13,7 @@ import { RoadmapTemplate, SkillRoadmapContent } from "@shared/schema";
 
 export default function Home() {
   const { user } = useAuth();
-  
+
   // Debug: Log user state
   console.log('Home - user:', user, 'isLoggedIn:', !!user);
   const [selectedRoadmap, setSelectedRoadmap] = useState<RoadmapTemplate | null>(null);
@@ -74,24 +74,24 @@ export default function Home() {
             <div className="mb-8">
               <div>
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground dark:bg-gradient-to-r dark:from-purple-400 dark:to-pink-400 dark:bg-clip-text dark:text-transparent">
-                  Welcome back{user?.firstName ? `, ${user.firstName}` : ''}!
+                  Welcome{user?.firstName ? `, ${user.firstName}` : ''}!
                 </h1>
                 <p className="text-muted-foreground mt-2 text-sm sm:text-base">Let's continue building your career path</p>
               </div>
             </div>
-            
+
             <Tabs defaultValue="career" className="w-full">
               <div className="text-center mb-8">
                 <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Choose your goal:</h2>
                 <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 bg-secondary border border-border min-h-[44px] dark:bg-white/10 dark:border-purple-500/30">
-                  <TabsTrigger 
+                  <TabsTrigger
                     value="career"
                     className="text-muted-foreground data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
                     data-testid="tab-career"
                   >
                     Career Roadmap
                   </TabsTrigger>
-                  <TabsTrigger 
+                  <TabsTrigger
                     value="skill"
                     className="text-muted-foreground data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white"
                     data-testid="tab-skill"
@@ -104,10 +104,10 @@ export default function Home() {
               <TabsContent value="career" className="mt-0">
                 <div className="grid gap-8">
                   <RoadmapBuilder onRoadmapGenerated={handleRoadmapGenerated} />
-                  
+
                   {selectedRoadmap && (
-                    <RoadmapDisplay 
-                      roadmap={selectedRoadmap} 
+                    <RoadmapDisplay
+                      roadmap={selectedRoadmap}
                       onFork={handleForkRoadmap}
                       onShare={handleShareRoadmap}
                     />
@@ -116,19 +116,19 @@ export default function Home() {
               </TabsContent>
 
               <TabsContent value="skill" className="mt-0">
-                  <SkillRoadmapBuilder onSkillRoadmapGenerated={handleSkillRoadmapGenerated} />
+                <SkillRoadmapBuilder onSkillRoadmapGenerated={handleSkillRoadmapGenerated} />
               </TabsContent>
             </Tabs>
           </div>
         </div>
 
-        <CustomizationModal 
-          isOpen={showCustomization} 
+        <CustomizationModal
+          isOpen={showCustomization}
           onClose={() => setShowCustomization(false)}
           roadmap={selectedRoadmap}
         />
 
-        <EmailModal 
+        <EmailModal
           isOpen={showEmailModal}
           onClose={() => setShowEmailModal(false)}
           roadmap={selectedRoadmap!}

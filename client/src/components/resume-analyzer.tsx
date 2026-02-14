@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import type { ResumeAnalysis, ResumeSkill } from "@shared/schema";
-import { Upload, FileText, Sparkles } from "lucide-react";
+import { Upload, FileText, Sparkles, AlertTriangle, TrendingUp, Lightbulb } from "lucide-react";
 
 export function ResumeAnalyzer() {
   const { toast } = useToast();
@@ -160,7 +160,25 @@ export function ResumeAnalyzer() {
               </div>
             </div>
 
-            {/* Advanced & Expert Skills Only */}
+            {/* Where It Feels Generic */}
+            {((result as any).genericPoints || []).length > 0 && (
+              <div className="p-4 rounded-lg border border-orange-500/20 bg-orange-500/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="h-4 w-4 text-orange-400" />
+                  <div className="text-foreground font-semibold text-sm">Where It Feels Generic</div>
+                </div>
+                <ul className="space-y-1.5">
+                  {((result as any).genericPoints as string[]).map((pt, i) => (
+                    <li key={i} className="text-sm text-orange-200/80 flex gap-2">
+                      <span className="text-orange-400 mt-0.5">•</span>
+                      <span>{pt}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Top Skills — Card Grid */}
             {(() => {
               const advancedSkills = result.skills.filter(s => s.level === "Advanced" || s.level === "Expert");
               const groupedByCategory = advancedSkills.reduce((acc, skill) => {
@@ -178,23 +196,23 @@ export function ResumeAnalyzer() {
                       {advancedSkills.length} advanced/expert skills
                     </span>
                   </div>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {Object.entries(groupedByCategory).map(([category, skills]) => (
-                      <div key={category} className="p-3 rounded border border-border bg-secondary/40">
-                        <div className="text-xs font-medium text-muted-foreground mb-2">{category}</div>
+                      <div key={category} className="p-4 rounded-lg border border-border bg-secondary/40 flex flex-col gap-3">
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{category}</div>
                         <div className="flex flex-wrap gap-2">
                           {skills.map((s, idx) => (
                             <div
                               key={idx}
-                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${levelColor(s.level)}`}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs ${levelColor(s.level)}`}
                               title={s.evidence || `${s.years ? s.years + ' years' : ''}`}
                             >
-                              <span className="font-medium text-sm">{s.name}</span>
+                              <span className="font-medium">{s.name}</span>
                               {s.level === "Expert" && (
                                 <Sparkles className="h-3 w-3 text-indigo-400" />
                               )}
                               {typeof s.years === "number" && (
-                                <span className="text-xs opacity-70">{s.years}y</span>
+                                <span className="opacity-60">{s.years}y</span>
                               )}
                             </div>
                           ))}
@@ -210,30 +228,46 @@ export function ResumeAnalyzer() {
               );
             })()}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="md:col-span-1 space-y-2">
-                <div className="text-foreground font-semibold">Strengths</div>
-                <ul className="list-disc list-inside text-foreground/90 text-sm space-y-1">
-                  {(result.strengths || ["Clear fundamentals", "Hands-on projects", "Good documentation"]).map((s, i) => (
-                    <li key={i}>{s}</li>
+            {/* Gaps — Prominent Section */}
+            {(result.gaps || []).length > 0 && (
+              <div className="p-4 rounded-lg border border-amber-500/30 bg-amber-500/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertTriangle className="h-4 w-4 text-amber-400" />
+                  <div className="text-foreground font-semibold text-sm">Areas to Improve</div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(result.gaps || []).map((g, i) => (
+                    <div key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-400/30 bg-amber-500/10 text-amber-300 text-sm font-medium">
+                      {g}
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
-              <div className="md:col-span-1 space-y-2">
-                <div className="text-foreground font-semibold">Gaps</div>
-                <ul className="list-disc list-inside text-foreground/90 text-sm space-y-1">
-                  {(result.gaps || ["Advanced system design", "End-to-end testing", "Cloud deployment"]).map((g, i) => (
-                    <li key={i}>{g}</li>
+            )}
+
+            {/* Strengths & Recommendations */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="p-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp className="h-4 w-4 text-emerald-400" />
+                  <div className="text-foreground font-semibold text-sm">Strengths</div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {(result.strengths || []).map((s, i) => (
+                    <Badge key={i} variant="outline" className="border-emerald-400/30 text-emerald-300 bg-emerald-500/10 text-xs font-medium">{s}</Badge>
                   ))}
-                </ul>
+                </div>
               </div>
-              <div className="md:col-span-1 space-y-2">
-                <div className="text-foreground font-semibold">Recommendations</div>
-                <ul className="list-disc list-inside text-foreground/90 text-sm space-y-1">
-                  {(result.recommendations || ["Build a full-stack project with tests", "Learn Docker basics", "Contribute to OSS"]).map((r, i) => (
-                    <li key={i}>{r}</li>
+              <div className="p-4 rounded-lg border border-blue-500/20 bg-blue-500/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lightbulb className="h-4 w-4 text-blue-400" />
+                  <div className="text-foreground font-semibold text-sm">Recommendations</div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {(result.recommendations || []).map((r, i) => (
+                    <Badge key={i} variant="outline" className="border-blue-400/30 text-blue-300 bg-blue-500/10 text-xs font-medium">{r}</Badge>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
           </div>

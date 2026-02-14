@@ -1,11 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
-import { RoadmapPhase, SkillRoadmapContent, GenerateSkillRoadmap, kanbanTaskGenerationSchema, KanbanTaskGeneration, UserRoadmapHistory, resumeAnalysisSchema } from "@shared/schema";
+import {
+  RoadmapPhase,
+  SkillRoadmapContent,
+  GenerateSkillRoadmap,
+  kanbanTaskGenerationSchema,
+  KanbanTaskGeneration,
+  UserRoadmapHistory,
+  resumeAnalysisSchema,
+} from "@shared/schema";
 import type { ResumeAnalysis } from "@shared/schema";
 import { z } from "zod";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
-export async function generateRoadmap(currentCourse: string, targetRole: string): Promise<RoadmapPhase[]> {
+export async function generateRoadmap(
+  currentCourse: string,
+  targetRole: string,
+): Promise<RoadmapPhase[]> {
   try {
     const systemPrompt = `You are a career guidance expert. Generate a detailed, structured career roadmap for a student.
 
@@ -47,19 +58,19 @@ Respond with valid JSON in this exact format:
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: systemPrompt,
-        responseMimeType: "application/json"
+        responseMimeType: "application/json",
       },
-      contents: `Generate a career roadmap for a ${currentCourse} student to become a ${targetRole}. Include specific resources, tools, and actionable steps relevant to the Indian job market.`
+      contents: `Generate a career roadmap for a ${currentCourse} student to become a ${targetRole}. Include specific resources, tools, and actionable steps relevant to the Indian job market.`,
     });
 
     const rawJson = response.text;
-    
+
     if (!rawJson) {
       throw new Error("Empty response from Gemini");
     }
 
     const phases: RoadmapPhase[] = JSON.parse(rawJson);
-    
+
     // Validate the structure
     if (!Array.isArray(phases) || phases.length === 0) {
       throw new Error("Invalid roadmap structure");
@@ -72,12 +83,15 @@ Respond with valid JSON in this exact format:
   }
 }
 
-export async function generateSkillRoadmap(params: GenerateSkillRoadmap): Promise<SkillRoadmapContent> {
+export async function generateSkillRoadmap(
+  params: GenerateSkillRoadmap,
+): Promise<SkillRoadmapContent> {
   try {
-    const { skill, proficiencyLevel, timeFrame, currentCourse, desiredRole } = params;
-    
+    const { skill, proficiencyLevel, timeFrame, currentCourse, desiredRole } =
+      params;
+
     const stageCount = mapTimeframeToStages(timeFrame);
-    
+
     const systemPrompt = `You are CareerRoad AI, an expert mentor in career and skill development.
 
 Generate a personalized, realistic skill-learning roadmap for the user based on their current proficiency and desired timeframe.
@@ -86,8 +100,8 @@ User details:
 - Skill: ${skill}
 - Current proficiency level: ${proficiencyLevel}
 - Target timeframe: ${timeFrame}
-${currentCourse ? `- Current course: ${currentCourse}` : ''}
-${desiredRole ? `- Desired role: ${desiredRole}` : ''}
+${currentCourse ? `- Current course: ${currentCourse}` : ""}
+${desiredRole ? `- Desired role: ${desiredRole}` : ""}
 
 Create ${stageCount} learning stages that fit within the ${timeFrame} timeframe.
 
@@ -98,7 +112,7 @@ Stage mapping:
 - Include India-relevant resources (Indian platforms, communities, companies)
 
 Requirements:
-1. Overview: Brief explanation of the skill and its relevance${desiredRole ? ` to ${desiredRole}` : ''}
+1. Overview: Brief explanation of the skill and its relevance${desiredRole ? ` to ${desiredRole}` : ""}
 2. Stages: ${stageCount} progressive stages (Beginner, Intermediate, Advanced, etc.)
    - Each stage has: stage name, duration, specific tasks array, resources array
 3. Milestones: 4-6 checkpoints to track progress
@@ -128,7 +142,7 @@ Respond with valid JSON matching this structure:
   "expectedOutcome": "What the user will be able to do"
 }`;
 
-    const userPrompt = `Generate a ${timeFrame} skill learning roadmap for ${skill}. The learner is at "${proficiencyLevel}" level${currentCourse ? ` and is currently studying ${currentCourse}` : ''}${desiredRole ? ` aiming to become a ${desiredRole}` : ''}.
+    const userPrompt = `Generate a ${timeFrame} skill learning roadmap for ${skill}. The learner is at "${proficiencyLevel}" level${currentCourse ? ` and is currently studying ${currentCourse}` : ""}${desiredRole ? ` aiming to become a ${desiredRole}` : ""}.
 
 Create ${stageCount} stages with practical tasks and resources. Ensure tasks are achievable within ${timeFrame}.
 
@@ -138,13 +152,13 @@ Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array 
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: systemPrompt,
-        responseMimeType: "application/json"
+        responseMimeType: "application/json",
       },
-      contents: userPrompt
+      contents: userPrompt,
     });
 
     const rawJson = response.text;
-    
+
     if (!rawJson) {
       throw new Error("Empty response from Gemini");
     }
@@ -154,19 +168,21 @@ Required JSON keys: skill, proficiencyLevel, timeFrame, overview, stages (array 
       proficiencyLevel: z.string(),
       timeFrame: z.string(),
       overview: z.string(),
-      stages: z.array(z.object({
-        stage: z.string(),
-        duration: z.string(),
-        tasks: z.array(z.string()),
-        resources: z.array(z.string())
-      })),
+      stages: z.array(
+        z.object({
+          stage: z.string(),
+          duration: z.string(),
+          tasks: z.array(z.string()),
+          resources: z.array(z.string()),
+        }),
+      ),
       milestones: z.array(z.string()),
-      expectedOutcome: z.string()
+      expectedOutcome: z.string(),
     });
 
     const parsedData = JSON.parse(rawJson);
     const validation = skillRoadmapSchema.safeParse(parsedData);
-    
+
     if (!validation.success) {
       console.error("Validation error:", validation.error);
       throw new Error("Invalid skill roadmap structure from AI");
@@ -198,7 +214,9 @@ function mapTimeframeToStages(timeFrame: string): number {
   }
 }
 
-export async function generateKanbanTasksFromRoadmap(roadmap: UserRoadmapHistory): Promise<KanbanTaskGeneration> {
+export async function generateKanbanTasksFromRoadmap(
+  roadmap: UserRoadmapHistory,
+): Promise<KanbanTaskGeneration> {
   try {
     const isCareerRoadmap = roadmap.roadmapType === "career";
     const roadmapDescription = isCareerRoadmap
@@ -252,20 +270,20 @@ Convert this skill roadmap into 10-18 actionable Kanban tasks distributed across
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: systemPrompt,
-        responseMimeType: "application/json"
+        responseMimeType: "application/json",
       },
-      contents: userMessage
+      contents: userMessage,
     });
 
     const rawJson = response.text;
-    
+
     if (!rawJson) {
       throw new Error("Empty response from Gemini");
     }
 
     const parsedData = JSON.parse(rawJson);
     const validation = kanbanTaskGenerationSchema.safeParse(parsedData);
-    
+
     if (!validation.success) {
       console.error("Kanban generation validation error:", validation.error);
       throw new Error("Invalid Kanban task structure from AI");
@@ -280,7 +298,7 @@ Convert this skill roadmap into 10-18 actionable Kanban tasks distributed across
 
 export async function analyzeResume(
   resumeText: string,
-  options: { currentCourse?: string; desiredRole?: string } = {}
+  options: { currentCourse?: string; desiredRole?: string } = {},
 ): Promise<ResumeAnalysis> {
   try {
     const { currentCourse, desiredRole } = options;
@@ -288,7 +306,7 @@ export async function analyzeResume(
     const systemPrompt = `You are an elite career strategist and technical resume analyst with 15+ years of experience evaluating candidates at top-tier companies (FAANG, Big4, leading startups). Your analysis must be thorough, evidence-based, and actionable.
 
 ## YOUR ROLE
-Perform a comprehensive deep-dive analysis of the resume to extract skills, assess proficiency levels, identify career patterns, and provide strategic recommendations.
+Perform a deep-dive analysis of the resume to extract skills, assess proficiency levels, and provide strategic, resume-specific feedback. Compare this resume against what you typically see from candidates at a similar career stage and target role. Highlight what makes THIS resume different — both positively and negatively.
 
 ## SKILL EXTRACTION RULES
 
@@ -333,66 +351,80 @@ Write a compelling 2-3 sentence executive summary that captures:
 - Most notable achievement or differentiator
 - Overall career trajectory assessment
 
+### Where it feels generic
+List out 2-3 points where the resume feels generic, and ways to improve such
+
 ### Experience Calculation:
 - Sum up professional experience (exclude internships unless < 2 years total)
 - Account for overlapping roles
 - Consider career gaps and context
 
-### Primary Role Detection:
+### Role Detection: (2-3 roles)
 - Identify the most likely current or target role
 - Consider: job titles, responsibilities, skill distribution
 
-### Strengths (3-5 points):
-- What makes this candidate stand out?
-- Technical strengths + soft skills
-- Be specific with evidence
 
-### Gaps Analysis (2-4 points):
-${desiredRole ? `Critically analyze gaps specifically for the ${desiredRole} role:` : "Identify gaps for career progression:"}
-- Missing skills common in target roles
-- Experience gaps (scale, complexity, leadership)
-- Industry-standard certifications missing
-- Soft skill development areas
+### Strengths (EXACTLY 3 short phrases):
+${desiredRole ? `Evaluate specifically for the ${desiredRole} role.` : ""}
+- Each strength MUST be a short keyword phrase of 3-8 words max
+- Each MUST reference something specific from THIS resume (a project, company, metric, technology, or achievement)
+- Focus on what sets this candidate apart from others at the same level
+- GOOD examples: "Strong React + TypeScript portfolio", "Led 5-person backend team", "3 deployed production ML models"
+- BAD examples: "Good communication skills", "Strong problem-solving abilities", "Hands-on projects"
 
-### Recommendations (3-5 actionable items):
+### Gaps (EXACTLY 3 short phrases):
+${desiredRole ? `Critically analyze gaps specifically for the ${desiredRole} role.` : "Identify gaps for career progression."}
+- Each gap MUST be a short keyword phrase of 3-8 words max
+- Compare against what hiring managers expect for this role level
+- Focus on the highest-impact missing skills or experiences
+- GOOD examples: "No CI/CD or DevOps exposure", "Missing system design experience", "No cloud certifications"
+- BAD examples: "The candidate could benefit from improving their knowledge of distributed systems"
+
+### Recommendations (EXACTLY 3 short phrases):
 ${currentCourse ? `Consider the candidate is currently studying ${currentCourse}.` : ""}
 ${desiredRole ? `Tailor recommendations toward becoming a ${desiredRole}.` : ""}
-Provide specific, actionable recommendations:
-- Specific courses/certifications (name actual platforms: Coursera, Udemy, LinkedIn Learning)
-- Project ideas to fill gaps
-- Networking or community involvement suggestions
-- Indian job market specific advice (target companies, salary benchmarks, hiring trends)
+- Each recommendation MUST be a short keyword phrase of 3-8 words max
+- Prioritize the single highest-impact next step first
+- Be hyper-specific: name the cert, course, or project type
+- GOOD examples: "Get AWS Solutions Architect cert", "Build a distributed systems project", "Contribute to a CNCF project"
+- BAD examples: "Consider pursuing cloud certifications to strengthen your profile"
+
+## ANTI-GENERIC RULES (CRITICAL):
+1. **Every single point in strengths, gaps, and recommendations MUST reference something specific** — a project name, company, technology, metric, or skill from THIS resume. Never use filler.
+2. **Never use vague phrases** like "good fundamentals", "strong problem solver", "clear documentation", "hands-on projects", or "good communication skills" unless backed by DIRECT evidence from the resume.
+3. **Compare against the market**: What would a typical candidate at this level have that this person doesn't? What does this person have that others don't?
+4. **Be blunt and honest** — sugar-coating helps nobody. If the resume is weak, say so specifically.
 
 ## INDIAN JOB MARKET CONTEXT
 - Factor in demand for skills in Indian tech hubs (Bangalore, Hyderabad, Pune, Chennai, NCR)
 - Consider service companies vs product companies skill expectations
 - Account for startup ecosystem requirements
-- Note any globally recognized certifications that carry weight
 
 ## OUTPUT FORMAT
 
 **IMPORTANT: Only include skills that are at "Advanced" or "Expert" level.** 
-Do NOT include Novice, Beginner, or Intermediate skills in the output. The UI will only display top-tier skills to highlight the candidate's real strengths.
+Do NOT include Novice, Beginner, or Intermediate skills in the output.
 
 Return strict JSON matching this schema:
 {
   "summary": string (2-3 sentences, highlight trajectory and standout qualities),
+  "genericPoints": string[] (2-3 points where the resume feels generic, and ways to improve such),
   "totalExperienceYears": number (can be decimal like 2.5),
   "primaryRole": string (detected primary role),
   "skills": [
     {
       "name": string (specific skill name),
-      "level": "Advanced"|"Expert" (ONLY these levels - do not include lower levels),
-      "confidence": number (0-1, how confident in this assessment),
-      "years": number (estimated years of experience),
-      "keywords": string[] (related keywords found in resume),
-      "evidence": string (brief evidence supporting level assessment),
+      "level": "Advanced"|"Expert" (ONLY these levels),
+      "confidence": number (0-1),
+      "years": number (estimated years),
+      "keywords": string[] (related keywords from resume),
+      "evidence": string (brief evidence supporting level),
       "category": string (one of the defined categories)
     }
   ],
-  "strengths": string[] (3-5 clear strengths),
-  "gaps": string[] (2-4 development areas),
-  "recommendations": string[] (3-5 specific, actionable recommendations)
+  "strengths": string[] (EXACTLY 3 short keyword phrases, 3-8 words each),
+  "gaps": string[] (EXACTLY 3 short keyword phrases, 3-8 words each),
+  "recommendations": string[] (EXACTLY 3 short keyword phrases, 3-8 words each)
 }
 
 ## CRITICAL RULES:
@@ -400,9 +432,10 @@ Return strict JSON matching this schema:
 2. Never inflate skill levels - be conservative and evidence-based
 3. Every skill needs strong evidence - 2+ years experience, complex projects, or certifications
 4. If a candidate has no Advanced/Expert skills, return an empty skills array
-5. Recommendations must be specific - include actual course names, platforms, or certifications
+5. **Strengths, gaps, and recommendations MUST be 3-8 word keyword phrases, NOT full sentences**
 6. Sort skills by category first, then by confidence (highest first)
-7. Return valid JSON only - no markdown, no comments, no extra text`;
+7. Return valid JSON only - no markdown, no comments, no extra text
+8. **genericPoints MUST always be included** — each point should name the specific generic phrase/section from the resume and suggest a concrete improvement (e.g. "'Responsible for development' → quantify: 'Built X serving Y users'")`;
 
     const userPrompt = `Resume text:
 ${resumeText.slice(0, 15000)}
@@ -413,9 +446,9 @@ Analyze the above resume. Output JSON only.`;
       model: "gemini-2.5-flash",
       config: {
         systemInstruction: systemPrompt,
-        responseMimeType: "application/json"
+        responseMimeType: "application/json",
       },
-      contents: userPrompt
+      contents: userPrompt,
     });
 
     const rawJson = response.text;
