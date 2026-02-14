@@ -28,9 +28,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={user ? Home : Landing} />
+      <Route path="/auth/success" component={AuthSuccess} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
-      <Route path="/auth/success" component={AuthSuccess} />
       <Route path="/dashboard" component={user ? Dashboard : Landing} />
       <Route path="/history" component={user ? HistoryPage : Landing} />
       <Route path="/kanban/:id?" component={user ? KanbanBoardPage : Landing} />
