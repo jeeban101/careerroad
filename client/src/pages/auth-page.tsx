@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { queryClient } from "@/lib/queryClient";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,26 +61,7 @@ export default function AuthPage() {
   const handleGoogleSignIn = () => {
     const API_BASE = import.meta.env.VITE_APP_BACKEND_URL || "";
     const googleAuthUrl = `${API_BASE.endsWith("/") ? API_BASE : `${API_BASE}/`}auth/google`;
-
-    // Open in a centered popup window
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    const popup = window.open(
-      googleAuthUrl,
-      "google-auth",
-      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`
-    );
-
-    // Poll for popup close, then refetch user session
-    const timer = setInterval(() => {
-      if (!popup || popup.closed) {
-        clearInterval(timer);
-        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      }
-    }, 500);
+    window.location.href = googleAuthUrl;
   };
 
   return (

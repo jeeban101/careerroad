@@ -248,9 +248,8 @@ export function setupAuth(app: Express) {
       failureRedirect: "/auth?error=google_failed",
     }),
     (req, res) => {
-      // Redirect to the self-closing popup success page
       const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-      res.redirect(`${clientOrigin}/auth/success`);
+      res.redirect(clientOrigin);
     },
   );
 

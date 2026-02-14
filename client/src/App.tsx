@@ -12,7 +12,7 @@ import KanbanBoardPage from "@/pages/kanban-board";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import AuthPage from "@/pages/auth-page";
 import ResetPasswordPage from "@/pages/reset-password-page";
-import AuthSuccess from "@/pages/auth-success";
+
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -28,7 +28,6 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={user ? Home : Landing} />
-      <Route path="/auth/success" component={AuthSuccess} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/reset-password" component={ResetPasswordPage} />
       <Route path="/dashboard" component={user ? Dashboard : Landing} />
