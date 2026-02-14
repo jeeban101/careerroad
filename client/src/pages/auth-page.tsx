@@ -60,7 +60,7 @@ export default function AuthPage() {
 
   const handleGoogleSignIn = () => {
     const API_BASE = import.meta.env.VITE_APP_BACKEND_URL || "";
-    const googleAuthUrl = `${API_BASE}/auth/google`;
+    const googleAuthUrl = `${API_BASE.endsWith("/") ? API_BASE : `${API_BASE}/`}auth/google`;
 
     // Open in a centered popup window
     const width = 500;
